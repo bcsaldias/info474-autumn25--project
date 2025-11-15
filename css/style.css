@@ -10,8 +10,8 @@
 
 #sections {
   position: relative;
-  display: inline-block;
-  width: 250px;
+  display: block;
+  width: 100%;
   top: 0px;
   z-index: 90;
   padding-bottom: 200px;
@@ -19,18 +19,27 @@
 
 .step {
   margin-bottom: 200px;
-  font-family: "TiemposTextWeb-Regular","Georgia";
+  font-family: "Inria Serif","TiemposTextWeb-Regular","Georgia";
   font-size: 16px;
   line-height: 23px;
-  color: #767678;
+  color: #f5f5f598;
 }
 
 #sections .title {
-  font-family: Arial,Helvetica,"san-serif";
-  font-size: 16px;
+  font-family: "TiemposTextWeb-Regular","Georgia";
+  font-style: italic;
+  font-size: 45px;
   font-weight: bold;
   margin-bottom: 2px;
-  color: #262626;
+  color: #f5f5f5;
+  line-height: 1.2em;
+}
+
+#sections .subtitle {
+  font-family: "Inria Serif","TiemposTextWeb-Regular","Georgia";
+  font-size: 30px;
+  margin-bottom: 2px;
+  color: #f5f5f5;
   line-height: 1.2em;
 }
 
@@ -39,8 +48,8 @@
 }
 
 #vis {
-  display: inline-block;
-  position: fixed;
+  display: block;
+  position: relative !important;
   top: 60px;
   z-index: 100;
   margin-left: 0;
@@ -91,4 +100,7 @@
 
 }
 
-
+body {
+  background-color: #161616;
+  color: #f5f5f5;
+}

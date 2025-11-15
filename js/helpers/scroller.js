@@ -70,7 +70,29 @@
     }
 
     Scroller.prototype.on = function (action, cb) {
-        if (action === 'active') this.onActive = cb;
+        if (action === 'active') {
+            this.onActive = (index) => {
+                // Hide all #vis containers
+                this.steps.forEach((step) => {
+                    const vis = step.querySelector('#vis');
+                    if (vis) {
+                        vis.classList.remove('vis-visible');
+                        vis.classList.add('vis-hidden');
+                    }
+                });
+
+                // Show the #vis container for the active step
+                const activeStep = this.steps[index];
+                const activeVis = activeStep.querySelector('#vis');
+                if (activeVis) {
+                    activeVis.classList.remove('vis-hidden');
+                    activeVis.classList.add('vis-visible');
+                }
+
+                // Call the user-defined callback (if provided)
+                cb(index);
+            };
+        }
         if (action === 'progress') this.onProgress = cb;
         return this;
     };

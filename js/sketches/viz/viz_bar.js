@@ -1,4 +1,5 @@
 // viz_bar.js
+// Change this to women against golden ratio (card right to left animation as scroll)
 // Simple horizontal bar plot visual (12 months) using cached random values.
 (function () {
     window.VizBar = {
