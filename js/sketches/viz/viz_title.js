@@ -12,10 +12,10 @@
             var h = 120;
             p.rect(cx - w / 2, cy - h / 2, w, h, 6);
 
-            p.fill(0);
+            p.fill(80, 100, 25);
             p.textAlign(p.CENTER, p.CENTER);
             p.textSize(48);
-            p.text(ai === 0 ? 'INFO 474' : 'Final Project', cx, cy);
+            p.text(ai === 0 ? 'The Trade War' : 'Final Project', cx, cy);
             p.pop();
         }
     };
