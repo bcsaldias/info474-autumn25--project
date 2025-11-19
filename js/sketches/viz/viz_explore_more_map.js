@@ -19,6 +19,13 @@
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
   function toPct(x) { if (x==null || x==='') return null; let v=Number(x); if(!isFinite(v)) return null; if(v<=1) v*=100; return v; }
   function fmtPct(x){ if(x==null) return ''; return x<10 ? (x.toFixed(1)+'%') : (Math.round(x)+'%'); }
+  // for counts
+  function fmtInt(n){
+    if (n==null || n==='') return '';
+    const v = Number(String(n).replace(/[^0-9.-]/g,''));
+    if (!isFinite(v)) return '';
+    return v.toLocaleString('en-US');
+  }
   function defaultPalette(){ return ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#3182bd','#08519c']; }
   function colorFor(rate, thresholds, palette){
     if(rate==null) return '#e6eef7'; 
@@ -66,8 +73,8 @@
 
       // choropleth config 
       const stateDataUrl  = manager.stateDataUrl  || 'data/state_child_fi_2023.csv';
-      const countyDataUrl = manager.countyDataUrl || 'data/county_child_fi_2023.csv'; // <-- added for county coloring
-      const thresholds   = manager.mapThresholds || [8,12,16,20,24,28]; // %
+      const countyDataUrl = manager.countyDataUrl || 'data/county_child_fi_2023.csv';
+      const thresholds   = manager.mapThresholds || [8,12,16,20,24,28];
       const palette      = manager.palette || defaultPalette();
 
       if (!manager._init) {
@@ -141,15 +148,24 @@
         const fCol = cols.includes('state_fips') ? 'state_fips' : (cols.includes('FIPS') ? 'FIPS' : cols[0]);
         const rCol = cols.includes('child_fi_rate') ? 'child_fi_rate' : (cols.includes('fi_rate') ? 'fi_rate' : cols[1]);
         const nCol = cols.includes('state') ? 'state' : (cols.includes('State Name') ? 'State Name' : null);
+        const kCol = cols.includes('children_insecure') ? 'children_insecure' :
+                     (cols.includes('children') ? 'children' : null);
 
         manager._stateRates = new Map();
         manager._stateNames = new Map();
+        if (kCol) manager._stateChildren = new Map();
+
         for (let r=0; r<manager._stateTable.getRowCount(); r++) {
           const fips = String(manager._stateTable.getString(r, fCol)).padStart(2,'0');
           const rate = toPct(manager._stateTable.getString(r, rCol));
           const name = nCol ? manager._stateTable.getString(r, nCol) : '';
           if (isFinite(rate)) manager._stateRates.set(fips, rate);
           if (name) manager._stateNames.set(fips, name);
+
+          if (kCol) {
+            const kids = Number(manager._stateTable.getString(r, kCol));
+            if (isFinite(kids)) manager._stateChildren.set(fips, kids);
+          }
         }
       }
 
@@ -160,10 +176,13 @@
         const csCol = ccols.includes('state_fips') ? 'state_fips' : null;
         const crCol = ccols.includes('child_fi_rate') ? 'child_fi_rate' : (ccols.includes('fi_rate') ? 'fi_rate' : ccols[1]);
         const cnCol = ccols.includes('county') ? 'county' : (ccols.includes('County') ? 'County' : null);
+        const ckCol = ccols.includes('children_insecure') ? 'children_insecure' :
+                      (ccols.includes('children') ? 'children' : null);
 
         manager._countyRate = new Map();
         manager._countyName = new Map();
         manager._countiesByState = new Map();
+        if (ckCol) manager._countyChildren = new Map();
 
         for (let r=0; r<manager._countyTable.getRowCount(); r++) {
           const cf = String(manager._countyTable.getString(r, cfCol)).padStart(5,'0');
@@ -175,6 +194,11 @@
           if (nm) manager._countyName.set(cf, nm);
           if (!manager._countiesByState.has(sf)) manager._countiesByState.set(sf, []);
           manager._countiesByState.get(sf).push({ county_fips: cf, name: nm, rate: rt });
+
+          if (ckCol) {
+            const kids = Number(manager._countyTable.getString(r, ckCol));
+            if (isFinite(kids)) manager._countyChildren.set(cf, kids);
+          }
         }
       }
 
@@ -220,14 +244,17 @@
           ctx.restore();
         }
 
-        // tooltip with name + rate
+        // tooltip with name + rate (+ counts if available)
         if (hovered && manager._stateRates) {
           const fips = String(hovered.id).padStart(2,'0');
           const rate = manager._stateRates.get(fips);
           const name = (manager._stateNames && manager._stateNames.get(fips)) ||
                        (hovered.properties && hovered.properties.name) || 'State';
+          let label = name + (rate!=null ? (' — ' + fmtPct(rate)) : '');
+          const kids = (manager._stateChildren && manager._stateChildren.get(fips));
+          if (kids != null) label += ' (' + fmtInt(kids) + ' children)';
           const c = proj(d3.geoCentroid(hovered));
-          if (c) drawTooltip(p, name + (rate!=null ? (' — ' + fmtPct(rate)) : ''), left + c[0], top + c[1], left, top, W, H);
+          if (c) drawTooltip(p, label, left + c[0], top + c[1], left, top, W, H);
         }
 
         // click 
@@ -294,10 +321,13 @@
           const nm = (manager._countyName && manager._countyName.get(cf)) ||
                      (hoveredC.properties && hoveredC.properties.name) || 'County';
           const rt = manager._countyRate.get(cf);
+          let label = nm + (rt!=null ? (' — ' + fmtPct(rt)) : '');
+          const kids = (manager._countyChildren && manager._countyChildren.get(cf));
+          if (kids != null) label += ' (' + fmtInt(kids) + ' children)';
           const c = projState(d3.geoCentroid(hoveredC));
-          if (c) drawTooltip(p, nm + (rt!=null ? (' — ' + fmtPct(rt)) : ''), left + c[0], top + c[1], left, top, W, H);
+          if (c) drawTooltip(p, label, left + c[0], top + c[1], left, top, W, H);
 
-          // hover for county
+          // hover outline for county
           ctx.save(); ctx.translate(left, top);
           ctx.beginPath(); pathState(hoveredC);
           ctx.lineWidth = 1.2; ctx.strokeStyle = '#333';
