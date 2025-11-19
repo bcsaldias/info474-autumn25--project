@@ -7,8 +7,7 @@
     data: null,
   };
 
-  let men_data;
-  let women_data;
+  let men_data, women_data, menYearArr, menTimeArr, womenYearArr, womenTimeArr;
   let pix_per_sec = 15;
 
   new p5(function (p) {
@@ -22,6 +21,11 @@
     };
 
     p.setup = function () {
+      menYearArr = men_data.getColumn("Year");
+      menTimeArr = men_data.getColumn("Results");
+      womenYearArr = women_data.getColumn("Year");
+      womenTimeArr = women_data.getColumn("Results");
+
       var canvas = p.createCanvas(900, 400);
       canvas.parent("viz_gap");
       p.textFont("Inria Serif");
@@ -47,9 +51,45 @@
       p.text("Time (s)", 780, 380);
       p.pop();
 
-      // p.plotData();
+      plotData();
     };
 
-    function plotData(p) {}
+    function plotData() {
+      year_px = 100;
+      time_px_baseline = 100;
+      for (i = 0; i < menYearArr.length; i++) {
+        console.log(menYearArr[i]);
+
+        // year labels
+        p.push();
+        p.fill(255);
+        p.textSize(20);
+        p.text(menYearArr[i], 50, year_px);
+        p.pop();
+
+        // data plotting
+
+        let men_time_loc =
+          time_px_baseline + pix_per_sec * (menTimeArr[i] - 40);
+        let women_time_loc =
+          time_px_baseline + pix_per_sec * (womenTimeArr[i] - 40);
+
+        p.push();
+        p.stroke(255);
+        p.line(men_time_loc, year_px - 7, women_time_loc, year_px - 7);
+        p.pop();
+
+        p.push();
+        p.fill("red");
+        p.ellipse(men_time_loc, year_px - 7, 10, 10);
+        p.ellipse(women_time_loc, year_px - 7, 10, 10);
+        p.pop();
+
+        // set up for next loop
+        year_px += 40;
+      }
+    }
+    // 1912, 1932, 1952, 1972, 1992, 2012
+    // 1916, 1944 olympics canclled bc of ww1
   });
 })();
