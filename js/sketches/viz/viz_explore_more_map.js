@@ -4,8 +4,37 @@
 // each feature has an id to the FIPS code: 2 digit for states, 5 digit for counties.
 // laod the json then convert to geojson for drawing. also use
 // d3-geo albers to proejct a map of the us. d3-geo mercator to do each state and county.
-
+// data:
+// From the Feeding America file (MMG2025_2019-2023_Data_To_Share.xlsx), 
+// I created two smaller CSVs for the map. I filtered both the State and County sheets to Year = 2023 (latest), then selected and renamed just the fields the choropleth needs for each county: FIPS → zero-padded state_fips (2-digit) and county_fips (5-digit),
+// parsed County, State to a clean county name, mapped Child Food Insecurity Rate to child_fi_rate, and # of Food Insecure Children as children_insecure for tooltips. 
+// I saved these as /data/state_child_fi_2023.csv and /data/county_child_fi_2023.csv, which join directly to the us-atlas TopoJSON by FIPS for the map of state and counties for the us.
 (function () {
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  function toPct(x) { if (x==null || x==='') return null; let v=Number(x); if(!isFinite(v)) return null; if(v<=1) v*=100; return v; }
+  function fmtPct(x){ if(x==null) return ''; return x<10 ? (x.toFixed(1)+'%') : (Math.round(x)+'%'); }
+  function defaultPalette(){ return ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#3182bd','#08519c']; }
+  function colorFor(rate, thresholds, palette){
+    if(rate==null) return '#e6eef7'; 
+    for(let i=thresholds.length-1;i>=0;i--){ if(rate>=thresholds[i]) return palette[Math.min(i+1, palette.length-1)]; }
+    return palette[0];
+  }
+  function drawLegend(p, x, y, thresholds, palette){
+    const boxW=22, boxH=10, gap=4;
+    for(let i=0;i<palette.length;i++){ p.noStroke(); p.fill(palette[i]); p.rect(x+i*(boxW+2), y, boxW, boxH, 2); }
+    p.fill(40); p.textAlign(p.LEFT, p.TOP);
+    const labels=['low'].concat(thresholds.map(t=>t+'%')).concat(['high']);
+    p.text(labels.join('  '), x, y+boxH+gap);
+  }
+  function drawTooltip(p, txt, x, y, left, top, W, H){
+    p.textSize(12);
+    const pad=6, th=18, tw=p.textWidth(txt)+pad*2;
+    let tx=x+12, ty=y-10; tx=clamp(tx, left+2, left+W-tw-2); ty=clamp(ty, top+2, top+H-th-2);
+    p.noStroke(); p.fill(20,20,20,220); p.rect(tx, ty, tw, th, 3);
+    p.fill(255); p.textAlign(p.LEFT, p.CENTER); p.text(txt, tx+pad, ty+th/2);
+  }
+
+  // hit test
   function hitFeatureAtMouse(p, features, projection, left, top) {
     if (!features || !features.length) return null;
     const m = [p.mouseX - left, p.mouseY - top];
@@ -29,6 +58,11 @@
       const topoStatesUrl   = manager.topoStatesUrl   || 'data/states-10m.json';
       const topoCountiesUrl = manager.topoCountiesUrl || 'data/counties-10m.json';
 
+      // choropleth config 
+      const stateDataUrl = manager.stateDataUrl || 'data/state_child_fi_2023.csv';
+      const thresholds   = manager.mapThresholds || [8,12,16,20,24,28]; // %
+      const palette      = manager.palette || defaultPalette();
+
       if (!manager._init) {
         manager._init = true;
         manager._scene = 'nation';
@@ -37,7 +71,7 @@
         manager._escLatch = false;
       }
 
-      
+      // topojson
       if (!manager._statesTopo && !manager._statesTopoLoading && !manager._statesTopoError) {
         manager._statesTopoLoading = true;
         p.loadJSON(
@@ -53,6 +87,16 @@
           topoCountiesUrl,
           (json) => { manager._countiesTopo = json; manager._countiesTopoLoading = false; },
           () => { manager._countiesTopoError = true; manager._countiesTopoLoading = false; }
+        );
+      }
+
+      // load state CSV for nation-level coloring
+      if (manager._statesTopo && !manager._stateTable && !manager._stateTableLoading && !manager._stateTableError) {
+        manager._stateTableLoading = true;
+        p.loadTable(
+          stateDataUrl, 'csv', 'header',
+          (t)=>{ manager._stateTable=t; manager._stateTableLoading=false; },
+          ()=>{ manager._stateTableError=true; manager._stateTableLoading=false; }
         );
       }
 
@@ -72,6 +116,24 @@
       }
       if (manager._countiesTopo && !manager._countiesGeo) {
         manager._countiesGeo = topojson.feature(manager._countiesTopo, manager._countiesTopo.objects.counties);
+      }
+
+      // build state lookups once CSV is ready 
+      if (manager._stateTable && !manager._stateRates) {
+        const cols = manager._stateTable.columns || [];
+        const fCol = cols.includes('state_fips') ? 'state_fips' : (cols.includes('FIPS') ? 'FIPS' : cols[0]);
+        const rCol = cols.includes('child_fi_rate') ? 'child_fi_rate' : (cols.includes('fi_rate') ? 'fi_rate' : cols[1]);
+        const nCol = cols.includes('state') ? 'state' : (cols.includes('State Name') ? 'State Name' : null);
+
+        manager._stateRates = new Map();
+        manager._stateNames = new Map();
+        for (let r=0; r<manager._stateTable.getRowCount(); r++) {
+          const fips = String(manager._stateTable.getString(r, fCol)).padStart(2,'0');
+          const rate = toPct(manager._stateTable.getString(r, rCol));
+          const name = nCol ? manager._stateTable.getString(r, nCol) : '';
+          if (isFinite(rate)) manager._stateRates.set(fips, rate);
+          if (name) manager._stateNames.set(fips, name);
+        }
       }
 
       const ctx = p.drawingContext;
@@ -95,10 +157,13 @@
         for (const f of manager._statesGeo.features) {
           ctx.beginPath();
           path(f);
-          ctx.fillStyle = '#e6eef7';
+          // color by rate if data loaded
+          const fips = String(f.id).padStart(2,'0');
+          const rate = manager._stateRates ? manager._stateRates.get(fips) : null;
+          ctx.fillStyle = colorFor(rate, thresholds, palette);
           ctx.fill();
           ctx.lineWidth = 0.8;
-          ctx.strokeStyle = '#ffffffff';
+          ctx.strokeStyle = '#ffffff';
           ctx.stroke();
         }
         ctx.restore();
@@ -113,6 +178,16 @@
           ctx.restore();
         }
 
+        // tooltip with name + rate
+        if (hovered && manager._stateRates) {
+          const fips = String(hovered.id).padStart(2,'0');
+          const rate = manager._stateRates.get(fips);
+          const name = (manager._stateNames && manager._stateNames.get(fips)) ||
+                       (hovered.properties && hovered.properties.name) || 'State';
+          const c = proj(d3.geoCentroid(hovered));
+          if (c) drawTooltip(p, name + (rate!=null ? (' — ' + fmtPct(rate)) : ''), left + c[0], top + c[1], left, top, W, H);
+        }
+
         // click 
         if (p.mouseIsPressed && !manager._mouseLatch && hovered && manager._countiesGeo) {
           manager._selectedStateFips = String(hovered.id).padStart(2, '0');
@@ -120,6 +195,9 @@
           manager._mouseLatch = true;
         }
         if (!p.mouseIsPressed) manager._mouseLatch = false;
+
+        // legend
+        if (manager._stateRates) drawLegend(p, left + 10, top + H - 36, thresholds, palette);
 
         p.pop();
         return;
