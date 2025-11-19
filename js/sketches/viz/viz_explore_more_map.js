@@ -9,6 +9,12 @@
 // I created two smaller CSVs for the map. I filtered both the State and County sheets to Year = 2023 (latest), then selected and renamed just the fields the choropleth needs for each county: FIPS → zero-padded state_fips (2-digit) and county_fips (5-digit),
 // parsed County, State to a clean county name, mapped Child Food Insecurity Rate to child_fi_rate, and # of Food Insecure Children as children_insecure for tooltips. 
 // I saved these as /data/state_child_fi_2023.csv and /data/county_child_fi_2023.csv, which join directly to the us-atlas TopoJSON by FIPS for the map of state and counties for the us.
+
+// Then bascially join the data to shpaes using the fips code, basically map these
+// read the id, look up the rate, pick a colorfrom the blue pallete, and fill based on that percent.
+
+// For interacction, use mouse position to show tooltip, clicking a sate filters the county
+// for that state which probbaly needs a redraw.
 (function () {
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
   function toPct(x) { if (x==null || x==='') return null; let v=Number(x); if(!isFinite(v)) return null; if(v<=1) v*=100; return v; }
@@ -55,11 +61,12 @@
       const W    = Math.max(320, manager.width  || (p.width  - left - 10));
       const H    = Math.max(260, manager.height || (p.height - top  - 10));
 
-      const topoStatesUrl   = manager.topoStatesUrl   || 'data/states-10m.json';
-      const topoCountiesUrl = manager.topoCountiesUrl || 'data/counties-10m.json';
+      const topoStatesUrl   = manager.topoStatesUrl   || 'data/us-states-10m.json';
+      const topoCountiesUrl = manager.topoCountiesUrl || 'data/us-counties-10m.json';
 
       // choropleth config 
-      const stateDataUrl = manager.stateDataUrl || 'data/state_child_fi_2023.csv';
+      const stateDataUrl  = manager.stateDataUrl  || 'data/state_child_fi_2023.csv';
+      const countyDataUrl = manager.countyDataUrl || 'data/county_child_fi_2023.csv'; // <-- added for county coloring
       const thresholds   = manager.mapThresholds || [8,12,16,20,24,28]; // %
       const palette      = manager.palette || defaultPalette();
 
@@ -100,6 +107,16 @@
         );
       }
 
+      // load county CSV for state-level coloring
+      if (manager._statesTopo && !manager._countyTable && !manager._countyTableLoading && !manager._countyTableError) {
+        manager._countyTableLoading = true;
+        p.loadTable(
+          countyDataUrl, 'csv', 'header',
+          (t)=>{ manager._countyTable=t; manager._countyTableLoading=false; },
+          ()=>{ manager._countyTableError=true; manager._countyTableLoading=false; }
+        );
+      }
+
       // loading UI
       if (!manager._statesTopo) {
         p.noStroke(); p.fill(80); p.textAlign(p.LEFT, p.TOP); p.textSize(14);
@@ -133,6 +150,31 @@
           const name = nCol ? manager._stateTable.getString(r, nCol) : '';
           if (isFinite(rate)) manager._stateRates.set(fips, rate);
           if (name) manager._stateNames.set(fips, name);
+        }
+      }
+
+      // build county lookups once CSV is ready 
+      if (manager._countyTable && !manager._countyRate) {
+        const ccols = manager._countyTable.columns || [];
+        const cfCol = ccols.includes('county_fips') ? 'county_fips' : (ccols.includes('FIPS') ? 'FIPS' : ccols[0]);
+        const csCol = ccols.includes('state_fips') ? 'state_fips' : null;
+        const crCol = ccols.includes('child_fi_rate') ? 'child_fi_rate' : (ccols.includes('fi_rate') ? 'fi_rate' : ccols[1]);
+        const cnCol = ccols.includes('county') ? 'county' : (ccols.includes('County') ? 'County' : null);
+
+        manager._countyRate = new Map();
+        manager._countyName = new Map();
+        manager._countiesByState = new Map();
+
+        for (let r=0; r<manager._countyTable.getRowCount(); r++) {
+          const cf = String(manager._countyTable.getString(r, cfCol)).padStart(5,'0');
+          const sf = csCol ? String(manager._countyTable.getString(r, csCol)).padStart(2,'0') : cf.slice(0,2);
+          const nm = cnCol ? manager._countyTable.getString(r, cnCol) : '';
+          const rt = toPct(manager._countyTable.getString(r, crCol));
+
+          if (isFinite(rt)) manager._countyRate.set(cf, rt);
+          if (nm) manager._countyName.set(cf, nm);
+          if (!manager._countiesByState.has(sf)) manager._countiesByState.set(sf, []);
+          manager._countiesByState.get(sf).push({ county_fips: cf, name: nm, rate: rt });
         }
       }
 
@@ -230,13 +272,26 @@
         // draw counties 
         ctx.save(); ctx.translate(left, top);
         for (const f of manager._stateCountyFeatures) {
+          const cf = String(f.id).padStart(5,'0');
+          const rt = manager._countyRate ? manager._countyRate.get(cf) : null;
           ctx.beginPath(); pathState(f);
-          ctx.fillStyle = '#e6eef7';
+          ctx.fillStyle = colorFor(rt, thresholds, palette);
           ctx.fill();
           ctx.lineWidth = 0.6; ctx.strokeStyle = '#ffffff';
           ctx.stroke();
         }
         ctx.restore();
+
+        // county tooltip 
+        const hoveredC = hitFeatureAtMouse(p, manager._stateCountyFeatures, projState, left, top);
+        if (hoveredC && manager._countyRate) {
+          const cf = String(hoveredC.id).padStart(5,'0');
+          const nm = (manager._countyName && manager._countyName.get(cf)) ||
+                     (hoveredC.properties && hoveredC.properties.name) || 'County';
+          const rt = manager._countyRate.get(cf);
+          const c = projState(d3.geoCentroid(hoveredC));
+          if (c) drawTooltip(p, nm + (rt!=null ? (' — ' + fmtPct(rt)) : ''), left + c[0], top + c[1], left, top, W, H);
+        }
 
         // ESC to go back 
         p.noStroke(); p.fill(90); p.textAlign(p.RIGHT, p.TOP); p.textSize(11);
@@ -248,6 +303,9 @@
           manager._escLatch = true;
         }
         if (!p.keyIsPressed) manager._escLatch = false;
+
+        // legend 
+        if (manager._countyRate) drawLegend(p, left + 10, top + H - 36, thresholds, palette);
 
         p.pop();
         return;
