@@ -104,3 +104,10 @@ body {
   background-color: #161616;
   color: #f5f5f5;
 }
+
+.subtitle p {
+  margin-bottom: 5%;
+}
+.subtitle img {
+  margin: 0 10%;
+}
