@@ -53,7 +53,11 @@
 
       // axis ticks
       for (i = 1; i < 45; i++) {
-        p.line(100 + i * pix_per_sec, 345, 100 + i * pix_per_sec, 355);
+        if (i % 5 == 0) {
+          p.line(100 + i * pix_per_sec, 345, 100 + i * pix_per_sec, 355);
+        } else {
+          p.line(100 + i * pix_per_sec, 348, 100 + i * pix_per_sec, 352);
+        }
       }
 
       p.pop();
