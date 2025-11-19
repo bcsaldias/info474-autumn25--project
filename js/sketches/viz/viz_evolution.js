@@ -8,7 +8,7 @@
 
   new p5(function (p) {
     p.preload = function () {
-      data = p.loadTable("../data/table_viz_data.csv", "csv", "header");
+      // data = p.loadTable("../data/table_viz_data.csv", "csv", "header");
     };
 
     p.setup = function () {
