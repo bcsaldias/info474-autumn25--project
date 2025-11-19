@@ -42,13 +42,20 @@
       p.push();
       p.fill(255);
       p.stroke(255);
-      p.line(100, 350, 750, 350);
+      p.line(100, 350, 770, 350);
       p.line(100, 50, 100, 350);
 
       // text
       p.textSize(20);
       p.text("Year", 45, 45);
       p.text("Time (s)", 780, 380);
+      p.text("40s", 80, 380);
+
+      // axis ticks
+      for (i = 1; i < 45; i++) {
+        p.line(100 + i * pix_per_sec, 345, 100 + i * pix_per_sec, 355);
+      }
+
       p.pop();
 
       plotData();
@@ -62,7 +69,7 @@
 
         // year labels
         p.push();
-        p.fill(255);
+        p.fill("#C80428");
         p.textSize(20);
         p.text(menYearArr[i], 50, year_px);
         p.pop();
@@ -80,9 +87,17 @@
         p.pop();
 
         p.push();
-        p.fill("red");
         p.ellipse(men_time_loc, year_px - 7, 10, 10);
+        p.fill("#0281C8");
+        p.textSize(16);
+        p.text(menTimeArr[i], men_time_loc - 15, year_px + 14);
+        p.pop();
+
+        p.push();
         p.ellipse(women_time_loc, year_px - 7, 10, 10);
+        p.fill("#FCB131");
+        p.textSize(16);
+        p.text(womenTimeArr[i], women_time_loc - 15, year_px + 14);
         p.pop();
 
         // set up for next loop
