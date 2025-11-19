@@ -282,6 +282,11 @@
         }
         ctx.restore();
 
+        // title for the state
+        const stateName = (manager._stateNames && manager._stateNames.get(sf)) || 'Selected State';
+        p.noStroke(); p.fill(30); p.textAlign(p.CENTER, p.TOP); p.textSize(18);
+        p.text(stateName, left + W/2, top - 28);
+
         // county tooltip 
         const hoveredC = hitFeatureAtMouse(p, manager._stateCountyFeatures, projState, left, top);
         if (hoveredC && manager._countyRate) {
@@ -291,6 +296,13 @@
           const rt = manager._countyRate.get(cf);
           const c = projState(d3.geoCentroid(hoveredC));
           if (c) drawTooltip(p, nm + (rt!=null ? (' — ' + fmtPct(rt)) : ''), left + c[0], top + c[1], left, top, W, H);
+
+          // hover for county
+          ctx.save(); ctx.translate(left, top);
+          ctx.beginPath(); pathState(hoveredC);
+          ctx.lineWidth = 1.2; ctx.strokeStyle = '#333';
+          ctx.stroke();
+          ctx.restore();
         }
 
         // ESC to go back 
