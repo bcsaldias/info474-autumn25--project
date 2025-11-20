@@ -62,4 +62,36 @@
                 leftSum += itemsList[i].value;
                 if (leftSum >= half){ splitIndex = i; break; }
             }
+            var leftGroup = itemsList.slice(0, splitIndex+1);
+            var rightGroup = itemsList.slice(splitIndex+1);
+            var leftTotal = sumValues(leftGroup);
+            var rightTotal = sumValues(rightGroup);
+            function partition(itemsList, x, y, w, h, vertical){
+            if (!itemsList || itemsList.length === 0) return;
+            if (itemsList.length === 1){
+                rects.push({x:x, y:y, w:w, h:h, data: itemsList[0]});
+                return;
+            }
+            var total = sumValues(itemsList);
+            var half = total / 2;
+            var leftSum = 0; var splitIndex = 0;
+            for (var i=0;i<itemsList.length;i++){
+                leftSum += itemsList[i].value;
+                if (leftSum >= half){ splitIndex = i; break; }
+            }
+            var leftGroup = itemsList.slice(0, splitIndex+1);
+            var rightGroup = itemsList.slice(splitIndex+1);
+            var leftTotal = sumValues(leftGroup);
+            var rightTotal = sumValues(rightGroup);
+
+            if (vertical){
+                var leftW = (total > 0) ? (w * (leftTotal / total)) : w/2;
+                partition(leftGroup, x, y, leftW, h, !vertical);
+                partition(rightGroup, x + leftW, y, w - leftW, h, !vertical);
+            } else {
+                var topH = (total > 0) ? (h * (leftTotal / total)) : h/2;
+                partition(leftGroup, x, y, w, topH, !vertical);
+                partition(rightGroup, x, y + topH, w, h - topH, !vertical);
+            }
+        }
 
