@@ -35,11 +35,20 @@
         var width = (manager && manager.width) || 760;
         var height = (manager && manager.height) || 480;
         // Inner inset (pixels). Reduce this to make tiles larger. Can be overridden by manager._tileInset
-        var innerPad = (manager && typeof manager._tileInset === 'number') ? manager._tileInset : 4;
+        var innerPad = (manager && typeof manager._tileInset === 'number') ? manager._tileInset : 2;
         var innerLeft = left + innerPad;
         var innerTop = top + innerPad;
         var innerWidth = Math.max(10, width - innerPad * 2);
         var innerHeight = Math.max(10, height - innerPad * 2);
+        // Scale factor to enlarge the tile board inside the container (default 1.1)
+        var scale = (manager && typeof manager._tileScale === 'number') ? manager._tileScale : 1.12;
+        // compute scaled inner area, centered within the container and clamped to container bounds
+        var targetInnerWidth = Math.min(width - 4, Math.max(10, innerWidth * scale));
+        var targetInnerHeight = Math.min(height - 4, Math.max(10, innerHeight * scale));
+        innerLeft = left + (width - targetInnerWidth) / 2;
+        innerTop = top + (height - targetInnerHeight) / 2;
+        innerWidth = targetInnerWidth;
+        innerHeight = targetInnerHeight;
 
             var data = (manager && manager._treemapData) ? manager._treemapData : VizTreemap.defaultData;
             var items = Object.keys(data).map(function(k){ return {key:k, value: Number(data[k])}; });
@@ -92,7 +101,7 @@
 
         // Sort items descending to make partitioning produce balanced shapes
         items.sort(function(a,b){ return b.value - a.value; });
-        partition(items, left + 0, top + 0, width, height, true);
+        partition(items, innerLeft, innerTop, innerWidth, innerHeight, true);
 
         // Draw container
         p.noFill(); p.stroke(200); p.rect(left, top, width, height);
@@ -112,8 +121,8 @@
                 if (m && m[1]) { textIsDark = (parseInt(m[1],10) > 60); }
             } catch (e) { textIsDark = true; }
             p.fill(textIsDark ? 40 : 255);
-            if (r.w > 50 && r.h > 28){
-                    p.textSize(12); p.text(it.key + ' — ' + (isFinite(it.value) ? (Math.round(it.value*10)/10 + '%') : 'n/a'), r.x + r.w/2, r.y + r.h/2);
+                    if (r.w > 50 && r.h > 28){
+                        p.textSize(9); p.text(it.key + ' — ' + (isFinite(it.value) ? (Math.round(it.value*10)/10 + '%') : 'n/a'), r.x + r.w/2, r.y + r.h/2);
             } else {
                 // collect small tiles to render in a compact list so their values are visible
                 smallTiles.push(it);
