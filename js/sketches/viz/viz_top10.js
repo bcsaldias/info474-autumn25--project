@@ -32,11 +32,27 @@
       p.push();
       p.stroke(255);
       p.noFill();
+      let rowNames = [
+        "Name",
+        "Year",
+        "Country",
+        "Age",
+        "Weight",
+        "Height",
+        "Speed",
+      ];
 
       let x_cell = 0;
       for (i = 0; i < 7; i++) {
         let y_cell = 0;
+        p.push();
+        p.fill("#C80428");
         p.rect(x_cell, 0, 128, 50);
+        p.fill("white");
+        p.textSize(20);
+        p.textAlign(p.CENTER, p.CENTER);
+        p.text(rowNames[i], x_cell + 65, 30);
+        p.pop();
         for (j = 0; j < 10; j++) {
           p.rect(x_cell, y_cell + 50, 128, 50);
           y_cell += 50;
