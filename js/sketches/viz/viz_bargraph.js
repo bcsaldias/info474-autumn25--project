@@ -1,71 +1,86 @@
-// Added contents of viz_bar into viz_bar graph
+// ...existing code...
 (function () {
-    window.VizBar = {
+    // VizBarGraph implementation (also aliased to VizBar so existing renderer works)
+    var VizBarGraph = {
         draw: function (p, manager, ai, progress) {
             p.push();
-            var countries = ['BR','CA', 'CN','DE','GB','IN','JP','KR','MX','NG','ZA'];
-            var gdp_usd = {
-                BR: 2.18e12,
-                CA: 2.24e12,
-                CN: 1.87e13,
-                DE: 4.66e12,
-                GB: 3.64e12,
-                IN: 3.91e12,
-                JP: 4.03e12,
-                KR: 1.71e12,
-                MX: 1.79e12,
-                NG: 1.88e11,
-                ZA: 4.00e11
+
+            var countries = ['BR','CA','CN','DE','GB','IN','JP','KR','MX','NG','ZA'];
+            var gdp = {
+                BR: 2.18,
+                CA: 2.24,
+                CN: 1.87,
+                DE: 4.66,
+                GB: 3.64,
+                IN: 3.91,
+                JP: 4.03,
+                KR: 1.71,
+                MX: 1.79,
+                NG: 1.88,
+                ZA: 4.00,
             };
-            var left = manager.offsetX || 20;
-            var top = manager.offsetY || 0;
-            var availW = (manager.width || 600) - 40; // leave some right padding
-            var availH = (manager.height || 520) - 20;
-            var rowH = availH / months.length;
-            var barMaxW = Math.max(60, availW - 120);
+
+            var left = (manager && manager.offsetX) || 20;
+            var top = (manager && manager.offsetY) || 0;
+            var availW = ((manager && manager.width) || 760) - 40; // leave some right padding
+            var availH = ((manager && manager.height) || 480) - 20;
+            var rowH = availH / countries.length;
+            var barMaxW = Math.max(60, availW - 140);
 
             p.noStroke();
-            p.textAlign(p.LEFT, p.CENTER)
+            p.textAlign(p.LEFT, p.CENTER);
+            p.textSize(12);
+
+            // find max GDP for scaling
             var maxGDP = 0;
-            for(var i = 0; i < countries.length; i++){
+            for (var i = 0; i < countries.length; i++) {
                 var v = gdp[countries[i]] || 0;
-                if(v > maxGDP){
-                    maxGDP = v;
-                }
+                if (v > maxGDP) maxGDP = v;
             }
-            for(var i = 0; i < countries.length; i++){
+
+            for (var i = 0; i < countries.length; i++) {
                 var y = top + i * rowH + rowH / 2;
+
+                // country code label
                 p.fill(30);
                 p.text(countries[i], left, y);
 
                 var val = gdp[countries[i]] || 0;
                 var bw = (val / (maxGDP || 1)) * barMaxW;
-                var bx = left + 60;
+                var bx = left + 80; // offset for label column
                 var by = y - (rowH * 0.35);
                 var bh = rowH * 0.7;
-            
 
-            // starting to form bar chart
-            p.fill(200, 60, 60, 200);
-            p.rect(bx, by, bw, bh, 3);
-            p.fill(255);
-            p.textAlign(p.LEFT, p.CENTER);
-            p.text(formatGDP(val)< bx + 6, y);
-        }
-        p.pop();
+                // bar
+                p.fill(25, 220, 190);
+                p.rect(bx, by, bw, bh, 3);
 
-        // helper function format GDP
-        function formatGDP(v){
-            if(!isFinite(v) || v == 0){
-                return n/a;
+                // value text on the bar (or to the right if bar is too narrow)
+                var valueText = formatGDP(val);
+                if (bw < 60) {
+                    p.fill(30);
+                    p.textAlign(p.LEFT, p.CENTER);
+                    p.text(valueText, bx + bw + 6, y);
+                } else {
+                    p.fill(255);
+                    p.textAlign(p.LEFT, p.CENTER);
+                    p.text(valueText, bx + 6, y);
+                }
             }
-            var abs = Math.abs(v);
-            if(abs >= 1e12) return'$' + (v / 1e12).toFixed(2) + 'T';
+
+            p.pop();
+
+            // helper: format GDP as $x.yyT / $x.yyB
+            function formatGDP(v) {
+                if (!isFinite(v) || v === 0) return 'n/a';
+                var abs = Math.abs(v);
+                if (abs >= 1e12) return '$' + (v / 1e12).toFixed(2) + 'T';
                 if (abs >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
                 return '$' + v.toString();
-             }
-
-            
+            }
         }
     };
+
+    // expose to global scope
+    window.VizBarGraph = VizBarGraph;
 })();

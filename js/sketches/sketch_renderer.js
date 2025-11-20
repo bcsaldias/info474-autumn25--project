@@ -36,8 +36,8 @@
             }
              // bar chart on data-active-index="4"
             if (ai === 4) {
-                if (window.VizBar && typeof window.VizBar.draw === 'function') {
-                    window.VizBar.draw(p, manager, ai, progress);
+                if (window.VizBarGraph  && typeof window.VizBarGraph.draw === 'function') {
+                    window.VizBarGraph.draw(p, manager, ai, progress);
                     return;
                 }
             }
@@ -48,8 +48,10 @@
             }
 
             if (ai === 7) {
-                window.VizBar.draw(p, manager, ai, progress);
-                return;
+                if (window.VizBarGraph && typeof window.VizBarGraph.draw === 'function') {
+                    window.VizBarGraph.draw(p, manager, ai, progress);
+                    return;
+                }
             }
         }
     };
