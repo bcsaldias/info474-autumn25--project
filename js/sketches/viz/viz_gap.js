@@ -13,11 +13,7 @@
   new p5(function (p) {
     p.preload = function () {
       men_data = p.loadTable("data/gap_viz_data_men.csv", "csv", "header");
-      women_data = p.loadTable(
-        "data/gap_viz_data_women.csv",
-        "csv",
-        "header"
-      );
+      women_data = p.loadTable("data/gap_viz_data_women.csv", "csv", "header");
     };
 
     p.setup = function () {
@@ -85,21 +81,32 @@
         let women_time_loc =
           time_px_baseline + pix_per_sec * (womenTimeArr[i] - 40);
 
+        if (i == 0) {
+          p.push();
+          p.fill(255);
+          p.textSize(16);
+          p.fill("#0281C8");
+          p.text("M", men_time_loc - 7, year_px - 18);
+          p.fill("#FCB131");
+          p.text("F", women_time_loc - 3, year_px - 18);
+          p.pop();
+        }
+
         p.push();
         p.stroke(255);
         p.line(men_time_loc, year_px - 7, women_time_loc, year_px - 7);
         p.pop();
 
         p.push();
-        p.ellipse(men_time_loc, year_px - 7, 10, 10);
         p.fill("#0281C8");
+        p.ellipse(men_time_loc, year_px - 7, 10, 10);
         p.textSize(16);
         p.text(menTimeArr[i], men_time_loc - 15, year_px + 14);
         p.pop();
 
         p.push();
-        p.ellipse(women_time_loc, year_px - 7, 10, 10);
         p.fill("#FCB131");
+        p.ellipse(women_time_loc, year_px - 7, 10, 10);
         p.textSize(16);
         p.text(womenTimeArr[i], women_time_loc - 15, year_px + 14);
         p.pop();
