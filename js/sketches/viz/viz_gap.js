@@ -12,9 +12,9 @@
 
   new p5(function (p) {
     p.preload = function () {
-      men_data = p.loadTable("/data/gap_viz_data_men.csv", "csv", "header");
+      men_data = p.loadTable("data/gap_viz_data_men.csv", "csv", "header");
       women_data = p.loadTable(
-        "/data/gap_viz_data_women.csv",
+        "data/gap_viz_data_women.csv",
         "csv",
         "header"
       );
