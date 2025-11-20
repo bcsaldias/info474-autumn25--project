@@ -65,8 +65,6 @@
       year_px = 100;
       time_px_baseline = 100;
       for (i = 0; i < menYearArr.length; i++) {
-        console.log(menYearArr[i]);
-
         // year labels
         p.push();
         p.fill("#C80428");
