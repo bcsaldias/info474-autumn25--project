@@ -21,8 +21,13 @@
         draw: function (p, manager, ai, progress) {
             try { console.log('Renderer: delegating draw, ai=', ai); } catch (e) { }
 
-            if (ai === 0 || ai === 1) {
-                window.VizTitle.draw(p, manager, ai, progress);
+            if (ai === 0) {
+                // window.VizTitle.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai === 1) {
+                window.GuessHowMany.draw(p, manager, ai, progress);
                 return;
             }
 
