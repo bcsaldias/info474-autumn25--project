@@ -29,7 +29,6 @@
         draw: function(p, manager, ai, progress) {
             p.push();
 
-            // fallback values
             var w = (manager && manager.width) || 1200;
             var h = (manager && manager.height) || 600;
 
@@ -67,7 +66,7 @@
             p.text(`Top 10 Countries by ${data.showing} (${data.selectedYear})`, w / 2, 50);
 
             var margin = 120;
-            var chartWidth = w - 200 - 2 * margin;
+            var chartWidth = w - 2 * margin;
             var chartHeight = h - 2 * margin;
             var barWidth = chartWidth / data.top10Data.length;
 
@@ -79,7 +78,7 @@
             
             for (var i = 0; i < data.top10Data.length; i++) {
                 var d = data.top10Data[i];
-                var x = margin + i * (chartWidth / data.top10Data.length) + (chartWidth / data.top10Data.length - barWidth) / 2;
+                var x = margin + i * 1.5 * (chartWidth / data.top10Data.length) + (chartWidth / data.top10Data.length - barWidth) / 2;
                 var yBottom = h - margin;
 
                 for (var j = 0; j < data.sectors.length; j++) {
@@ -91,42 +90,10 @@
                     yBottom -= barHeight;
                 }
 
-                // country label
                 p.fill(0);
                 p.textAlign(p.CENTER);
                 p.text(d.country, x + barWidth / 2, h - margin + 15);
             }
-            
-
-            // for (var i = 0; i < data.top10Data.length; i++) {
-            //     var d = data.top10Data[i];
-                
-            //     // X Position:
-            //     // 1. Start at the margin
-            //     // 2. Add the total width of previous slots (i * slotWidth)
-            //     // 3. Add half the remaining gap (slotWidth - barWidth) / 2 to center the bar
-            //     var x = margin + i * slotWidth + (slotWidth - barWidth) / 2;
-                
-            //     var yBottom = h - margin;
-            
-            //     for (var j = 0; j < data.sectors.length; j++) {
-            //         var val = d[data.sectors[j]] || 0;
-            //         var barHeight = p.map(val, 0, maxVal, 0, chartHeight);
-            //         var c = colors[j];
-            //         p.fill(c[0], c[1], c[2]);
-            //         p.rect(x, yBottom - barHeight, barWidth, barHeight);
-            //         yBottom -= barHeight;
-            //     }
-            
-            //     // country label
-            //     p.fill(0);
-            //     p.textAlign(p.CENTER);
-            //     p.text(d.country, x + barWidth / 2, h - margin + 15);
-            // }
-
-            // -------------------------
-            // Draw legend
-            // -------------------------
             var lx = 20;
             var ly = 60;
             p.textAlign(p.LEFT);
