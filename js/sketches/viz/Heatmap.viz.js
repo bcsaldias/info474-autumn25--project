@@ -115,4 +115,19 @@
             p.fill(textIsDark ? 40 : 255);
             if (r.w > 50 && r.h > 28){ p.textSize(12); p.text(it.key + ' — ' + it.value, r.x + r.w/2, r.y + r.h/2); }
         }
+        var legendX = left + width - 180, legendY = top + height - 40;
+        var legendW = 140, legendH = 12;
+        for (var j = 0; j <= legendW; j++){
+            var t = j / legendW; var v = minV + t * (maxV - minV);
+            p.fill(colorForValue(v, minV, maxV)); p.noStroke(); p.rect(legendX + j, legendY, 1, legendH);
+        }
+        p.fill(255); p.textSize(11); p.textAlign(p.LEFT, p.CENTER);
+        p.fill(255); p.text(maxV.toFixed(1) + '%', legendX + legendW + 6, legendY + legendH/2);
+        p.text(minV.toFixed(1) + '%', legendX - 40, legendY + legendH/2);
+
+        p.pop();
+    };
+
+})();
+
 
