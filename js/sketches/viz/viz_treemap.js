@@ -5,17 +5,17 @@
     window.VizTreemap = {};
 
     VizTreemap.defaultData = {
-        Brazil: 7,
-        Canada: 1,
-        China: 2,
-        Germany: 1,
-        UK: 1,
-        India: 6,
-        Japan: 1,
-        Korea: 6,
-        Mexico: 2,
-        Nigeria: 9,
-        SA: 5
+        BR: 7,
+        CA: 1,
+        CN: 2,
+        DE: 1,
+        GB: 1,
+        IN: 6,
+        JP: 1,
+        KR: 6,
+        MX: 2,
+        NG: 9,
+        ZA: 5
     };
 
     // Color scale: shades of red (light red = low value, dark red = high value)
@@ -91,6 +91,7 @@
         // Draw container
         p.noFill(); p.stroke(200); p.rect(left, top, width, height);
 
+        var smallTiles = [];
         for (var k = 0; k < rects.length; k++){
             var r = rects[k];
             var it = r.data;
@@ -105,7 +106,12 @@
                 if (m && m[1]) { textIsDark = (parseInt(m[1],10) > 60); }
             } catch (e) { textIsDark = true; }
             p.fill(textIsDark ? 40 : 255);
-            if (r.w > 50 && r.h > 28){ p.textSize(12); p.text(it.key + ' — ' + it.value, r.x + r.w/2, r.y + r.h/2); }
+            if (r.w > 50 && r.h > 28){
+                p.textSize(12); p.text(it.key + ' — ' + it.value, r.x + r.w/2, r.y + r.h/2);
+            } else {
+                // collect small tiles to render in a compact list so their values are visible
+                smallTiles.push(it);
+            }
         }
 
         // legend
@@ -119,6 +125,17 @@
         p.fill(0); // legend labels in black for readability (e.g., 1% and 9%)
         p.text(maxV.toFixed(1) + '%', legendX + legendW + 6, legendY + legendH/2);
         p.text(minV.toFixed(1) + '%', legendX - 40, legendY + legendH/2);
+
+        // If any tiles were too small to label, show them in a compact list below the legend.
+        if (smallTiles.length > 0) {
+            var listX = legendX;
+            var listY = legendY + legendH + 8;
+            p.textSize(11); p.textAlign(p.LEFT, p.TOP); p.fill(0);
+            for (var s = 0; s < smallTiles.length; s++){
+                var it = smallTiles[s];
+                p.text(it.key + ' — ' + it.value + '%', listX, listY + s * 14);
+            }
+        }
 
         p.pop();
     };
