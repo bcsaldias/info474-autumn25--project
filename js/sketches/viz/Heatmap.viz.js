@@ -44,3 +44,6 @@
 
         var minV = Math.min.apply(null, items.map(function(it){ return it.value; }));
         var maxV = Math.max.apply(null, items.map(function(it){ return it.value; }));
+
+         function sumValues(arr){ return arr.reduce(function(s,it){ return s + it.value; }, 0); }
+
