@@ -97,3 +97,22 @@
             items.sort(function(a,b){ return b.value - a.value; });
         partition(items, left + 0, top + 0, width, height, true);
 
+         p.noFill(); p.stroke(200); p.rect(left, top, width, height);
+
+        for (var k = 0; k < rects.length; k++){
+            var r = rects[k];
+            var it = r.data;
+            var fill = colorForValue(it.value, minV, maxV);
+            p.noStroke(); p.fill(fill);
+            p.rect(r.x, r.y, r.w, r.h, 4);
+
+            // label contrast
+            var textIsDark = true;
+            try {
+                var m = /hsl\(\s*0\s*,\s*\d+%\s*,\s*(\d+)%\)/.exec(fill);
+                if (m && m[1]) { textIsDark = (parseInt(m[1],10) > 60); }
+            } catch (e) { textIsDark = true; }
+            p.fill(textIsDark ? 40 : 255);
+            if (r.w > 50 && r.h > 28){ p.textSize(12); p.text(it.key + ' — ' + it.value, r.x + r.w/2, r.y + r.h/2); }
+        }
+
