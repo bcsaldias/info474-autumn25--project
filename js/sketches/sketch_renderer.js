@@ -31,6 +31,11 @@
                 return;
             }
 
+            if (ai === 2) {
+                window.Viz1In5.draw(p, manager, ai, progress);
+                return;
+            }
+
             if (ai >= 4 && ai < 7) {
                 window.VizScatter.draw(p, manager, ai, progress);
                 return;
