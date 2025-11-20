@@ -15,6 +15,13 @@
 
 // For interacction, use mouse position to show tooltip, clicking a sate filters the county
 // for that state which probbaly needs a redraw.
+// cited sources:
+// copilot 
+// https://unpkg.com/ - for the state and conty vectors
+// https://d3js.org/d3-geo - for plotting 
+// https://cdn.jsdelivr.net - cdns for libraries without installing, converting to geojson so d3-geo could plot
+// and for the map itself.
+// https://www.feedingamerica.org/research/map-the-meal-gap/by-county - data
 (function () {
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
   function toPct(x) { if (x==null || x==='') return null; let v=Number(x); if(!isFinite(v)) return null; if(v<=1) v*=100; return v; }
