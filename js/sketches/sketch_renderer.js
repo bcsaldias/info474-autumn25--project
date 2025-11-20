@@ -34,7 +34,15 @@
                 }
             }
 
-            if (ai >= 4 && ai < 7) {
+            // treemap on data-active-index="4"
+            if (ai === 3) {
+                if (window.VizTreemap && typeof window.VizTreemap.draw === 'function') {
+                    window.VizTreemap.draw(p, manager, ai, progress);
+                    return;
+                }
+            }
+
+            if (ai >= 5 && ai < 7) {
                 window.VizScatter.draw(p, manager, ai, progress);
                 return;
             }
