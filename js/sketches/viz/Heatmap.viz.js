@@ -94,4 +94,6 @@
                 partition(rightGroup, x, y + topH, w, h - topH, !vertical);
             }
         }
+            items.sort(function(a,b){ return b.value - a.value; });
+        partition(items, left + 0, top + 0, width, height, true);
 
