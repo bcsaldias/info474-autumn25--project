@@ -51,9 +51,16 @@
                 var by = y - (rowH * 0.35);
                 var bh = rowH * 0.7;
 
-                // bar
-                p.fill(25, 220, 190);
+                // adding color hues to bar
+                var hue = Math.round((i / countries.length) * 90);
+                var lightness = 45;
+                var barColor = 'hsl(' + hue + ',70%,' + lightness + '%)';
+
+                p.fill(barColor);
                 p.rect(bx, by, bw, bh, 3);
+
+                // choose text color for contrast
+                if (lightness < 50) p.fill(255); else p.fill(30);
 
                 // value text on the bar (or to the right if bar is too narrow)
                 var valueText = formatGDP(val);
