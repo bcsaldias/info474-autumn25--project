@@ -4,13 +4,10 @@
     margin: { top: 40, right: 40, bottom: 40, left: 80 },
     offsetX: 80,
     offsetY: 40,
+    data: null,
   };
 
   new p5(function (p) {
-    p.preload = function () {
-      // data = p.loadTable("../data/table_viz_data.csv", "csv", "header");
-    };
-
     p.setup = function () {
       var canvas = p.createCanvas(900, 400);
       canvas.parent("viz_evolution");
@@ -20,12 +17,11 @@
     p.draw = function () {
       p.clear();
       p.background(0);
-      //  p.Table(data.rows);
 
-      // drawEvolution(p);
+      drawTop10(p);
     };
 
-    /* function drawEvolution(p) {
+    function drawTop10(p) {
       p.push();
       p.translate(manager.offsetX, manager.offsetY);
 
@@ -36,6 +32,6 @@
 
       // etc...
       p.pop();
-    } */
+    }
   });
 })();
