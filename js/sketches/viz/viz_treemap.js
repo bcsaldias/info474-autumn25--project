@@ -115,8 +115,9 @@
             var t = j / legendW; var v = minV + t * (maxV - minV);
             p.fill(colorForValue(v, minV, maxV)); p.noStroke(); p.rect(legendX + j, legendY, 1, legendH);
         }
-        p.fill(255); p.textSize(11); p.textAlign(p.LEFT, p.CENTER);
-        p.fill(255); p.text(maxV.toFixed(1) + '%', legendX + legendW + 6, legendY + legendH/2);
+        p.textSize(11); p.textAlign(p.LEFT, p.CENTER);
+        p.fill(0); // legend labels in black for readability (e.g., 1% and 9%)
+        p.text(maxV.toFixed(1) + '%', legendX + legendW + 6, legendY + legendH/2);
         p.text(minV.toFixed(1) + '%', legendX - 40, legendY + legendH/2);
 
         p.pop();
