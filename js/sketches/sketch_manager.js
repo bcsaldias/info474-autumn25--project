@@ -36,6 +36,19 @@ function startP5() {
                 p.background(255);
                 self.draw(p);
             };
+
+            // forward mouse presses on the p5 canvas to the renderer's
+            // mousePressed handler (if provided). This lets sketches
+            // like `GuessHowMany` respond to clicks.
+            p.mousePressed = function () {
+                try {
+                    if (typeof localRenderer.mousePressed === 'function') {
+                        localRenderer.mousePressed(p, manager, manager.state.activeIndex, manager.state.progress);
+                    }
+                } catch (e) {
+                    console.error('Error in forwarded mousePressed:', e);
+                }
+            };
         };
 
         this.p5 = new p5(sketch);

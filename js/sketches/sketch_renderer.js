@@ -40,6 +40,13 @@
                 window.VizBar.draw(p, manager, ai, progress);
                 return;
             }
+        },
+
+        mousePressed: function (p, manager, ai, progress) {
+            if (ai === 1) {
+                window.GuessHowMany.mousePressed(p, manager, ai, progress);
+                return;
+            }
         }
     };
 })();
