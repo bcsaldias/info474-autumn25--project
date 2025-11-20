@@ -34,9 +34,15 @@
         var top = (manager && manager.offsetY) || 20;
         var width = (manager && manager.width) || 760;
         var height = (manager && manager.height) || 480;
+        // Inner inset (pixels). Reduce this to make tiles larger. Can be overridden by manager._tileInset
+        var innerPad = (manager && typeof manager._tileInset === 'number') ? manager._tileInset : 4;
+        var innerLeft = left + innerPad;
+        var innerTop = top + innerPad;
+        var innerWidth = Math.max(10, width - innerPad * 2);
+        var innerHeight = Math.max(10, height - innerPad * 2);
 
-        var data = (manager && manager._treemapData) ? manager._treemapData : VizTreemap.defaultData;
-        var items = Object.keys(data).map(function(k){ return {key:k, value: Number(data[k])}; });
+            var data = (manager && manager._treemapData) ? manager._treemapData : VizTreemap.defaultData;
+            var items = Object.keys(data).map(function(k){ return {key:k, value: Number(data[k])}; });
         items = items.filter(function(it){ return isFinite(it.value) && it.value >= 0; });
 
         if (items.length === 0){
@@ -107,7 +113,7 @@
             } catch (e) { textIsDark = true; }
             p.fill(textIsDark ? 40 : 255);
             if (r.w > 50 && r.h > 28){
-                p.textSize(12); p.text(it.key + ' — ' + it.value, r.x + r.w/2, r.y + r.h/2);
+                    p.textSize(12); p.text(it.key + ' — ' + (isFinite(it.value) ? (Math.round(it.value*10)/10 + '%') : 'n/a'), r.x + r.w/2, r.y + r.h/2);
             } else {
                 // collect small tiles to render in a compact list so their values are visible
                 smallTiles.push(it);
@@ -133,7 +139,8 @@
             p.textSize(11); p.textAlign(p.LEFT, p.TOP); p.fill(0);
             for (var s = 0; s < smallTiles.length; s++){
                 var it = smallTiles[s];
-                p.text(it.key + ' — ' + it.value + '%', listX, listY + s * 14);
+                    var labelVal = isFinite(it.value) ? (Math.round(it.value*10)/10 + '%') : 'n/a';
+                    p.text(it.key + ' — ' + labelVal, listX, listY + s * 14);
             }
         }
 
