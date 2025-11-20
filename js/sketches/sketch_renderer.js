@@ -34,10 +34,14 @@
                     return;
                 }
             }
-             // bar chart on data-active-index="4"
+            // bar chart on data-active-index="4" — prefer VizBarGraph, fallback to VizBar
             if (ai === 4) {
-                if (window.VizBarGraph  && typeof window.VizBarGraph.draw === 'function') {
+                if (window.VizBarGraph && typeof window.VizBarGraph.draw === 'function') {
                     window.VizBarGraph.draw(p, manager, ai, progress);
+                    return;
+                }
+                if (window.VizBar && typeof window.VizBar.draw === 'function') {
+                    window.VizBar.draw(p, manager, ai, progress);
                     return;
                 }
             }
@@ -48,6 +52,11 @@
             }
 
             if (ai === 7) {
+                // for index 7 prefer the simple VizBar (months example), fallback to VizBarGraph
+                if (window.VizBar && typeof window.VizBar.draw === 'function') {
+                    window.VizBar.draw(p, manager, ai, progress);
+                    return;
+                }
                 if (window.VizBarGraph && typeof window.VizBarGraph.draw === 'function') {
                     window.VizBarGraph.draw(p, manager, ai, progress);
                     return;
