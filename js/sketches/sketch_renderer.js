@@ -26,15 +26,8 @@
                 return;
             }
 
-            // show heatmap for the tariffs-focused section (data-active-index="3")
-            if (ai === 3) {
-                if (window.VizHeatmap && typeof window.VizHeatmap.draw === 'function') {
-                    window.VizHeatmap.draw(p, manager, ai, progress);
-                    return;
-                }
-            }
 
-            // treemap on data-active-index="4"
+            // treemap on data-active-index="3"
             if (ai === 3) {
                 if (window.VizTreemap && typeof window.VizTreemap.draw === 'function') {
                     window.VizTreemap.draw(p, manager, ai, progress);
