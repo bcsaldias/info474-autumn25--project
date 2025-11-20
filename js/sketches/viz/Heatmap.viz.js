@@ -45,5 +45,21 @@
         var minV = Math.min.apply(null, items.map(function(it){ return it.value; }));
         var maxV = Math.max.apply(null, items.map(function(it){ return it.value; }));
 
-         function sumValues(arr){ return arr.reduce(function(s,it){ return s + it.value; }, 0); }
+        function sumValues(arr){ return arr.reduce(function(s,it){ return s + it.value; }, 0); }
+
+        var rects = [];
+        // function that divides rectangle into tiles 
+        function partition(itemsList, x, y, w, h, vertical){
+            if (!itemsList || itemsList.length === 0) return;
+            if (itemsList.length === 1){
+                rects.push({x:x, y:y, w:w, h:h, data: itemsList[0]});
+                return;
+            }
+            var total = sumValues(itemsList);
+            var half = total / 2;
+            var leftSum = 0; var splitIndex = 0;
+            for (var i=0;i<itemsList.length;i++){
+                leftSum += itemsList[i].value;
+                if (leftSum >= half){ splitIndex = i; break; }
+            }
 
