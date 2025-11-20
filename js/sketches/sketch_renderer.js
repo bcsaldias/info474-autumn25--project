@@ -34,6 +34,13 @@
                     return;
                 }
             }
+             // bar chart on data-active-index="4"
+            if (ai === 4) {
+                if (window.VizBar && typeof window.VizBar.draw === 'function') {
+                    window.VizBar.draw(p, manager, ai, progress);
+                    return;
+                }
+            }
 
             if (ai >= 5 && ai < 7) {
                 window.VizScatter.draw(p, manager, ai, progress);
