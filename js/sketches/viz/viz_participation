@@ -39,4 +39,12 @@ function draw() {
         vertex(x, y);
     }
     endShape();
+
+    fill(0, 100, 255);
+    noStroke();
+    for (let i = 0; i < years.length; i++) {
+      let x = map(years[i], minYear, maxYear, margin, width - margin);
+      let y = map(counts[i], minCount, maxCount, height - margin, margin);
+      circle(x, y, 6);
+    }
 }
