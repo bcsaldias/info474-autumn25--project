@@ -1,0 +1,5 @@
+let table;
+
+function preload() {
+  table = loadTable("swimming_participation.csv", "csv", "header");
+}
