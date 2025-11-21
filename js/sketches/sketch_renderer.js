@@ -37,7 +37,7 @@
             }
 
             if (ai === 7) {
-                window.VizBar.draw(p, manager, ai, progress);
+                window.VizExploreMoreMap.draw(p, manager, ai, progress);
                 return;
             }
         }
