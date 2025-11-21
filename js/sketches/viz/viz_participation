@@ -4,6 +4,30 @@ function preload() {
   table = loadTable("swimming_participation.csv", "csv", "header");
 }
 
+let years = [];
+let counts = [];
+
 function setup() {
   createCanvas(800, 500);
+
+  for (let r = 0; r < table.getRowCount(); r++) {
+    years.push(table.getNum(r, "Year"));
+    counts.push(table.getNum(r, "Count"));
+  }
+}
+
+function draw() {
+    background(255);
+  
+    let margin = 60;
+  
+    let minYear = min(years);
+    let maxYear = max(years);
+    let minCount = min(counts);
+    let maxCount = max(counts);
+  
+    stroke(0);
+    line(margin, height - margin, width - margin, height - margin);  
+    line(margin, margin, margin, height - margin); 
+
 }
