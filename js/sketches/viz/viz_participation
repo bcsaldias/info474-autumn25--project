@@ -30,4 +30,13 @@ function draw() {
     line(margin, height - margin, width - margin, height - margin);  
     line(margin, margin, margin, height - margin); 
 
+    noFill();
+    stroke(0, 100, 255);
+    beginShape();
+    for (let i = 0; i < years.length; i++) {
+        let x = map(years[i], minYear, maxYear, margin, width - margin);
+        let y = map(counts[i], minCount, maxCount, height - margin, margin);
+        vertex(x, y);
+    }
+    endShape();
 }
