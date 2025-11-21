@@ -82,7 +82,8 @@
             }
 
             p.noFill();
-            p.stroke(0, 100, 255);
+            p.stroke(0, 150, 255);
+            p.strokeWeight(3);
             p.beginShape();
             for (let i = 0; i < years.length; i++) {
                 let x = p.map(years[i], minYear, maxYear, margin, p.width - margin);
