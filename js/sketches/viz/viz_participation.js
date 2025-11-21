@@ -49,7 +49,7 @@
             p.text("Year", p.width / 2, p.height - 20);
 
             p.push();
-            p.translate(40, p.height / 2);
+            p.translate(20, p.height / 2);
             p.rotate(-p.HALF_PI);
             p.text("Number of Women Athletes", 0, 0);
             p.pop();
@@ -58,6 +58,28 @@
             p.textSize(20);
             p.textAlign(p.CENTER);
             p.text("Women's Participation in Olympic Swimming (1912–2016)", p.width / 2, 30);
+
+            p.textSize(12);
+            p.fill(255);
+
+                // X-axis ticks (years)
+            for (let i = 0; i < years.length; i += 4) {   // show every 4 years
+                let x = p.map(years[i], minYear, maxYear, margin, p.width - margin);
+                p.stroke(255);
+                p.line(x, p.height - margin - 5, x, p.height - margin + 5);
+                p.noStroke();
+                p.text(years[i], x, p.height - margin + 20);
+            }
+
+            // Y-axis ticks (counts)
+            let step = 20;
+            for (let c = minCount; c <= maxCount; c += step) {
+                let y = p.map(c, minCount, maxCount, p.height - margin, margin);
+                p.stroke(255);
+                p.line(margin - 5, y, margin + 5, y);
+                p.noStroke();
+                p.text(c, margin - 25, y + 5);
+            }
 
             p.noFill();
             p.stroke(0, 100, 255);
