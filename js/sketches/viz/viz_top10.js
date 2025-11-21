@@ -19,7 +19,7 @@
     };
 
     p.setup = function () {
-      var canvas = p.createCanvas(900, 400);
+      var canvas = p.createCanvas(1000, 400);
       canvas.parent("viz_top10");
       p.textFont("Inria Serif");
     };
@@ -68,31 +68,44 @@
       ];
 
       let x_cell = 0;
+      let x_width = 128;
+      let name_adjustment = 0;
 
-      // first loop - horizontal cells
+      // first loop for columns
       for (i = 0; i < 7; i++) {
         let y_cell = 0;
-        p.push();
-        p.fill("#C80428");
-        p.rect(x_cell, 0, 128, 50);
-        p.fill("white");
-        p.textSize(20);
-        p.textAlign(p.CENTER, p.CENTER);
-        p.text(rowNames[i], x_cell + 65, 30);
-        p.pop();
         let selectedArr = arrNames[i];
+
+        if (i == 0) {
+          x_width = 230;
+          name_adjustment = 50;
+        }
         // second loop - fills in cells vertically
         for (j = 0; j < 10; j++) {
-          p.rect(x_cell, y_cell + 50, 128, 50);
-          p.push();
-          p.fill("white");
-          p.textSize(20);
-          p.textAlign(p.CENTER, p.CENTER);
-          p.text(selectedArr[j], x_cell + 70, y_cell + 75);
-          p.pop();
-          y_cell += 50;
+          if (j == 0) {
+            p.push();
+            p.fill("#C80428");
+            p.rect(x_cell, y_cell, x_width, 50);
+            p.fill("white");
+            p.textSize(20);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.text(rowNames[i], x_cell + 65 + name_adjustment, 30);
+            p.pop();
+            y_cell += 50;
+          } else {
+            p.push();
+            p.rect(x_cell, y_cell, x_width, 50);
+            p.fill("white");
+            p.textSize(20);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.text(selectedArr[j], x_cell + 65 + name_adjustment, y_cell + 25);
+            p.pop();
+            y_cell += 50;
+          }
         }
-        x_cell += 128;
+        x_cell += x_width;
+        x_width = 128;
+        name_adjustment = 0;
       }
 
       p.pop();
