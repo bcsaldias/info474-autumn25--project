@@ -111,3 +111,23 @@ body {
 .subtitle img {
   margin: 0 10%;
 }
+
+.small-caption {
+  font-size: 14px;
+  line-height: 1.55;
+  font-style: italic;
+  color: #e0e0e0;
+  max-width: 80%;
+  margin: 20px auto 40px auto;
+  border-left: 2px solid white;
+  padding-left: 15px;
+  font-family: 'Inria Serif', serif;
+}
+
+.viz-caption{
+  font-size: 13px;
+  font-style: italic;
+  color: #bbbbbb;
+  max-width: 70%;
+  font-family: 'Inria Serif', serif;
+}
