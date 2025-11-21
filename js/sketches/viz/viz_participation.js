@@ -36,7 +36,7 @@
             let minCount = Math.min(...counts);
             let maxCount = Math.max(...counts);
         
-            p.stroke(0);
+            p.stroke(255);
             p.line(margin, p.height - margin, p.width - margin, p.height - margin);  
             p.line(margin, margin, margin, p.height - margin); 
 
