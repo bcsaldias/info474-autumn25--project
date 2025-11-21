@@ -92,13 +92,13 @@
             }
             p.endShape();
 
-            // fill(0, 100, 255);
-            // noStroke();
-            // for (let i = 0; i < years.length; i++) {
-            // let x = map(years[i], minYear, maxYear, margin, width - margin);
-            // let y = map(counts[i], minCount, maxCount, height - margin, margin);
-            // circle(x, y, 6);
-            // }
+            for (let i = 0; i < years.length; i++) {
+                let x = p.map(years[i], minYear, maxYear, margin, p.width - margin);
+                let y = p.map(counts[i], minCount, maxCount, p.height - margin, margin);
+                p.fill(0, 150, 255);
+                p.noStroke();
+                p.circle(x, y, 6);
+            }
         };
     });
 
