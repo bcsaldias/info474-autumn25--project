@@ -36,13 +36,18 @@
                 return;
             }
 
-            if (ai >= 4 && ai < 7) {
+            if (ai == 4) {
+                window.VizJustice.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai >= 5 && ai < 7) {
                 window.VizScatter.draw(p, manager, ai, progress);
                 return;
             }
 
             if (ai === 7) {
-                window.VizBar.draw(p, manager, ai, progress);
+                window.VizExploreMoreMap.draw(p, manager, ai, progress);
                 return;
             }
         },

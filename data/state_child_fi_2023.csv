@@ -1,0 +1,52 @@
+state_fips,state,child_fi_rate,children_insecure
+01,Alabama,0.222,250580
+02,Alaska,0.178,31030
+04,Arizona,0.184,291290
+05,Arkansas,0.24,167940
+06,California,0.169,1427650
+08,Colorado,0.143,172540
+09,Connecticut,0.17,122660
+10,Delaware,0.179,37920
+11,District of Columbia,0.147,18570
+12,Florida,0.184,806870
+13,Georgia,0.196,496110
+15,Hawaii,0.207,60840
+16,Idaho,0.162,75640
+17,Illinois,0.155,419180
+18,Indiana,0.185,292720
+19,Iowa,0.166,120220
+20,Kansas,0.184,126260
+21,Kentucky,0.211,213830
+22,Louisiana,0.234,248630
+23,Maine,0.206,50610
+24,Maryland,0.161,219040
+25,Massachusetts,0.132,177040
+26,Michigan,0.191,402680
+27,Minnesota,0.143,185010
+28,Mississippi,0.23,155190
+29,Missouri,0.181,248620
+30,Montana,0.17,40100
+31,Nebraska,0.192,91930
+32,Nevada,0.2,136580
+33,New Hampshire,0.144,36160
+34,New Jersey,0.135,271650
+35,New Mexico,0.233,104390
+36,New York,0.19,750180
+37,North Carolina,0.189,438200
+38,North Dakota,0.136,24510
+39,Ohio,0.201,517450
+40,Oklahoma,0.24,231800
+41,Oregon,0.175,145060
+42,Pennsylvania,0.181,475230
+44,Rhode Island,0.152,30930
+45,South Carolina,0.172,196320
+46,South Dakota,0.183,39960
+47,Tennessee,0.198,308920
+48,Texas,0.222,1673600
+49,Utah,0.172,161000
+50,Vermont,0.139,15960
+51,Virginia,0.14,261730
+53,Washington,0.171,281010
+54,West Virginia,0.202,71140
+55,Wisconsin,0.163,202600
+56,Wyoming,0.21,27230
