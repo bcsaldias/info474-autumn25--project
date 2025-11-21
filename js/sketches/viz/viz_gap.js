@@ -22,7 +22,7 @@
       womenYearArr = women_data.getColumn("Year");
       womenTimeArr = women_data.getColumn("Results");
 
-      var canvas = p.createCanvas(900, 400);
+      var canvas = p.createCanvas(850, 400);
       canvas.parent("viz_gap");
       p.textFont("Inria Serif");
     };

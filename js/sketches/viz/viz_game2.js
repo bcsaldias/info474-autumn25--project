@@ -20,34 +20,33 @@
   
         p.fill(255);
         p.textSize(24);
-        p.text("Drag slider to guess the range", manager.offsetX, 40);
   
         drawAgeHeightRanges(p);
       };
   
-      function drawAgeHeightRanges(p) {
-        p.push();
-        p.translate(manager.offsetX, 100);
+      // function drawAgeHeightRanges(p) {
+      //   p.push();
+      //   p.translate(manager.offsetX, 100);
   
-        p.stroke(255);
-        p.line(0, 50, 600, 50);
-        p.line(0, 150, 600, 150);
+      //   p.stroke(255);
+      //   p.line(0, 50, 600, 50);
+      //   p.line(0, 150, 600, 150);
   
-        p.noStroke();
-        p.fill(255, 204, 0);
-        p.circle(200, 50, 15);
-        p.circle(400, 150, 15);
+      //   p.noStroke();
+      //   p.fill(255, 204, 0);
+      //   p.circle(200, 50, 15);
+      //   p.circle(400, 150, 15);
   
-        p.fill(255);
-        p.textSize(18);
-        p.text("Age", -40, 55);
-        p.text("Height", -40, 155);
+      //   p.fill(255);
+      //   p.textSize(18);
+      //   p.text("Age", -40, 55);
+      //   p.text("Height", -40, 155);
   
-        p.text("20–30", 640, 55);
-        p.text("180–190cm", 640, 155);
+      //   p.text("20–30", 640, 55);
+      //   p.text("180–190cm", 640, 155);
   
-        p.pop();
-      }
+      //   p.pop();
+      // }
   
     });
   })();

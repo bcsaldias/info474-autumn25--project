@@ -9,7 +9,7 @@
 
   new p5(function (p) {
     p.setup = function () {
-      var canvas = p.createCanvas(900, 400);
+      var canvas = p.createCanvas(850, 400);
       canvas.parent("viz_evolution");
       p.textFont("Inria Serif");
     };
