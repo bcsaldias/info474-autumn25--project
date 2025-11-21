@@ -27,7 +27,7 @@
 
         p.draw = function () {
             p.clear();
-            p.background(255);
+            p.background(0);
         
             let margin = 60;
         
