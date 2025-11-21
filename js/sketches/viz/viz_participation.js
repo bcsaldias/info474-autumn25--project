@@ -1,8 +1,8 @@
 (function () {
     var manager = {
-      margin: { top: 40, right: 40, bottom: 40, left: 60 },
-      offsetX: 0,
-      offsetY: 0,
+      margin: { top: 40, right: 40, bottom: 40, left: 80 },
+      offsetX: 80,
+      offsetY: 40,
       data: null
     };
 
@@ -16,7 +16,7 @@
         }
 
         p.setup = function()  {
-            const canvas = p.createCanvas(700, 400);
+            const canvas = p.createCanvas(850, 400);
             canvas.parent("viz_participation");
 
             for (let r = 0; r < table.getRowCount(); r++) {
