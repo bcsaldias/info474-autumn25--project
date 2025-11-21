@@ -1,50 +1,53 @@
-let table;
 
-function preload() {
-  table = loadTable("swimming_participation.csv", "csv", "header");
-}
+const s = (p) => {
+    let table;
+    let years = [];
+    let counts = [];
 
-let years = [];
-let counts = [];
-
-function setup() {
-  createCanvas(800, 500);
-
-  for (let r = 0; r < table.getRowCount(); r++) {
-    years.push(table.getNum(r, "Year"));
-    counts.push(table.getNum(r, "Count"));
-  }
-}
-
-function draw() {
-    background(255);
-  
-    let margin = 60;
-  
-    let minYear = min(years);
-    let maxYear = max(years);
-    let minCount = min(counts);
-    let maxCount = max(counts);
-  
-    stroke(0);
-    line(margin, height - margin, width - margin, height - margin);  
-    line(margin, margin, margin, height - margin); 
-
-    noFill();
-    stroke(0, 100, 255);
-    beginShape();
-    for (let i = 0; i < years.length; i++) {
-        let x = map(years[i], minYear, maxYear, margin, width - margin);
-        let y = map(counts[i], minCount, maxCount, height - margin, margin);
-        vertex(x, y);
+    p.preload = () => {
+    table = loadTable("data/swimming_participation.csv", "csv", "header");
     }
-    endShape();
 
-    fill(0, 100, 255);
-    noStroke();
-    for (let i = 0; i < years.length; i++) {
-      let x = map(years[i], minYear, maxYear, margin, width - margin);
-      let y = map(counts[i], minCount, maxCount, height - margin, margin);
-      circle(x, y, 6);
+    p.setup = () => {
+        const canvas = p.createCanvas(700, 400);
+        canvas.parent("viz_participation");
+
+        for (let r = 0; r < table.getRowCount(); r++) {
+            years.push(table.getNum(r, "Year"));
+            counts.push(table.getNum(r, "Count"));
+        }
+    }
+
+    p.draw = () => {
+        p.background(255);
+    
+        let margin = 60;
+    
+        let minYear = min(years);
+        let maxYear = max(years);
+        let minCount = min(counts);
+        let maxCount = max(counts);
+    
+        p.stroke(0);
+        p.line(margin, p.height - margin, p.width - margin, p.height - margin);  
+        p.line(margin, margin, margin, p.height - margin); 
+
+        p.noFill();
+        p.stroke(0, 100, 255);
+        p.beginShape();
+        for (let i = 0; i < years.length; i++) {
+            let x = p.map(years[i], minYear, maxYear, margin, width - margin);
+            let y = p.map(counts[i], minCount, maxCount, height - margin, margin);
+            vertex(x, y);
+        }
+        p.endShape();
+
+        // fill(0, 100, 255);
+        // noStroke();
+        // for (let i = 0; i < years.length; i++) {
+        // let x = map(years[i], minYear, maxYear, margin, width - margin);
+        // let y = map(counts[i], minCount, maxCount, height - margin, margin);
+        // circle(x, y, 6);
+        // }
     }
 }
