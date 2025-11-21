@@ -63,12 +63,14 @@
             p.fill(255);
 
                 // X-axis ticks (years)
-            for (let i = 0; i < years.length; i += 4) {   // show every 4 years
-                let x = p.map(years[i], minYear, maxYear, margin, p.width - margin);
-                p.stroke(255);
-                p.line(x, p.height - margin - 5, x, p.height - margin + 5);
-                p.noStroke();
-                p.text(years[i], x, p.height - margin + 20);
+            for (let i = 0; i < years.length; i++) {
+                if (i === 0 || i === years.length - 1 || i % 4 === 0) {
+                    let x = p.map(years[i], minYear, maxYear, margin, p.width - margin);
+                    p.stroke(255);
+                    p.line(x, p.height - margin - 5, x, p.height - margin + 5);
+                    p.noStroke();
+                    p.text(years[i], x, p.height - margin + 20);
+                }
             }
 
             // Y-axis ticks (counts)
