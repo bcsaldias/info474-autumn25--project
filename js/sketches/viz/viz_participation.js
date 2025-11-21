@@ -1,0 +1,110 @@
+(function () {
+    var manager = {
+      margin: { top: 40, right: 40, bottom: 40, left: 60 },
+      offsetX: 0,
+      offsetY: 0,
+      data: null
+    };
+
+    let table;
+    let years = [];
+    let counts = [];
+
+    new p5(function (p) {
+        p.preload = () => {
+            table = p.loadTable("data/swimming_participation.csv", "csv", "header");
+        }
+
+        p.setup = function()  {
+            const canvas = p.createCanvas(700, 400);
+            canvas.parent("viz_participation");
+
+            for (let r = 0; r < table.getRowCount(); r++) {
+                years.push(table.getNum(r, "Year"));
+                counts.push(table.getNum(r, "Athlete"));
+            }
+        }
+
+        p.draw = function () {
+            p.clear();
+            p.background(0);
+        
+            let margin = 60;
+        
+            let minYear = Math.min(...years);
+            let maxYear = Math.max(...years);
+            let minCount = Math.min(...counts);
+            let maxCount = Math.max(...counts);
+        
+            p.stroke(255);
+            p.strokeWeight(2)
+            p.line(margin, p.height - margin, p.width - margin, p.height - margin);  
+            p.line(margin, margin, margin, p.height - margin); 
+
+            // axis labels
+            p.fill(255);
+            p.noStroke();
+            p.textSize(16);
+            p.textAlign(p.CENTER);
+            p.text("Year", p.width / 2, p.height - 20);
+
+            p.push();
+            p.translate(20, p.height / 2);
+            p.rotate(-p.HALF_PI);
+            p.text("Number of Women Athletes", 0, 0);
+            p.pop();
+        
+            // title
+            p.textSize(20);
+            p.textAlign(p.CENTER);
+            p.text("Women's Participation in Olympic Swimming (1912–2016)", p.width / 2, 30);
+
+            p.textSize(12);
+            p.fill(255);
+
+                // X-axis ticks (years)
+            for (let i = 0; i < years.length; i++) {
+                if (i === 0 || i === years.length - 1 || i % 4 === 0) {
+                    let x = p.map(years[i], minYear, maxYear, margin, p.width - margin);
+                    p.stroke(255);
+                    p.line(x, p.height - margin - 5, x, p.height - margin + 5);
+                    p.noStroke();
+                    p.text(years[i], x, p.height - margin + 20);
+                }
+            }
+
+            // Y-axis ticks (counts)
+            let step = 20;
+            for (let c = minCount; c <= maxCount; c += step) {
+                let y = p.map(c, minCount, maxCount, p.height - margin, margin);
+                p.stroke(255);
+                p.line(margin - 5, y, margin + 5, y);
+                p.noStroke();
+                p.text(c, margin - 25, y + 5);
+            }
+
+            p.noFill();
+            p.stroke(0, 150, 255);
+            p.strokeWeight(3);
+            p.beginShape();
+            for (let i = 0; i < years.length; i++) {
+                let x = p.map(years[i], minYear, maxYear, margin, p.width - margin);
+                let y = p.map(counts[i], minCount, maxCount,p.height - margin, margin);
+                p.vertex(x, y);
+            }
+            p.endShape();
+
+            for (let i = 0; i < years.length; i++) {
+                let x = p.map(years[i], minYear, maxYear, margin, p.width - margin);
+                let y = p.map(counts[i], minCount, maxCount, p.height - margin, margin);
+                p.fill(0, 150, 255);
+                p.noStroke();
+                p.circle(x, y, 6);
+            }
+        };
+    });
+
+    if (typeof window.sketch_manager !== "undefined") {
+        window.sketch_manager.register("viz_participation", manager);
+    }
+})();
