@@ -41,6 +41,19 @@
             p.line(margin, p.height - margin, p.width - margin, p.height - margin);  
             p.line(margin, margin, margin, p.height - margin); 
 
+            p.fill(255);
+            p.noStroke();
+            p.textSize(16);
+            p.textAlign(p.CENTER);
+            p.text("Year", p.width / 2, p.height - 20);
+
+            p.push();
+            p.translate(40, p.height / 2);
+            p.rotate(-p.HALF_PI);
+            p.text("Number of Women Athletes", 0, 0);
+            p.pop();
+        
+
             p.noFill();
             p.stroke(0, 100, 255);
             p.beginShape();
