@@ -131,3 +131,36 @@ body {
   max-width: 70%;
   font-family: 'Inria Serif', serif;
 }
+/* button {
+  background-color: #368D46;
+  color: white;
+  
+  border-radius: 50px;
+  margin: 10px;
+  padding: 10px 15px;
+  border: 1px solid white;
+} */
+
+/* .container section[data-active-index="4"] {
+  background-image: url('../assets/gridpool.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: white;
+} */
+/* 
+#viz_top10 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin: 0 auto;
+}
+#viz_game1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin: 0 auto;
+} */
+
