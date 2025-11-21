@@ -56,8 +56,10 @@
           Make sure you read both source files to understand how they work.
         </section>
         <section class="step" data-active-index="7">
-          <div class="title">Best of Luck in the Project!</div>
-          You are now ready to start building your interactive article. Good luck!
+          <div class="title">Explore More</div>
+          Hover over the map so see each state's child food-insecurity rate for the most recent year of data (2023). Click on a state to zoom in and view county level differences. 
+          
+          <p>Data source: Feeding America – Map the Meal Gap (2019–2023)</p>
         </section>
       </div>
       <div id='vis' class='vis-hidden'>
@@ -70,6 +72,8 @@
 
   <!-- p5.js (using CDN) -->
   <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
   <!-- helpers (data/loading, scroller, visual controller) -->
   <script src="js/helpers/data_loader.js"></script>
   <script src="js/helpers/scroller.js"></script>
@@ -87,7 +91,7 @@
   <!-- sketches (renderers): UPDATE HERE FOR PROJECT -->
   <script src="js/sketches/viz/viz_title.js"></script>
   <script src="js/sketches/viz/viz_scatter.js"></script>
-  <script src="js/sketches/viz/viz_bar.js"></script>
+  <script src="js/sketches/viz/viz_explore_more_map.js"></script>
   <script src="js/sketches/sketch_renderer.js"></script>
 
 
