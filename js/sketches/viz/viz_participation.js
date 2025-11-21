@@ -41,6 +41,7 @@
             p.line(margin, p.height - margin, p.width - margin, p.height - margin);  
             p.line(margin, margin, margin, p.height - margin); 
 
+            // axis labels
             p.fill(255);
             p.noStroke();
             p.textSize(16);
@@ -53,6 +54,10 @@
             p.text("Number of Women Athletes", 0, 0);
             p.pop();
         
+            // title
+            p.textSize(20);
+            p.textAlign(p.CENTER);
+            p.text("Women's Participation in Olympic Swimming (1912–2016)", p.width / 2, 30);
 
             p.noFill();
             p.stroke(0, 100, 255);
