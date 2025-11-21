@@ -37,6 +37,7 @@
             let maxCount = Math.max(...counts);
         
             p.stroke(255);
+            p.strokeWeight(2)
             p.line(margin, p.height - margin, p.width - margin, p.height - margin);  
             p.line(margin, margin, margin, p.height - margin); 
 
