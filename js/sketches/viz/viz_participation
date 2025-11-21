@@ -1,11 +1,11 @@
 
-const s = (p) => {
+const viz_participation = (p) => {
     let table;
     let years = [];
     let counts = [];
 
     p.preload = () => {
-    table = loadTable("data/swimming_participation.csv", "csv", "header");
+        table = p.loadTable("data/swimming_participation.csv", "csv", "header");
     }
 
     p.setup = () => {
@@ -23,10 +23,10 @@ const s = (p) => {
     
         let margin = 60;
     
-        let minYear = min(years);
-        let maxYear = max(years);
-        let minCount = min(counts);
-        let maxCount = max(counts);
+        let minYear = p.min(years);
+        let maxYear = p.max(years);
+        let minCount =p.min(counts);
+        let maxCount = p.max(counts);
     
         p.stroke(0);
         p.line(margin, p.height - margin, p.width - margin, p.height - margin);  
@@ -36,9 +36,9 @@ const s = (p) => {
         p.stroke(0, 100, 255);
         p.beginShape();
         for (let i = 0; i < years.length; i++) {
-            let x = p.map(years[i], minYear, maxYear, margin, width - margin);
-            let y = p.map(counts[i], minCount, maxCount, height - margin, margin);
-            vertex(x, y);
+            let x = p.map(years[i], minYear, maxYear, margin, p.width - margin);
+            let y = p.map(counts[i], minCount, maxCount,p.height - margin, margin);
+            p.vertex(x, y);
         }
         p.endShape();
 
@@ -51,3 +51,4 @@ const s = (p) => {
         // }
     }
 }
+new p5(viz_participation);
