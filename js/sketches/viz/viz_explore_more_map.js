@@ -33,18 +33,30 @@
     if (!isFinite(v)) return '';
     return v.toLocaleString('en-US');
   }
+  // convert percent to "≈1 in N"
+  function oneInN(ratePct){
+    if (ratePct == null || !isFinite(ratePct) || ratePct <= 0) return '';
+    return '≈1 in ' + Math.round(100 / ratePct);
+  }
   function defaultPalette(){ return ['#f7fbff','#deebf7','#c6dbef','#9ecae1','#6baed6','#3182bd','#08519c']; }
   function colorFor(rate, thresholds, palette){
     if(rate==null) return '#e6eef7'; 
     for(let i=thresholds.length-1;i>=0;i--){ if(rate>=thresholds[i]) return palette[Math.min(i+1, palette.length-1)]; }
     return palette[0];
   }
+  // give the legend a bit more headroom so it never clips at the bottom
+  const LEGEND_Y_PAD = 52;  // previously ~36; extra space for the 1-in-N line
+
   function drawLegend(p, x, y, thresholds, palette){
     const boxW=22, boxH=10, gap=4;
     for(let i=0;i<palette.length;i++){ p.noStroke(); p.fill(palette[i]); p.rect(x+i*(boxW+2), y, boxW, boxH, 2); }
     p.fill(40); p.textAlign(p.LEFT, p.TOP);
     const labels=['low'].concat(thresholds.map(t=>t+'%')).concat(['high']);
     p.text(labels.join('  '), x, y+boxH+gap);
+    // examples: tie % to "1 in N"
+    const ex = thresholds.map(t => `${t}% ${oneInN(t)}`).join('   •   ');
+    p.fill(90); p.textSize(11);
+    p.text(ex, x, y + boxH + gap + 14);
   }
   function drawTooltip(p, txt, x, y, left, top, W, H){
     p.textSize(12);
@@ -258,6 +270,7 @@
           const name = (manager._stateNames && manager._stateNames.get(fips)) ||
                        (hovered.properties && hovered.properties.name) || 'State';
           let label = name + (rate!=null ? (' — ' + fmtPct(rate)) : '');
+          if (rate != null) label += ' (' + oneInN(rate) + ')';
           const kids = (manager._stateChildren && manager._stateChildren.get(fips));
           if (kids != null) label += ' (' + fmtInt(kids) + ' children)';
           const c = proj(d3.geoCentroid(hovered));
@@ -272,8 +285,8 @@
         }
         if (!p.mouseIsPressed) manager._mouseLatch = false;
 
-        // legend
-        if (manager._stateRates) drawLegend(p, left + 10, top + H - 36, thresholds, palette);
+        // legend (raised to avoid clipping)
+        if (manager._stateRates) drawLegend(p, left + 10, top + H - LEGEND_Y_PAD, thresholds, palette);
 
         p.pop();
         return;
@@ -321,7 +334,22 @@
         p.noStroke(); p.fill(30); p.textAlign(p.CENTER, p.TOP); p.textSize(18);
         p.text(stateName, left + W/2, top - 28);
 
-        // county tooltip 
+        // back button
+        const bx = left, by = top - 30, bw = 128, bh = 26;
+        p.noStroke(); p.fill(240); p.rect(bx, by, bw, bh, 6);
+        p.fill(40); p.textAlign(p.LEFT, p.CENTER); p.textSize(13);
+        p.text('← Back to U.S.', bx + 10, by + bh / 2);
+        const overBack = p.mouseX >= bx && p.mouseX <= bx + bw && p.mouseY >= by && p.mouseY <= by + bh;
+        if (p.mouseIsPressed && !manager._mouseLatch && overBack) {
+          manager._scene = 'nation';
+          manager._selectedStateFips = null;
+          manager._mouseLatch = true;
+        }
+        if (!p.mouseIsPressed) manager._mouseLatch = false;
+        p.noStroke(); p.fill(90); p.textAlign(p.LEFT, p.TOP); p.textSize(11);
+        p.text('or press ESC', bx + 10, by + bh + 4);
+
+        // county tooltip + outline 
         const hoveredC = hitFeatureAtMouse(p, manager._stateCountyFeatures, projState, left, top);
         if (hoveredC && manager._countyRate) {
           const cf = String(hoveredC.id).padStart(5,'0');
@@ -329,6 +357,7 @@
                      (hoveredC.properties && hoveredC.properties.name) || 'County';
           const rt = manager._countyRate.get(cf);
           let label = nm + (rt!=null ? (' — ' + fmtPct(rt)) : '');
+          if (rt != null) label += ' (' + oneInN(rt) + ')';
           const kids = (manager._countyChildren && manager._countyChildren.get(cf));
           if (kids != null) label += ' (' + fmtInt(kids) + ' children)';
           const c = projState(d3.geoCentroid(hoveredC));
@@ -343,9 +372,6 @@
         }
 
         // ESC to go back 
-        p.noStroke(); p.fill(90); p.textAlign(p.RIGHT, p.TOP); p.textSize(11);
-        p.text('Press ESC to return', left + W - 10, top - 26);
-
         if (p.keyIsPressed && p.keyCode === 27 && !manager._escLatch) {
           manager._scene = 'nation';
           manager._selectedStateFips = null;
@@ -353,8 +379,8 @@
         }
         if (!p.keyIsPressed) manager._escLatch = false;
 
-        // legend 
-        if (manager._countyRate) drawLegend(p, left + 10, top + H - 36, thresholds, palette);
+        // legend
+        if (manager._countyRate) drawLegend(p, left + 10, top + H - LEGEND_Y_PAD, thresholds, palette);
 
         p.pop();
         return;
