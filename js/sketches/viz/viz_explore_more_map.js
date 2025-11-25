@@ -223,9 +223,13 @@
 
       const ctx = p.drawingContext;
 
+      // for making sure the state doesn't overlap
+      const MAP_H = Math.max(120, H - LEGEND_Y_PAD - 8);
+      const VISIBLE_H_FOR_TOOLTIP = MAP_H;
+
       // us nation
       if (manager._scene === 'nation') {
-        const proj = d3.geoAlbersUsa().fitSize([W, H], manager._statesGeo);
+        const proj = d3.geoAlbersUsa().fitSize([W, MAP_H], manager._statesGeo);
         const path = d3.geoPath(proj, ctx);
 
         // nation
@@ -274,7 +278,7 @@
           const kids = (manager._stateChildren && manager._stateChildren.get(fips));
           if (kids != null) label += ' (' + fmtInt(kids) + ' children)';
           const c = proj(d3.geoCentroid(hovered));
-          if (c) drawTooltip(p, label, left + c[0], top + c[1], left, top, W, H);
+          if (c) drawTooltip(p, label, left + c[0], top + c[1], left, top, W, VISIBLE_H_FOR_TOOLTIP);
         }
 
         // click 
@@ -286,7 +290,7 @@
         if (!p.mouseIsPressed) manager._mouseLatch = false;
 
         // legend (raised to avoid clipping)
-        if (manager._stateRates) drawLegend(p, left + 10, top + H - LEGEND_Y_PAD, thresholds, palette);
+        drawLegend(p, left + 10, top + H - LEGEND_Y_PAD, thresholds, palette);
 
         p.pop();
         return;
@@ -313,7 +317,7 @@
         }
 
         const fc = { type: 'FeatureCollection', features: manager._stateCountyFeatures };
-        const projState = d3.geoMercator().fitSize([W, H], fc);
+        const projState = d3.geoMercator().fitSize([W, MAP_H], fc);
         const pathState = d3.geoPath(projState, ctx);
 
         // draw counties 
@@ -361,7 +365,7 @@
           const kids = (manager._countyChildren && manager._countyChildren.get(cf));
           if (kids != null) label += ' (' + fmtInt(kids) + ' children)';
           const c = projState(d3.geoCentroid(hoveredC));
-          if (c) drawTooltip(p, label, left + c[0], top + c[1], left, top, W, H);
+          if (c) drawTooltip(p, label, left + c[0], top + c[1], left, top, W, VISIBLE_H_FOR_TOOLTIP);
 
           // hover outline for county
           ctx.save(); ctx.translate(left, top);
@@ -380,7 +384,7 @@
         if (!p.keyIsPressed) manager._escLatch = false;
 
         // legend
-        if (manager._countyRate) drawLegend(p, left + 10, top + H - LEGEND_Y_PAD, thresholds, palette);
+        drawLegend(p, left + 10, top + H - LEGEND_Y_PAD, thresholds, palette);
 
         p.pop();
         return;
