@@ -34,11 +34,9 @@
           Bababababa income.
         </section>
         <section class="step" data-active-index="4">
-          <div class="title">Children Change Everything</div>
-          Food insecurity doesn't affect every community equally. Across the
-          U.S., the presence of children in a household dramatically changes the
-          equation. Explore this map to see how food insecurity rates shift when
-          we compare households with and without children.
+          <div class="title">State Level Food Insecurity Comparison (2023)</div>
+          Each state outline sits on a number line (13% to 24%) at that state’s child food-insecurity rate.
+          Hover to see the exact percent and the name of the state. The color gradient is from lower (lighter blue color) to higher (darker blue color) child food insecurity</i>.
         </section>
         <section class="step" data-active-index="5">
           <div class="title">A System Out of Balance</div>
@@ -50,30 +48,42 @@
           and which states were lifted up or left behind.
         </section>
         <section class="step" data-active-index="6">
-          <div class="title">Same visualization multiple sections</div>
-          Some visualizations may be relevant to multiple sections. You can reuse the same visualization
-          across different sections to reinforce key points. Or build on the previous visualization to just add on.
-        </section>
-        <div id="extra-space">
-        </div>
-        <section class="step" data-active-index="7">
           <div class="title">Examples</div>
           There is two examples in this code. One is a grid of circles that changes color
           based on the section index. The other is a scatter plot and bar chart that
           shows random data points. You can modify or replace these examples with your own visualizations.
           Make sure you read both source files to understand how they work.
         </section>
-        <section class="step" data-active-index="8">
-          <div class="title">Explore More</div>
-          Hover over the map so see each state's child food-insecurity rate for the most recent year of data (2023). Click on a state to zoom in and view county level differences.
 
-          <p>Data source: Feeding America – Map the Meal Gap (2019–2023)</p>
+        <div id="extra-space"></div>
+
+        <section class="step" data-active-index="7">
+          <div class="title">Explore More</div>
+          <p>
+            This map shows the <b>proportion of children (under 18) living in food-insecure households in 2023</b>.
+          </p>
+          <p>
+            It includes both low and very low food insecurity which by the USDA definition means:  <b>low food security</b>: reports of reduced quality, variety, or desirability of diet and little or no indication of reduced food intake
+            and <b>very low food security</b>: reports of multiple indications of disrupted eating patterns and reduced food intake.
+          </p>
+          <div class="subtitle">Tips</div>
+          <p>
+            Darker blue = higher proportion. Hover to see the <b>percent</b>, the <b>≈ “1 in N”</b> translation
+            (e.g., 28% ≈ 1 in 4 children), and the <b>number of affected children</b>.
+            Click a state to view county-level detail.
+          </p>
+        </section>
+        <section class="step" data-active-index="8">
+          <div class="title">Data and References</div>
+          <p class="text-muted" style="margin-top:.5rem;">
+            Data: <a href="https://www.feedingamerica.org/research/map-the-meal-gap/by-county" target="_blank" rel="noopener noreferrer">Feeding America – Map the Meal Gap (2019–2023)</a><br>
+            Definitions: <a href="https://www.ers.usda.gov/topics/food-nutrition-assistance/food-security-in-the-us/definitions-of-food-security" target="_blank" rel="noopener noreferrer">USDA ERS – Definitions of Food Security</a>
+          </p>
         </section>
       </div>
-      <div id='vis' class='vis-hidden'>
-      </div>
-      <div id="extra-space">
-      </div>
+
+      <div id='vis' class='vis-hidden'></div>
+      <div id="extra-space"></div>
     </div>
   </div>
 
@@ -100,6 +110,7 @@
   <!-- sketches (renderers): UPDATE HERE FOR PROJECT -->
   <script src="js/sketches/viz/viz_title.js"></script>
   <script src="js/sketches/viz/viz_scatter.js"></script>
+  <script src="js/sketches/viz/viz_state_numberline.js"></script>
   <script src="js/sketches/viz/viz_explore_more_map.js"></script>
   <script src="js/sketches/viz/viz_guess_how_many.js"></script>
   <script src="js/sketches/viz/viz_1_in_5.js"></script>
@@ -107,7 +118,5 @@
   <script src="js/sketches/sketch_renderer.js"></script>
   <script src="js/sketches/viz/viz_scale.js"></script>
 
-
 </body>
-
 </html>

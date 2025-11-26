@@ -41,12 +41,17 @@
                 return;
             }
 
+            if (ai === 4) {
+                window.VizStateNumberLine.draw(p, manager, ai, progress);
+                return;
+            }
+
             if (ai == 5) {
                 window.VizJustice.draw(p, manager, ai, progress);
                 return;
             }
 
-            if (ai === 8) {
+            if (ai >= 7) {
                 window.VizExploreMoreMap.draw(p, manager, ai, progress);
                 return;
             }
