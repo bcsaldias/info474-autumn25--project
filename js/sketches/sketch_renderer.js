@@ -36,20 +36,20 @@
                 return;
             }
 
-            if (ai == 4) {
+            if (ai === 3) {
+                window.FIIncomeMap.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai === 4) {
+                window.VizStateNumberLine.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai == 5) {
                 window.VizJustice.draw(p, manager, ai, progress);
                 return;
             }
-            
-             if (ai === 6) {
-                window.VizStateNumberLine.draw(p, manager, ai, progress);
-                return;
-            } 
-
-            // if (ai >= 6 && ai < 7) {
-            //     window.VizScatter.draw(p, manager, ai, progress);
-            //     return;
-            // }
 
             if (ai >= 7) {
                 window.VizExploreMoreMap.draw(p, manager, ai, progress);
@@ -60,6 +60,11 @@
         mousePressed: function (p, manager, ai, progress) {
             if (ai === 1) {
                 window.GuessHowMany.mousePressed(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai === 3) {
+                window.FIIncomeMap.mousePressed(p, manager, ai, progress);
                 return;
             }
         }
