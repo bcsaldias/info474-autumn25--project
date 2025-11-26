@@ -57,6 +57,11 @@
                 window.GuessHowMany.mousePressed(p, manager, ai, progress);
                 return;
             }
+
+            if (ai === 3) {
+                window.FIIncomeMap.mousePressed(p, manager, ai, progress);
+                return;
+            }
         }
     };
 })();

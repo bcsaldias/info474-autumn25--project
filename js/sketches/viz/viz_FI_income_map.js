@@ -1,21 +1,8 @@
 let usMap = null;
 let projection = null;
-let fiData = {}; // State abbreviation -> % FI ≤ SNAP Threshold
-
-// Map full state names to abbreviations (from GeoJSON to CSV)
-const stateNameToAbbr = {
-    'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
-    'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'District of Columbia': 'DC', 'Florida': 'FL',
-    'Georgia': 'GA', 'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN',
-    'Iowa': 'IA', 'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME',
-    'Maryland': 'MD', 'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS',
-    'Missouri': 'MO', 'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH',
-    'New Jersey': 'NJ', 'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND',
-    'Ohio': 'OH', 'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI',
-    'South Carolina': 'SC', 'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT',
-    'Vermont': 'VT', 'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI',
-    'Wyoming': 'WY'
-};
+let fiDataBelow = {}; // % FI children in HH incomes ≤185% FPL
+let fiDataAbove = {}; // % FI children in HH incomes >185% FPL
+let currentView = 'below'; // default view
 
 // Fetch GeoJSON
 fetch('data/us-states.json')
@@ -27,30 +14,37 @@ fetch('data/us-states.json')
 
 // Fetch and parse CSV (robust parsing: handles decimals like 0.34 or whole numbers like 34)
 fetch('data/FI_income.csv')
-    .then(response => response.text())
-    .then(csvText => {
-        const lines = csvText.trim().split('\n');
-        const stateAbbrIndex = 2; // "State" column (0-indexed)
-        const snapThresholdIndex = 4; // "% FI ≤ SNAP Threshold" column (0-indexed)
+  .then(response => response.text())
+  .then(csvText => {
+    const lines = csvText.trim().split('\n');
+    const stateNameIndex = 1; // "State Name" column
+    const belowIndex = 4;
+    const aboveIndex = 5;
 
-        for (let i = 1; i < lines.length; i++) {
-            const row = lines[i].split(',');
-            const stateAbbr = row[stateAbbrIndex]?.trim();
-            let valueStr = row[snapThresholdIndex]?.trim() || '';
+    function parseVal(str) {
+      let valueStr = (str || '').replace(/^"|"$/g, '').replace(/,/g, '').trim();
+      let value = parseFloat(valueStr);
+      if (!isNaN(value)) {
+        if (value > 0 && value <= 1) value *= 100; // scale fractions
+        return Math.round(value * 10) / 10;
+      }
+      //return null;
+    }
 
-            // Sanitize string: remove surrounding quotes and commas
-            valueStr = valueStr.replace(/^"|"$/g, '').replace(/,/g, '').trim();
+    for (let i = 1; i < lines.length; i++) {
+      const row = lines[i].split(',');
+      const stateName = row[stateNameIndex]?.trim();
+      if (!stateName) continue;
 
-            // Parse as float. Handle either a fraction (0.34) or a percentage (34)
-            let value = parseFloat(valueStr);
-            if (!isNaN(value)) {
-                if (value > 0 && value <= 1) value = value * 100; // scale fractions
-                value = Math.round(value * 10) / 10; // round to 1 decimal
-                fiData[stateAbbr] = value;
-            }
-        }
-    })
-    .catch(error => console.error('Failed to load CSV:', error));
+      fiDataBelow[stateName] = parseVal(row[belowIndex]);
+      fiDataAbove[stateName] = parseVal(row[aboveIndex]);
+    }
+
+    console.log('Parsed fiDataBelow sample:', fiDataBelow['Alabama']);
+    console.log('Parsed fiDataAbove sample:', fiDataAbove['Alabama']);
+  })
+  .catch(error => console.error('Failed to load CSV:', error));
+
 
 // Color scale: 20 discrete blue bins (light to dark), normalized to 0-100%
 function getColor(value) {
@@ -69,6 +63,91 @@ function getColor(value) {
     const binIndex = Math.min(19, Math.floor(normalized * 20));
 
     return blueBins[binIndex];
+}
+
+
+// Button dimensions and position
+const buttonWidth = 165;
+const buttonHeight = 40;
+let buttonHovered = false;
+
+// Check if mouse is over button
+function isMouseOverButton(p) {
+    const buttonX = (p.width - buttonWidth) / 2; // centered horizontally
+    const buttonY = p.height - 80; // positioned higher
+    return p.mouseX >= buttonX && p.mouseX <= buttonX + buttonWidth &&
+           p.mouseY >= buttonY && p.mouseY <= buttonY + buttonHeight;
+}
+
+// Draw toggle button on canvas
+function drawToggleButton(p) {
+    const buttonX = (p.width - buttonWidth) / 2; // centered horizontally
+    const buttonY = p.height - 80; // positioned higher
+
+    // Button background
+    p.fill(buttonHovered ? 5 : 0, 123, 255);
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.rect(buttonX, buttonY, buttonWidth, buttonHeight, 4);
+
+    // Button text
+    p.fill(255);
+    p.textSize(13);
+    p.textAlign(p.CENTER, p.CENTER);
+    const labelText = currentView === 'below'
+        ? 'Toggle: Below 185% FPL'
+        : 'Toggle: Above 185% FPL';
+    p.text(labelText, buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
+
+    // Update hover state
+    buttonHovered = isMouseOverButton(p);
+}
+
+// Draw discrete color legend on the right side (20 bins)
+function drawLegend(p) {
+    const legendX = p.width - 75;
+    const legendY = 200;
+    const legendWidth = 30;
+    const binHeight = 10;
+    const numBins = 20;
+    const legendHeight = binHeight * numBins;
+
+    // Draw legend label
+    p.fill(0);
+    p.textSize(12);
+    p.textAlign(p.RIGHT, p.TOP);
+    p.text('% Food', legendX + legendWidth + 5, legendY - 35);
+    p.text('Insecure', legendX + legendWidth + 5, legendY - 21);
+
+    // Draw 20 discrete color bins
+    for (let i = 0; i < numBins; i++) {
+        const normalizedValue = (i / (numBins - 1)) * 100; // 0 to 100
+        const color = getColor(normalizedValue);
+        p.fill(color[0], color[1], color[2]);
+        p.noStroke();
+        const y = legendY + (i * binHeight);
+        p.rect(legendX, y, legendWidth, binHeight);
+    }
+
+    // Draw legend border
+    p.noFill();
+    p.stroke(0);
+    p.strokeWeight(1);
+    p.rect(legendX, legendY, legendWidth, legendHeight);
+
+    // Draw percentage labels
+    p.fill(0);
+    p.textSize(10);
+    p.textAlign(p.LEFT, p.CENTER);
+
+    // 0% label
+    p.text('0%', legendX + legendWidth + 3, legendY);
+
+    // 50% label (middle)
+    p.text('50%', legendX + legendWidth + 3, legendY + legendHeight / 2);
+
+    // 100% label
+    p.text('100%', legendX + legendWidth + 3, legendY + legendHeight);
 }
 
 (function () {
@@ -103,14 +182,14 @@ function getColor(value) {
 
                     // Get state name from GeoJSON properties
                     const stateName = feature.properties?.name;
-                    // Convert name to abbreviation (e.g., "Alabama" -> "AL")
-                    const stateAbbr = stateNameToAbbr[stateName];
-                    // Look up % FI ≤ SNAP Threshold value from parsed CSV data
-                    const value = fiData[stateAbbr];
+                    // Choose dataset based on currentView
+                    const value = (currentView === 'below')
+                      ? fiDataBelow[stateName]
+                      : fiDataAbove[stateName];
 
                         // Debug logging for first few states
                         if (usMap.features.indexOf(feature) < 3) {
-                            console.log(`Feature: ${stateName} -> Abbr: ${stateAbbr} -> Value: ${value} -> Color: ${getColor(value)}`);
+                            console.log(`Feature: ${stateName} -> Value: ${value} -> Color: ${getColor(value)}`);
                         }
 
                     // Get color based on value (light blue = low, dark blue = high)
@@ -144,7 +223,21 @@ function getColor(value) {
                 console.error('Error rendering map:', e.message);
             }
 
+            // Draw the toggle button
+            drawToggleButton(p);
+
+            // Draw the legend
+            drawLegend(p);
+
             p.pop();
+        },
+
+        mousePressed: function (p, manager, ai, progress) {
+            if (isMouseOverButton(p)) {
+                currentView = (currentView === 'below') ? 'above' : 'below';
+                console.log('Switched to view:', currentView);
+                return false; // prevent default
+            }
         }
     };
 })();
