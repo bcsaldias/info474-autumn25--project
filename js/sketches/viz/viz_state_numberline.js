@@ -131,6 +131,12 @@ function drawLegendRamp(p, x, y, thresholds, palette, xMax){
       p.text(domain[0]+'%', x1, baseY+6);
       p.text(domain[1]+'%', x2, baseY+6);
 
+      const axisLabel = manager.axisLabel || 'Percent of children living in food-insecure households (2023)';
+      p.fill(70); 
+      p.textAlign(p.CENTER, p.TOP);
+      p.textSize(12);
+      p.text(axisLabel, (x1 + x2) / 2, baseY + 20);
+
       let iconW = 80, iconH = 60; 
       const laneGap = 4; 
       const axisPad = 8;
