@@ -82,7 +82,7 @@ function isMouseOverButton(p) {
 // Draw toggle button on canvas
 function drawToggleButton(p) {
     const buttonX = (p.width - buttonWidth) / 2;
-    const buttonY = p.height - 80;
+    const buttonY = p.height - 90;
 
     // Button background
     p.fill(buttonHovered ? 5 : 0, 123, 255);
@@ -136,6 +136,7 @@ function drawLegend(p) {
     p.rect(legendX, legendY, legendWidth, legendHeight);
 
     // Draw percentage labels
+    p.strokeWeight(0);
     p.fill(0);
     p.textSize(10);
     p.textAlign(p.LEFT, p.CENTER);
@@ -318,25 +319,24 @@ function drawTooltip(p) {
                 console.error('Error rendering map:', e.message);
             }
 
-            // Draw title
-            p.strokeWeight(0);
-
             p.fill(0);
             p.textSize(24);
             p.textAlign(p.CENTER, p.TOP);
             p.text('Food Insecurity Rates Across America', p.width / 2, 60);
 
-            // Draw subtitle that changes based on view
+            // Draw the toggle button
+            drawToggleButton(p);
+
+            // Draw subtitle that changes based on view (below button)
+            p.strokeWeight(0);
             p.fill(100);
             p.textSize(14);
+            p.textStyle(p.ITALIC);
             p.textAlign(p.CENTER, p.TOP);
             const subtitle = currentView === 'below'
                 ? 'Now viewing households BELOW 185% Federal Poverty Line'
                 : 'Now viewing households ABOVE 185% Federal Poverty Line';
-            p.text(subtitle, p.width / 2, 90);
-
-            // Draw the toggle button
-            drawToggleButton(p);
+            p.text(subtitle, p.width / 2, p.height - 40);
 
             // Draw the legend
             drawLegend(p);
