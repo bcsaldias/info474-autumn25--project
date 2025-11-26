@@ -40,13 +40,18 @@
                 window.VizJustice.draw(p, manager, ai, progress);
                 return;
             }
-
-            if (ai >= 5 && ai < 7) {
-                window.VizScatter.draw(p, manager, ai, progress);
+            
+             if (ai === 6) {
+                window.VizStateNumberLine.draw(p, manager, ai, progress);
                 return;
-            }
+            } 
 
-            if (ai === 7) {
+            // if (ai >= 6 && ai < 7) {
+            //     window.VizScatter.draw(p, manager, ai, progress);
+            //     return;
+            // }
+
+            if (ai >= 7) {
                 window.VizExploreMoreMap.draw(p, manager, ai, progress);
                 return;
             }
