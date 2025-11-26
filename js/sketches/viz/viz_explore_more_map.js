@@ -56,7 +56,7 @@
   }
 
   p.fill(40); p.textAlign(p.LEFT, p.TOP); p.textSize(12);
-  const labels=['low'].concat(thresholds.map(t=>t+'%')).concat(['high']);
+  const labels=[''].concat(thresholds.map(t=>t+'%')).concat(['']);
   p.text(labels.join('  '), x, y+boxH+gap);
 
   const ex = thresholds.map(t => `${t}% ${oneInN(t)}`).join('   •   ');
