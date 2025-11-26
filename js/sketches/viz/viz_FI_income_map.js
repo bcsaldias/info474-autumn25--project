@@ -3,6 +3,9 @@ let projection = null;
 let fiDataBelow = {}; // % FI children in HH incomes ≤185% FPL
 let fiDataAbove = {}; // % FI children in HH incomes >185% FPL
 let currentView = 'below';
+let hoveredState = null; // track which state is being hovered
+let hoveredValue = null; // track the value of hovered state
+let hoveredFeature = null; // track the hovered feature for outline drawing
 
 // Fetch GeoJSON
 fetch('data/us-states.json')
@@ -92,8 +95,8 @@ function drawToggleButton(p) {
     p.textSize(13);
     p.textAlign(p.CENTER, p.CENTER);
     const labelText = currentView === 'below'
-        ? 'Toggle: Below 185% FPL'
-        : 'Toggle: Above 185% FPL';
+        ? 'View High Income'
+        : 'View Low Income';
     p.text(labelText, buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
 
     // Update hover state
@@ -147,6 +150,45 @@ function drawLegend(p) {
     p.text('100%', legendX + legendWidth + 3, legendY + legendHeight);
 }
 
+// Check if a point is inside a polygon (ray casting algorithm)
+function pointInPolygon(point, polygon) {
+    if (!polygon || polygon.length < 3) return false;
+
+    let inside = false;
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+        let xi = polygon[i][0], yi = polygon[i][1];
+        let xj = polygon[j][0], yj = polygon[j][1];
+
+        let intersect = ((yi > point[1]) !== (yj > point[1]))
+            && (point[0] < (xj - xi) * (point[1] - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
+
+// Draw tooltip for hovered state
+function drawTooltip(p) {
+    if (!hoveredState || hoveredValue === null) return;
+
+    const tooltipX = p.mouseX + 10;
+    const tooltipY = p.mouseY - 20;
+    const tooltipWidth = 200;
+    const tooltipHeight = 50;
+
+    // Tooltip background
+    p.fill(0, 0, 0, 200);
+    p.stroke(255);
+    p.strokeWeight(1);
+    p.rect(tooltipX, tooltipY, tooltipWidth, tooltipHeight, 4);
+
+    // Tooltip text
+    p.fill(255);
+    p.textSize(12);
+    p.textAlign(p.LEFT, p.TOP);
+    p.text(hoveredState, tooltipX + 8, tooltipY + 6);
+    p.text(`Food Insecurity: ${hoveredValue}%`, tooltipX + 8, tooltipY + 22);
+}
+
 (function () {
     window.FIIncomeMap = {
         draw: function (p, manager, ai, progress) {
@@ -173,6 +215,11 @@ function drawLegend(p) {
             p.strokeWeight(0.8);
             p.strokeJoin(p.ROUND);
 
+            // Reset hover state each frame
+            hoveredState = null;
+            hoveredValue = null;
+            hoveredFeature = null;
+
             try {
                 usMap.features.forEach(function(feature) {
                     if (!feature.geometry || !feature.geometry.coordinates) return;
@@ -193,9 +240,60 @@ function drawLegend(p) {
                     const color = getColor(value);
                     p.fill(color[0], color[1], color[2]);
 
-                    // Draw state polygon(s)
+                    // Draw state polygon(s) and check for hover
                     if (feature.geometry.type === 'Polygon') {
                         feature.geometry.coordinates.forEach(function(ring) {
+                            p.beginShape();
+                            let points = [];
+                            ring.forEach(function(coord) {
+                                let pt = projection([coord[0], coord[1]]);
+                                if (pt) {
+                                    p.vertex(pt[0], pt[1]);
+                                    points.push(pt);
+                                }
+                            });
+                            p.endShape(p.CLOSE);
+
+                            // Check if mouse is hovering over this polygon
+                            if (pointInPolygon([p.mouseX, p.mouseY], points)) {
+                                hoveredState = stateName;
+                                hoveredValue = value;
+                                hoveredFeature = feature;
+                            }
+                        });
+                    } else if (feature.geometry.type === 'MultiPolygon') {
+                        feature.geometry.coordinates.forEach(function(polygon) {
+                            polygon.forEach(function(ring) {
+                                p.beginShape();
+                                let points = [];
+                                ring.forEach(function(coord) {
+                                    let pt = projection([coord[0], coord[1]]);
+                                    if (pt) {
+                                        p.vertex(pt[0], pt[1]);
+                                        points.push(pt);
+                                    }
+                                });
+                                p.endShape(p.CLOSE);
+
+                                // Check if mouse is hovering over this polygon
+                                if (pointInPolygon([p.mouseX, p.mouseY], points)) {
+                                    hoveredState = stateName;
+                                    hoveredValue = value;
+                                    hoveredFeature = feature;
+                                }
+                            });
+                        });
+                    }
+                });
+
+                // Draw outline for hovered state only (after all states are drawn)
+                if (hoveredFeature && hoveredFeature.geometry) {
+                    p.stroke(0);
+                    p.strokeWeight(1);
+                    p.noFill();
+
+                    if (hoveredFeature.geometry.type === 'Polygon') {
+                        hoveredFeature.geometry.coordinates.forEach(function(ring) {
                             p.beginShape();
                             ring.forEach(function(coord) {
                                 let pt = projection([coord[0], coord[1]]);
@@ -203,8 +301,8 @@ function drawLegend(p) {
                             });
                             p.endShape(p.CLOSE);
                         });
-                    } else if (feature.geometry.type === 'MultiPolygon') {
-                        feature.geometry.coordinates.forEach(function(polygon) {
+                    } else if (hoveredFeature.geometry.type === 'MultiPolygon') {
+                        hoveredFeature.geometry.coordinates.forEach(function(polygon) {
                             polygon.forEach(function(ring) {
                                 p.beginShape();
                                 ring.forEach(function(coord) {
@@ -215,12 +313,14 @@ function drawLegend(p) {
                             });
                         });
                     }
-                });
+                }
             } catch (e) {
                 console.error('Error rendering map:', e.message);
             }
 
             // Draw title
+            p.strokeWeight(0);
+
             p.fill(0);
             p.textSize(24);
             p.textAlign(p.CENTER, p.TOP);
@@ -240,6 +340,9 @@ function drawLegend(p) {
 
             // Draw the legend
             drawLegend(p);
+
+            // Draw tooltip if hovering over a state
+            drawTooltip(p);
 
             p.pop();
         },
