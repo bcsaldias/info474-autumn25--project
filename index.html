@@ -46,19 +46,19 @@
           and which states were lifted up or left behind.
         </section>
         <section class="step" data-active-index="5">
-          <div class="title">Same visualization multiple sections</div>
-          Some visualizations may be relevant to multiple sections. You can reuse the same visualization
-          across different sections to reinforce key points. Or build on the previous visualization to just add on.
-        </section>
-        <div id="extra-space">
-        </div>
-        <section class="step" data-active-index="6">
           <div class="title">Examples</div>
           There is two examples in this code. One is a grid of circles that changes color
           based on the section index. The other is a scatter plot and bar chart that
           shows random data points. You can modify or replace these examples with your own visualizations.
           Make sure you read both source files to understand how they work.
         </section>
+        <section class="step" data-active-index="6">
+          <div class="title">Compare the States (2023)</div>
+           Each outline sits on a number line at that state’s child food-insecurity rate.
+          Hover for the exact % (and ≈ “1 in N”) and children affected.
+        </section>
+        <div id="extra-space">
+        </div>
         <section class="step" data-active-index="7">
           <div class="title">Explore More</div>
           <p>
@@ -68,11 +68,14 @@
             It includes both low and very low food insecurity which by the USDA definition means:  <b>low food security</b>: reports of reduced quality, variety, or desirability of diet and little or no indication of reduced food intake 
             and <b>very low food security</b>: reports of multiple indications of disrupted eating patterns and reduced food intake.
           </p>
+          <div class="subtitle">Tips</div>
           <p>
-            Darker blue = higher share. Hover to see the <b>percent</b>, the <b>≈ “1 in N”</b> translation (e.g., 28% ≈ 1 in 4 children),
+            Darker blue = higher proportion. Hover to see the <b>percent</b>, the <b>≈ “1 in N”</b> translation (e.g., 28% ≈ 1 in 4 children),
             and the <b>number of affected children</b>. Click a state to view state specific proportions by counties.
           </p>
-          
+        </section>
+        <section class="step" data-active-index="8">
+          <div class="title">Data and References</div>
           <p class="text-muted" style="margin-top:.5rem;">
             Data: Feeding America – Map the Meal Gap (2019–2023)
             <br>
@@ -108,6 +111,7 @@
   <!-- sketches (renderers): UPDATE HERE FOR PROJECT -->
   <script src="js/sketches/viz/viz_title.js"></script>
   <script src="js/sketches/viz/viz_scatter.js"></script>
+  <script src="js/sketches/viz/viz_state_numberline.js"></script>
   <script src="js/sketches/viz/viz_explore_more_map.js"></script>
   <script src="js/sketches/viz/viz_guess_how_many.js"></script>
   <script src="js/sketches/viz/viz_1_in_5.js"></script>
