@@ -2,7 +2,7 @@ let usMap = null;
 let projection = null;
 let fiDataBelow = {}; // % FI children in HH incomes ≤185% FPL
 let fiDataAbove = {}; // % FI children in HH incomes >185% FPL
-let currentView = 'below'; // default view
+let currentView = 'below';
 
 // Fetch GeoJSON
 fetch('data/us-states.json')
@@ -12,12 +12,12 @@ fetch('data/us-states.json')
     })
     .catch(error => console.error('Failed to load GeoJSON:', error));
 
-// Fetch and parse CSV (robust parsing: handles decimals like 0.34 or whole numbers like 34)
+// Fetch and parse CSV
 fetch('data/FI_income.csv')
   .then(response => response.text())
   .then(csvText => {
     const lines = csvText.trim().split('\n');
-    const stateNameIndex = 1; // "State Name" column
+    const stateNameIndex = 1;
     const belowIndex = 4;
     const aboveIndex = 5;
 
@@ -25,10 +25,9 @@ fetch('data/FI_income.csv')
       let valueStr = (str || '').replace(/^"|"$/g, '').replace(/,/g, '').trim();
       let value = parseFloat(valueStr);
       if (!isNaN(value)) {
-        if (value > 0 && value <= 1) value *= 100; // scale fractions
+        if (value > 0 && value <= 1) value *= 100;
         return Math.round(value * 10) / 10;
       }
-      //return null;
     }
 
     for (let i = 1; i < lines.length; i++) {
@@ -50,7 +49,6 @@ fetch('data/FI_income.csv')
 function getColor(value) {
     if (value === undefined || value === null || isNaN(value)) return [220, 220, 220];
 
-    // 20 blue shades from light to dark
     const blueBins = [
         [240, 249, 255], [234, 246, 255], [227, 243, 255], [220, 240, 255], [213, 236, 255],
         [206, 233, 255], [199, 230, 255], [183, 215, 255], [166, 200, 255], [149, 185, 255],
@@ -58,7 +56,6 @@ function getColor(value) {
         [47, 70, 140], [38, 60, 125], [29, 50, 110], [20, 40, 95], [10, 30, 80]
     ];
 
-    // Normalize across 0-100% (user requested): value of 0 -> bin 0, 100 -> bin 19
     const normalized = Math.max(0, Math.min(1, value / 100));
     const binIndex = Math.min(19, Math.floor(normalized * 20));
 
@@ -73,16 +70,16 @@ let buttonHovered = false;
 
 // Check if mouse is over button
 function isMouseOverButton(p) {
-    const buttonX = (p.width - buttonWidth) / 2; // centered horizontally
-    const buttonY = p.height - 80; // positioned higher
+    const buttonX = (p.width - buttonWidth) / 2;
+    const buttonY = p.height - 80;
     return p.mouseX >= buttonX && p.mouseX <= buttonX + buttonWidth &&
            p.mouseY >= buttonY && p.mouseY <= buttonY + buttonHeight;
 }
 
 // Draw toggle button on canvas
 function drawToggleButton(p) {
-    const buttonX = (p.width - buttonWidth) / 2; // centered horizontally
-    const buttonY = p.height - 80; // positioned higher
+    const buttonX = (p.width - buttonWidth) / 2;
+    const buttonY = p.height - 80;
 
     // Button background
     p.fill(buttonHovered ? 5 : 0, 123, 255);
@@ -121,7 +118,7 @@ function drawLegend(p) {
 
     // Draw 20 discrete color bins
     for (let i = 0; i < numBins; i++) {
-        const normalizedValue = (i / (numBins - 1)) * 100; // 0 to 100
+        const normalizedValue = (i / (numBins - 1)) * 100;
         const color = getColor(normalizedValue);
         p.fill(color[0], color[1], color[2]);
         p.noStroke();
