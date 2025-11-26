@@ -44,27 +44,39 @@
     for(let i=thresholds.length-1;i>=0;i--){ if(rate>=thresholds[i]) return palette[Math.min(i+1, palette.length-1)]; }
     return palette[0];
   }
-  // give the legend a bit more headroom so it never clips at the bottom
-  const LEGEND_Y_PAD = 52;  // previously ~36; extra space for the 1-in-N line
+  const LEGEND_Y_PAD = 52;
 
   function drawLegend(p, x, y, thresholds, palette){
-    const boxW=22, boxH=10, gap=4;
-    for(let i=0;i<palette.length;i++){ p.noStroke(); p.fill(palette[i]); p.rect(x+i*(boxW+2), y, boxW, boxH, 2); }
-    p.fill(40); p.textAlign(p.LEFT, p.TOP);
-    const labels=['low'].concat(thresholds.map(t=>t+'%')).concat(['high']);
-    p.text(labels.join('  '), x, y+boxH+gap);
-    // examples: tie % to "1 in N"
-    const ex = thresholds.map(t => `${t}% ${oneInN(t)}`).join('   •   ');
-    p.fill(90); p.textSize(11);
-    p.text(ex, x, y + boxH + gap + 14);
+  p.push();
+  const boxW=22, boxH=10, gap=4;
+
+  for(let i=0;i<palette.length;i++){
+    p.noStroke(); p.fill(palette[i]);
+    p.rect(x+i*(boxW+2), y, boxW, boxH, 2);
   }
-  function drawTooltip(p, txt, x, y, left, top, W, H){
-    p.textSize(12);
-    const pad=6, th=18, tw=p.textWidth(txt)+pad*2;
-    let tx=x+12, ty=y-10; tx=clamp(tx, left+2, left+W-tw-2); ty=clamp(ty, top+2, top+H-th-2);
-    p.noStroke(); p.fill(20,20,20,220); p.rect(tx, ty, tw, th, 3);
-    p.fill(255); p.textAlign(p.LEFT, p.CENTER); p.text(txt, tx+pad, ty+th/2);
-  }
+
+  p.fill(40); p.textAlign(p.LEFT, p.TOP); p.textSize(12);
+  const labels=['low'].concat(thresholds.map(t=>t+'%')).concat(['high']);
+  p.text(labels.join('  '), x, y+boxH+gap);
+
+  const ex = thresholds.map(t => `${t}% ${oneInN(t)}`).join('   •   ');
+  p.fill(90); p.textSize(11);
+  p.text(ex, x, y + boxH + gap + 14);
+  p.pop();
+}
+
+function drawTooltip(p, txt, x, y, left, top, W, H){
+  p.push();
+  p.textSize(12);
+  const pad=6, th=18, tw=p.textWidth(txt)+pad*2;
+  let tx=x+12, ty=y-10;
+  tx=clamp(tx, left+2, left+W-tw-2);
+  ty=clamp(ty, top+2, top+H-th-2);
+
+  p.noStroke(); p.fill(20,20,20,220); p.rect(tx, ty, tw, th, 3);
+  p.fill(255); p.textAlign(p.LEFT, p.CENTER); p.text(txt, tx+pad, ty+th/2);
+  p.pop();
+}
 
   // hit test
   function hitFeatureAtMouse(p, features, projection, left, top) {
@@ -231,6 +243,10 @@
       if (manager._scene === 'nation') {
         const proj = d3.geoAlbersUsa().fitSize([W, MAP_H], manager._statesGeo);
         const path = d3.geoPath(proj, ctx);
+        // title 
+        const title = manager.mapTitle || 'State and County Level Child Food Insecurity in the US (2023)';
+        p.noStroke(); p.fill(30); p.textAlign(p.LEFT, p.TOP); p.textSize(16);
+        p.text(title, left, top - 28);
 
         // nation
         if (manager._nationGeo) {
