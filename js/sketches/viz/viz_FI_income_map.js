@@ -220,6 +220,21 @@ function drawLegend(p) {
                 console.error('Error rendering map:', e.message);
             }
 
+            // Draw title
+            p.fill(0);
+            p.textSize(24);
+            p.textAlign(p.CENTER, p.TOP);
+            p.text('Food Insecurity Rates Across America', p.width / 2, 60);
+
+            // Draw subtitle that changes based on view
+            p.fill(100);
+            p.textSize(14);
+            p.textAlign(p.CENTER, p.TOP);
+            const subtitle = currentView === 'below'
+                ? 'Now viewing households BELOW 185% Federal Poverty Line'
+                : 'Now viewing households ABOVE 185% Federal Poverty Line';
+            p.text(subtitle, p.width / 2, 90);
+
             // Draw the toggle button
             drawToggleButton(p);
 
@@ -233,7 +248,7 @@ function drawLegend(p) {
             if (isMouseOverButton(p)) {
                 currentView = (currentView === 'below') ? 'above' : 'below';
                 console.log('Switched to view:', currentView);
-                return false; // prevent default
+                return false;
             }
         }
     };
