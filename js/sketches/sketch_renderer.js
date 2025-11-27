@@ -51,6 +51,11 @@
                 return;
             }
 
+            if (ai == 6) {
+                window.VizBreakfast.draw(p, manager, ai, progress);
+                return;
+            }
+
             if (ai >= 7) {
                 window.VizExploreMoreMap.draw(p, manager, ai, progress);
                 return;
