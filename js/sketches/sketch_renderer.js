@@ -20,6 +20,9 @@
 
         draw: function (p, manager, ai, progress) {
             try { console.log('Renderer: delegating draw, ai=', ai); } catch (e) { }
+            if (window.VizStateNumberLine && typeof window.VizStateNumberLine.setActive === 'function') {
+                window.VizStateNumberLine.setActive(ai === 3);
+            }
 
             if (ai === 0) {
                 // window.VizTitle.draw(p, manager, ai, progress);

@@ -42,12 +42,57 @@ function drawLegendRamp(p, x, y, thresholds, palette, xMax){
     cx += boxW + gap;
   }
 }
+  const FIPS2ABBR = { '01': 'AL', '02': 'AK', '04': 'AZ', '05': 'AR', '06': 'CA', '08': 'CO', '09': 'CT', '10': 'DE', '11': 'DC', '12': 'FL', '13': 'GA', '15': 'HI', '16': 'ID', '17': 'IL', '18': 'IN', '19': 'IA', '20': 'KS', '21': 'KY', '22': 'LA', '23': 'ME', '24': 'MD', '25': 'MA', '26': 'MI', '27': 'MN', '28': 'MS', '29': 'MO', '30': 'MT', '31': 'NE', '32': 'NV', '33': 'NH', '34': 'NJ', '35': 'NM', '36': 'NY', '37': 'NC', '38': 'ND', '39': 'OH', '40': 'OK', '41': 'OR', '42': 'PA', '44': 'RI', '45': 'SC', '46': 'SD', '47': 'TN', '48': 'TX', '49': 'UT', '50': 'VT', '51': 'VA', '53': 'WA', '54': 'WV', '55': 'WI', '56': 'WY' };
 
-//   axes
+  // search bar
+  const uiState = {
+    input: null,
+    highlightFips: null
+  };
+
+  function ensureDropdown(manager){
+    if(uiState.input) return;
+    const host = (manager && manager.canvas && manager.canvas.elt && manager.canvas.elt.parentElement) || document.getElementById('vis') || document.body;
+    if(!host) return;
+    const cs = window.getComputedStyle(host);
+    if(cs.position === 'static') host.style.position = 'relative';
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'state-search-input';
+    input.style.cssText = 'position:absolute;top:40px;left:80px;z-index:100;font-size:14px;padding:4px 8px;border-radius:4px;border:1px solid #ccc;background:rgba(255,255,255,0.96);max-width:240px;display:none;box-shadow:0 2px 4px rgba(0,0,0,0.12);';
+    input.placeholder = 'Search for a state...';
+
+    input.addEventListener('input', (e)=>{
+      const q = e.target.value.trim().toLowerCase();
+      uiState.highlightFips = null;
+      if(!q || !manager._sn_points){ return; }
+      // find first state whose name starts with the query
+      const match = manager._sn_points.find(d => d.name.toLowerCase().startsWith(q));
+      if(match){
+        uiState.highlightFips = match.fips;
+      }
+    });
+
+    host.appendChild(input);
+    uiState.input = input;
+  }
+
+  function populateDropdown(points){
+
+    return points;
+  }
+
   const LINE_MIN = 13;
   const LINE_MAX = 24;
 
   window.VizStateNumberLine = {
+    setActive: function(isActive){
+      if(uiState.input){
+        uiState.input.style.display = isActive ? 'block' : 'none';
+      }
+    },
+
     draw: function (p, manager) {
       p.push();
 
@@ -103,6 +148,12 @@ function drawLegendRamp(p, x, y, thresholds, palette, xMax){
           pts.push({ fips, name, rate, feature: feat });
         }
         manager._sn_points = pts.sort((a,b)=>a.rate-b.rate);
+      }
+
+      // if we have points, ensure dropdown exists & filled
+      if(manager._sn_points){
+        ensureDropdown(manager);
+        populateDropdown(manager._sn_points);
       }
 
       if (!manager._sn_points || !manager._sn_statesGeo) {
@@ -185,6 +236,7 @@ function drawLegendRamp(p, x, y, thresholds, palette, xMax){
       const ctx = p.drawingContext;
       let hover = null;
 
+      // first pass to draw all state shapes; highlighted state gets a stronger outline and glow
       for (const d of L.placed) {
         const cyTop  = laneTop[d.lane] + (L.laneMaxH[d.lane] - d.ih); // bottom-align in lane
         const cxLeft = d.cx - d.iw/2;
@@ -192,18 +244,39 @@ function drawLegendRamp(p, x, y, thresholds, palette, xMax){
         const projIcon = d3.geoMercator().fitSize([d.iw, d.ih], d.feature);
         const pathIcon = d3.geoPath(projIcon, ctx);
 
+        const isHighlight = uiState.highlightFips && uiState.highlightFips === d.fips;
+
         ctx.save();
         ctx.translate(cxLeft, cyTop);
         ctx.beginPath(); pathIcon(d.feature);
         ctx.fillStyle = colorFor(d.rate, thresholds, palette);
+        if(isHighlight){
+          ctx.shadowColor = 'rgba(0,0,0,0.35)';
+          ctx.shadowBlur = 10;
+        }
         ctx.fill();
-        ctx.lineWidth = 1.0; ctx.strokeStyle = '#333';
+        ctx.lineWidth = isHighlight ? 2.4 : 1.0;
+        ctx.strokeStyle = isHighlight ? '#d95f02' : '#333';
         ctx.stroke();
         ctx.restore();
 
         if (p.mouseX >= cxLeft && p.mouseX <= cxLeft+d.iw &&
             p.mouseY >= cyTop   && p.mouseY <= cyTop+d.ih) {
           hover = { d, x: cxLeft + d.iw/2, y: cyTop + d.ih/2 };
+        }
+      }
+
+      // second pass to draw the highlighted state name on top of everything else
+      if(uiState.highlightFips){
+        for (const d of L.placed) {
+          if(d.fips !== uiState.highlightFips) continue;
+          const cyTop  = laneTop[d.lane] + (L.laneMaxH[d.lane] - d.ih);
+          const cxLeft = d.cx - d.iw/2;
+          p.noStroke();
+          p.fill(0);
+          p.textAlign(p.CENTER, p.BOTTOM);
+          p.textSize(11);
+          p.text(d.name, cxLeft + d.iw/2, cyTop - 3);
         }
       }
 
