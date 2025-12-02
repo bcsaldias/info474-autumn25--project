@@ -34,7 +34,6 @@
                 let imgHeight = (stadiumImage.height / stadiumImage.width) * imgWidth;
                 p.image(stadiumImage, (p.width - imgWidth) / 2, 130, imgWidth, imgHeight);
             } else {
-                // Fallback text while loading
                 p.fill(150);
                 p.textSize(14);
                 p.text("Loading stadium image...", p.width / 2, p.height / 2);
