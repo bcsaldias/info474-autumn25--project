@@ -115,9 +115,9 @@ function drawLegend(p) {
     // Draw legend label
     p.fill(0);
     p.textSize(12);
-    p.textAlign(p.RIGHT, p.TOP);
-    p.text('% Food', legendX + legendWidth + 5, legendY - 35);
-    p.text('Insecure', legendX + legendWidth + 5, legendY - 21);
+    p.textAlign(p.CENTER, p.TOP);
+    p.text('% Food Insecure', legendX + legendWidth - 15, legendY - 35);
+    p.text('Children', legendX + legendWidth - 15, legendY - 21);
 
     // Draw 20 discrete color bins
     for (let i = 0; i < numBins; i++) {
@@ -322,22 +322,21 @@ function drawTooltip(p) {
             p.fill(0);
             p.textSize(24);
             p.textAlign(p.CENTER, p.TOP);
-            p.text('Food Insecurity Rates Across America', p.width / 2, 60);
+            p.text('Food Insecurity Rates Across America', p.width / 2, 40);
+
+            // Draw subtitle that changes based on view (below button)
+            // p.strokeWeight(0);
+            // p.fill(100);
+            // p.textSize(24);
+            // p.textAlign(p.CENTER, p.TOP);
+            const subtitle = currentView === 'below'
+                ? 'in Households Below 185% Federal Poverty Line'
+                : 'in Households Above 185% Federal Poverty Line';
+            p.text(subtitle, p.width / 2, 70);
+
 
             // Draw the toggle button
             drawToggleButton(p);
-
-            // Draw subtitle that changes based on view (below button)
-            p.strokeWeight(0);
-            p.fill(100);
-            p.textSize(14);
-            p.textStyle(p.ITALIC);
-            p.textAlign(p.CENTER, p.TOP);
-            const subtitle = currentView === 'below'
-                ? 'Now viewing households BELOW 185% Federal Poverty Line'
-                : 'Now viewing households ABOVE 185% Federal Poverty Line';
-            p.text(subtitle, p.width / 2, p.height - 40);
-
             // Draw the legend
             drawLegend(p);
 
