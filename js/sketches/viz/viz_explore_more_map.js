@@ -248,6 +248,10 @@ function drawTooltip(p, txt, x, y, left, top, W, H){
         p.noStroke(); p.fill(30); p.textAlign(p.LEFT, p.TOP); p.textSize(16);
         p.text(title, left, top - 28);
 
+        // added subcaption
+        p.fill(80); p.textSize(12); p.textAlign(p.LEFT, p.TOP);
+        p.text('Explore the map by hovering over states. Click a state to see county-level details.', left, top - 10);
+
         // nation
         if (manager._nationGeo) {
           ctx.save(); ctx.translate(left, top);
