@@ -95,8 +95,8 @@ function drawToggleButton(p) {
     p.textSize(13);
     p.textAlign(p.CENTER, p.CENTER);
     const labelText = currentView === 'below'
-        ? 'View High Income'
-        : 'View Low Income';
+        ? 'View Above 185% FPL'
+        : 'View Below 185% FPL';
     p.text(labelText, buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
 
     // Update hover state
@@ -322,7 +322,7 @@ function drawTooltip(p) {
             p.fill(0);
             p.textSize(24);
             p.textAlign(p.CENTER, p.TOP);
-            p.text('Food Insecurity Rates Across America', p.width / 2, 40);
+            //p.text('Food Insecurity Rates Across America', p.width / 2, 40);
 
             // Draw subtitle that changes based on view (below button)
             // p.strokeWeight(0);
@@ -330,8 +330,8 @@ function drawTooltip(p) {
             // p.textSize(24);
             // p.textAlign(p.CENTER, p.TOP);
             const subtitle = currentView === 'below'
-                ? 'in Households Below 185% Federal Poverty Line'
-                : 'in Households Above 185% Federal Poverty Line';
+                ? 'Percent of Food-Insecure Children Below 185% FPL'
+                : 'Percent of Food-Insecure Children Above 185% FPL';
             p.text(subtitle, p.width / 2, 70);
 
 
