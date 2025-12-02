@@ -37,22 +37,22 @@
             }
 
             if (ai === 3) {
-                window.FIIncomeMap.draw(p, manager, ai, progress);
-                return;
-            }
-
-            if (ai === 4) {
                 window.VizStateNumberLine.draw(p, manager, ai, progress);
                 return;
             }
 
-            if (ai == 5) {
+            if (ai === 4) {
                 window.VizJustice.draw(p, manager, ai, progress);
                 return;
             }
 
-            if (ai == 6) {
+            if (ai === 5) {
                 window.VizBreakfast.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai === 6) {
+                window.FIIncomeMap.draw(p, manager, ai, progress);
                 return;
             }
 
@@ -68,7 +68,7 @@
                 return;
             }
 
-            if (ai === 3) {
+            if (ai === 6) {
                 window.FIIncomeMap.mousePressed(p, manager, ai, progress);
                 return;
             }
