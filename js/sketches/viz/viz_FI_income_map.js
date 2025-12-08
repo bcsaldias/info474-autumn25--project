@@ -81,6 +81,9 @@ function isMouseOverButton(p) {
 
 // Draw toggle button on canvas
 function drawToggleButton(p) {
+    // Update hover state
+    buttonHovered = isMouseOverButton(p);
+
     const buttonX = (p.width - buttonWidth) / 2;
     const buttonY = p.height - 90;
 
@@ -99,8 +102,7 @@ function drawToggleButton(p) {
         : 'View Below 185% FPL';
     p.text(labelText, buttonX + buttonWidth / 2, buttonY + buttonHeight / 2);
 
-    // Update hover state
-    buttonHovered = isMouseOverButton(p);
+
 }
 
 // Draw discrete color legend on the right side (20 bins)
@@ -113,6 +115,7 @@ function drawLegend(p) {
     const legendHeight = binHeight * numBins;
 
     // Draw legend label
+    p.noStroke();
     p.fill(0);
     p.textSize(12);
     p.textAlign(p.CENTER, p.TOP);
@@ -124,7 +127,6 @@ function drawLegend(p) {
         const normalizedValue = (i / (numBins - 1)) * 100;
         const color = getColor(normalizedValue);
         p.fill(color[0], color[1], color[2]);
-        p.noStroke();
         const y = legendY + (i * binHeight);
         p.rect(legendX, y, legendWidth, binHeight);
     }
@@ -190,6 +192,28 @@ function drawTooltip(p) {
     p.text(`Food Insecurity: ${hoveredValue}%`, tooltipX + 8, tooltipY + 22);
 }
 
+function drawContextText(p) {
+    const x = 150;
+    const y = 100;
+    const boxWidth = 420;
+
+    p.fill(0);
+    p.strokeWeight(0);
+
+    p.textSize(12);
+    p.textAlign(p.CENTER, p.TOP);
+
+    const contextText = "* The 185% threshold is the common eligibility cutoff for programs like free or reduced-price school meals and WIC";
+    const contextText2 = "Toggle the map to compare children who typically qualify for food assistance with those who do not, and see how hardship persists across both groups."
+
+    p.text(contextText, x, y, boxWidth);
+    p.fill(150);
+    p.textSize(11)
+    p.textStyle(p.ITALIC);
+    p.text(contextText2, x - 30, y + 420, boxWidth);
+}
+
+
 (function () {
     window.FIIncomeMap = {
         draw: function (p, manager, ai, progress) {
@@ -207,7 +231,7 @@ function drawTooltip(p) {
             // Initialize projection once
             if (!projection) {
                 projection = d3.geoAlbersUsa()
-                    .translate([p.width / 2, p.height / 2])
+                    .translate([p.width / 2, p.height / 2 + 15])
                     .scale(650);
             }
 
@@ -322,17 +346,13 @@ function drawTooltip(p) {
             p.fill(0);
             p.textSize(24);
             p.textAlign(p.CENTER, p.TOP);
-            //p.text('Food Insecurity Rates Across America', p.width / 2, 40);
 
-            // Draw subtitle that changes based on view (below button)
-            // p.strokeWeight(0);
-            // p.fill(100);
-            // p.textSize(24);
-            // p.textAlign(p.CENTER, p.TOP);
             const subtitle = currentView === 'below'
                 ? 'Percent of Food-Insecure Children Below 185% FPL'
                 : 'Percent of Food-Insecure Children Above 185% FPL';
             p.text(subtitle, p.width / 2, 70);
+
+            drawContextText(p);
 
 
             // Draw the toggle button

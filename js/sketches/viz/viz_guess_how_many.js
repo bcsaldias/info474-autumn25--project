@@ -3,7 +3,7 @@
     let selectedAnswer = null;
     let showResult = false;
     const correctAnswer = 2;
-    let options = [1, 5, 2, 8];
+    let options = [1, 2, 5, 8];
 
 
     window.GuessHowMany = {
@@ -75,7 +75,7 @@
                 p.textSize(24);
                 if (selectedAnswer === correctAnswer) {
                     p.fill(46, 204, 113);
-                    p.text("Correct!", p.width / 2, p.height / 2 + 100);
+                    p.text("Correct :(", p.width / 2, p.height / 2 + 100);
                 } else {
                     p.fill(231, 76, 60);
                     p.text("Incorrect. The answer is 2 in 10.", p.width / 2, p.height / 2 + 100);
