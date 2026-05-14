@@ -13,7 +13,7 @@
             p.fill(0);
             p.textAlign(p.CENTER, p.CENTER);
             p.textSize(48);
-            p.text(ai === 0 ? 'IMT 561' : 'Final Project', cx, cy);
+            p.text(ai === 0 ? 'IMT 561 Team Harry and Adam' : 'Final Project', cx, cy);
             p.pop();
         }
     };
