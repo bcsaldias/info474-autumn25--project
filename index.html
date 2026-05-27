@@ -9,10 +9,7 @@
   <meta name="author" content="Kexuan Feng" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Bootstrap / existing course styles -->
   <link rel="stylesheet" href="css/bootstrap.min.css" />
-
-  <!-- Custom style -->
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -40,8 +37,7 @@
         This interactive article explores the gap between forecast numbers and
         lived campus experience. Instead of creating one universal weather
         difficulty score, we show the environmental layers that shape a Seattle
-        campus day: rain, cloud cover, daylight, solar energy, wind, and
-        temperature comfort.
+        campus day.
       </p>
 
       <div class="tag-row">
@@ -57,7 +53,7 @@
     <section id="graphic">
       <div id="sections">
         <section class="step" data-active-index="0">
-          <div class="title">Beyond the Forecast</div>
+          <div class="title">Opening Question</div>
           Seattle weather is often described as “rainy,” but rain alone does not
           explain why some campus days feel harder than others.
           <br /><br />
@@ -66,63 +62,51 @@
         </section>
 
         <section class="step" data-active-index="1">
-          <div class="title">What the Forecast Shows</div>
+          <div class="title">1. Beyond the Forecast: Weather Layers</div>
           A standard forecast gives us separate numbers: temperature,
           precipitation, cloud cover, wind speed, sunrise time, and sunset time.
           These numbers are useful, but they do not always show how the day
           actually feels when students move through campus.
           <br /><br />
-          This section breaks the forecast into visible weather layers instead
-          of combining everything into one score.
+          This first visualization compares
+          <b>what the forecast shows</b> with
+          <b>what it does not connect</b>. The goal is to make the six weather
+          layers visible before moving into yearly patterns and interaction.
         </section>
 
         <section class="step" data-active-index="2">
-          <div class="title">Factor Patterns Across the Year</div>
-          Instead of creating one weather difficulty index, users can explore
-          each factor separately.
+          <div class="title">2. Factor Patterns Across the Year</div>
+          Next, users will choose one environmental factor and see how it changes
+          across 2025.
           <br /><br />
-          Select rain, cloud cover, daylight, solar energy, wind, or temperature
-          comfort to see how that factor changes across the year.
+          This section will be implemented in the next commit.
         </section>
 
         <section class="step" data-active-index="3">
-          <div class="title">Compare Factors Within a Month</div>
-          A month can feel difficult for different reasons.
+          <div class="title">3. Compare Factors Within a Month</div>
+          Later, users will select a month and compare all six environmental
+          factors side by side.
           <br /><br />
-          This view compares all six environmental factors within one selected
-          month, helping users see that Seattle weather is layered, not just
-          rainy.
+          This section will be implemented after the yearly factor view.
         </section>
 
         <section class="step" data-active-index="4">
-          <div class="title">Build Your Weekly Weather Lens</div>
-          Users can choose the factors that matter most to their own routine.
-          <br /><br />
-          A student who walks across campus may care more about rain and wind,
-          while a student with evening classes may care more about daylight.
-          When selected factors overlap on the same day, the day becomes visually
-          darker.
+          <div class="title">4. Build Your Weekly Weather Lens</div>
+          Users will choose the factors that matter most to their own routine.
+          Days with more selected overlapping factors will become visually darker.
         </section>
 
         <section class="step" data-active-index="5">
-          <div class="title">A Day in Context</div>
-          After selecting weather layers, users can inspect one day in detail.
-          <br /><br />
-          This section shows the raw values behind a day: rain, cloud cover,
-          daylight, solar energy, wind, and feels-like temperature.
-          The goal is to explain the day through visible conditions, not through
-          a hidden score.
+          <div class="title">5. Day in Context</div>
+          Finally, users will inspect one selected day and see the raw weather
+          values behind it.
         </section>
 
         <section class="step" data-active-index="6">
           <div class="title">Takeaway</div>
-          This project does not claim that there is one universal measurement
-          for a hard weather day.
-          <br /><br />
-          Instead, it shows how different environmental factors appear, overlap,
-          and matter differently depending on a student’s routine.
-          <br /><br />
-          <b>Seattle weather is not just rain. It is layered, contextual, and personal.</b>
+          This project does not create one universal weather difficulty score.
+          Instead, it keeps the factors visible and helps users understand how
+          weather experience is layered, contextual, and personal.
         </section>
       </div>
 
@@ -137,21 +121,10 @@
         weather layers, the article helps students understand why some days feel
         harder than the forecast suggests.
       </p>
-
-      <p>
-        Instead of hiding the story inside one score, the visualization keeps
-        the factors visible: rain, cloud cover, daylight, solar energy, wind, and
-        temperature comfort. Users can explore how each one changes across time
-        and how different combinations may shape their own campus experience.
-      </p>
     </section>
   </main>
 
-<!-- Local p5.js library -->
-<script src="js/libraries/p5.js"></script>
-
-<!-- Optional: p5 sound library, not needed for this project for now -->
-<!-- <script src="js/libraries/p5.sound.min.js"></script> -->
-
-<!-- Project 3 weather visualization -->
-<script src="js/sketches/weather/weather_project.js"></script>
+  <script src="js/libraries/p5.js"></script>
+  <script src="js/sketches/weather/weather_project.js"></script>
+</body>
+</html>

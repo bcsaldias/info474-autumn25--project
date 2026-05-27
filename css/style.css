@@ -69,7 +69,7 @@ body {
 .step {
   margin: 0 0 75vh 0;
   padding: 28px;
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid #e2dcd3;
   border-radius: 18px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
@@ -82,21 +82,12 @@ body {
   font-size: 24px;
   font-weight: 750;
   margin-bottom: 14px;
-  color: #222;
+  color: #2f276f;
   line-height: 1.2;
 }
 
 .step b {
   color: #111;
-}
-
-.step ul {
-  margin-top: 14px;
-  padding-left: 22px;
-}
-
-.step li {
-  margin-bottom: 8px;
 }
 
 #vis {

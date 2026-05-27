@@ -1,24 +1,11 @@
 let weatherTable;
 let weatherData = [];
-let monthlyData = [];
-
 let activeSection = 0;
-let selectedFactor = "rain";
-let selectedMonth = 10; // November by default
-let selectedWeekStart = 300;
-
-let selectedLayers = {
-  rain: true,
-  cloud: false,
-  daylight: false,
-  solar: false,
-  wind: false,
-  temp: false
-};
 
 const FACTORS = {
   rain: {
     label: "Rain",
+    icon: "💧",
     color: "#4A90E2",
     column: "precip",
     unit: "in",
@@ -26,20 +13,23 @@ const FACTORS = {
   },
   cloud: {
     label: "Cloud Cover",
+    icon: "☁️",
     color: "#8E8E93",
     column: "cloudcover",
     unit: "%",
-    description: "Grayness and visual heaviness"
+    description: "Gray sky and visual heaviness"
   },
   daylight: {
     label: "Daylight",
+    icon: "☀️",
     color: "#F4D35E",
     column: "daylightHours",
     unit: "hrs",
-    description: "Available daylight in a day"
+    description: "How much daylight is available"
   },
   solar: {
     label: "Solar Energy",
+    icon: "🌤️",
     color: "#F6A04D",
     column: "solarenergy",
     unit: "MJ/m²",
@@ -47,6 +37,7 @@ const FACTORS = {
   },
   wind: {
     label: "Wind",
+    icon: "〰️",
     color: "#2CB1A1",
     column: "windspeed",
     unit: "mph",
@@ -54,6 +45,7 @@ const FACTORS = {
   },
   temp: {
     label: "Temperature Comfort",
+    icon: "🌡️",
     color: "#E76F51",
     column: "feelslike",
     unit: "°F",
@@ -93,17 +85,11 @@ function draw() {
   }
 
   if (activeSection === 0) {
-    drawTitleView();
+    drawOpeningPanel();
   } else if (activeSection === 1) {
-    drawForecastLayers();
-  } else if (activeSection === 2) {
-    drawFactorPattern();
-  } else if (activeSection === 3) {
-    drawMonthProfile();
-  } else if (activeSection === 4) {
-    drawWeeklyLens();
+    drawWeatherLayersPanel();
   } else {
-    drawDayContext();
+    drawPlaceholderPanel();
   }
 }
 
@@ -112,7 +98,7 @@ function windowResized() {
 }
 
 /* -------------------------
-   Safe CSV reading helpers
+   Data helpers
 -------------------------- */
 
 function getCell(row, columnName, fallback = "") {
@@ -137,10 +123,6 @@ function getStringCell(row, columnName, fallback = "") {
   return String(value);
 }
 
-/* -------------------------
-   Data processing
--------------------------- */
-
 function processWeatherData() {
   weatherData = [];
 
@@ -150,23 +132,14 @@ function processWeatherData() {
     const row = weatherTable.getRow(r);
 
     const dateStr = getStringCell(row, "date", "");
-
-    if (!dateStr) {
-      console.warn("Missing date at row:", r);
-      continue;
-    }
+    if (!dateStr) continue;
 
     const dateObj = new Date(dateStr + "T12:00:00");
-
-    if (isNaN(dateObj.getTime())) {
-      console.warn("Invalid date at row:", r, dateStr);
-      continue;
-    }
+    if (isNaN(dateObj.getTime())) continue;
 
     const item = {
       date: dateStr,
       dateObj: dateObj,
-
       month: getNumberCell(row, "month", dateObj.getMonth() + 1) - 1,
       monthName: getStringCell(
         row,
@@ -184,18 +157,19 @@ function processWeatherData() {
       windspeed: getNumberCell(row, "windspeed", 0),
       daylightHours: getNumberCell(row, "daylightHours", 0),
 
+      sunrise: getStringCell(row, "sunrise", ""),
+      sunset: getStringCell(row, "sunset", ""),
       conditions: getStringCell(row, "conditions", "No condition label"),
-      description: getStringCell(row, "description", "No description available")
-    };
+      description: getStringCell(row, "description", "No description available"),
 
-    // Use active layer columns from cleaned CSV directly
-    item.layers = {
-      rain: getNumberCell(row, "rainActive", 0) === 1,
-      cloud: getNumberCell(row, "cloudActive", 0) === 1,
-      daylight: getNumberCell(row, "lowDaylightActive", 0) === 1,
-      solar: getNumberCell(row, "lowSolarActive", 0) === 1,
-      wind: getNumberCell(row, "windActive", 0) === 1,
-      temp: getNumberCell(row, "tempDiscomfortActive", 0) === 1
+      layers: {
+        rain: getNumberCell(row, "rainActive", 0) === 1,
+        cloud: getNumberCell(row, "cloudActive", 0) === 1,
+        daylight: getNumberCell(row, "lowDaylightActive", 0) === 1,
+        solar: getNumberCell(row, "lowSolarActive", 0) === 1,
+        wind: getNumberCell(row, "windActive", 0) === 1,
+        temp: getNumberCell(row, "tempDiscomfortActive", 0) === 1
+      }
     };
 
     weatherData.push(item);
@@ -206,34 +180,6 @@ function processWeatherData() {
   if (weatherData.length > 0) {
     console.log("First processed row:", weatherData[0]);
   }
-
-  buildMonthlyData();
-}
-
-function buildMonthlyData() {
-  monthlyData = [];
-
-  for (let m = 0; m < 12; m++) {
-    const days = weatherData.filter(d => d.month === m);
-
-    if (!days.length) continue;
-
-    monthlyData.push({
-      month: m,
-      monthName: days[0].monthName,
-      rain: average(days, "precip"),
-      cloud: average(days, "cloudcover"),
-      daylight: average(days, "daylightHours"),
-      solar: average(days, "solarenergy"),
-      wind: average(days, "windspeed"),
-      temp: average(days, "feelslike")
-    });
-  }
-}
-
-function average(arr, key) {
-  if (!arr.length) return 0;
-  return arr.reduce((sum, d) => sum + d[key], 0) / arr.length;
 }
 
 function setupSectionObserver() {
@@ -253,46 +199,9 @@ function setupSectionObserver() {
   steps.forEach(step => observer.observe(step));
 }
 
-function mousePressed() {
-  if (activeSection === 2) {
-    handleFactorButtons();
-  }
-
-  if (activeSection === 3) {
-    handleMonthButtons();
-  }
-
-  if (activeSection === 4) {
-    handleLayerButtons();
-  }
-}
-
 /* -------------------------
-   Shared drawing helpers
+   Drawing helpers
 -------------------------- */
-
-function drawTitle(textValue, subtitle) {
-  fill("#222");
-  noStroke();
-  textSize(28);
-  textStyle(BOLD);
-  text(textValue, 40, 55, width - 80);
-
-  textStyle(NORMAL);
-  textSize(14);
-  fill("#555");
-  text(subtitle, 40, 90, width - 80);
-}
-
-function drawCard(x, y, w, h) {
-  noStroke();
-  fill("#FFFFFF");
-  rect(x, y, w, h, 18);
-
-  stroke("#E6E0D8");
-  noFill();
-  rect(x, y, w, h, 18);
-}
 
 function drawLoading() {
   fill("#222");
@@ -300,550 +209,379 @@ function drawLoading() {
   text("Loading Seattle weather data...", 40, 60);
 }
 
-function drawButton(x, y, w, h, label, isActive, colorValue) {
+function drawMainTitle(title, subtitle) {
+  fill("#222");
   noStroke();
-  fill(isActive ? colorValue : "#FFFFFF");
-  rect(x, y, w, h, 14);
+  textSize(26);
+  textStyle(BOLD);
+  text(title, 34, 46, width - 68);
 
-  stroke(isActive ? colorValue : "#D8D0C8");
-  noFill();
-  rect(x, y, w, h, 14);
+  textStyle(NORMAL);
+  textSize(13);
+  fill("#555");
+  text(subtitle, 34, 78, width - 68);
+}
 
+function drawSectionNumber(num, x, y) {
+  fill("#4D3F8F");
   noStroke();
-  fill(isActive ? "#FFFFFF" : "#333");
-  textSize(12);
+  circle(x, y, 26);
+
+  fill("#FFFFFF");
+  textSize(14);
+  textStyle(BOLD);
   textAlign(CENTER, CENTER);
-  text(label, x + w / 2, y + h / 2);
+  text(num, x, y + 1);
   textAlign(LEFT, BASELINE);
 }
 
+function drawCard(x, y, w, h, radius = 16) {
+  noStroke();
+  fill("#FFFFFF");
+  rect(x, y, w, h, radius);
+
+  stroke("#D9D2C7");
+  strokeWeight(1.4);
+  noFill();
+  rect(x, y, w, h, radius);
+  strokeWeight(1);
+}
+
+function drawMiniDivider(x1, y1, x2, y2) {
+  stroke("#D8D0C8");
+  strokeWeight(1.3);
+  line(x1, y1, x2, y2);
+  strokeWeight(1);
+}
+
+function formatTime(timeText) {
+  if (!timeText) return "N/A";
+  return timeText.toString().slice(0, 5);
+}
+
 /* -------------------------
-   View 0: Title
+   Section 0: Opening panel
 -------------------------- */
 
-function drawTitleView() {
-  drawTitle(
-    "Beyond the Forecast",
+function drawOpeningPanel() {
+  drawMainTitle(
+    "BEYOND THE FORECAST",
     "What environmental factors make Seattle weather feel hard?"
   );
 
-  drawCard(50, 135, width - 100, 315);
+  drawCard(45, 125, width - 90, 365, 18);
 
-  fill("#222");
-  textSize(34);
+  fill("#2f276f");
+  textSize(22);
   textStyle(BOLD);
-  text("Seattle weather is not just rain.", 85, 195, width - 170);
+  text("Seattle weather is not just rain.", 75, 185, width - 150);
 
   textStyle(NORMAL);
-  textSize(18);
   fill("#444");
+  textSize(17);
   text(
-    "A campus day can feel difficult when several ordinary conditions overlap: rain, cloud cover, short daylight, low solar energy, wind, and temperature discomfort.",
-    85,
-    250,
-    width - 170
-  );
-
-  const labels = ["Rain", "Cloud", "Daylight", "Solar", "Wind", "Temp"];
-  const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
-
-  for (let i = 0; i < labels.length; i++) {
-    const x = 85 + i * 95;
-    const y = 365;
-
-    fill(FACTORS[keys[i]].color);
-    noStroke();
-    circle(x, y, 32);
-
-    fill("#333");
-    textSize(13);
-    textAlign(CENTER);
-    text(labels[i], x, y + 34);
-  }
-
-  textAlign(LEFT);
-}
-
-/* -------------------------
-   View 1: Weather Layers
--------------------------- */
-
-function drawForecastLayers() {
-  drawTitle(
-    "1. What the Forecast Shows vs. What It Does Not Connect",
-    "A normal forecast gives separate numbers. This view keeps each environmental layer visible instead of combining them into one score."
-  );
-
-  const day = weatherData[Math.min(305, weatherData.length - 1)];
-
-  drawCard(45, 145, 240, 360);
-
-  fill("#222");
-  textSize(18);
-  textStyle(BOLD);
-  text("Standard Forecast", 70, 180);
-
-  textStyle(NORMAL);
-  textSize(14);
-  fill("#555");
-  text(day.date + " · " + day.conditions, 70, 205, 190);
-
-  const forecastLines = [
-    `Temp: ${nf(day.feelslike, 1, 1)}°F`,
-    `Rain: ${nf(day.precip, 1, 2)} in`,
-    `Cloud: ${nf(day.cloudcover, 1, 0)}%`,
-    `Wind: ${nf(day.windspeed, 1, 1)} mph`,
-    `Daylight: ${nf(day.daylightHours, 1, 1)} hrs`,
-    `Solar: ${nf(day.solarenergy, 1, 1)} MJ/m²`
-  ];
-
-  for (let i = 0; i < forecastLines.length; i++) {
-    fill("#333");
-    textSize(15);
-    text(forecastLines[i], 75, 250 + i * 38);
-  }
-
-  fill("#222");
-  textSize(22);
-  textStyle(BOLD);
-  text("Weather Layers", 340, 175);
-
-  textStyle(NORMAL);
-  textSize(14);
-  fill("#555");
-  text(
-    "Each layer remains visible, so users can see what is shaping the day.",
-    340,
-    200,
-    width - 390
+    "This project starts from a simple idea: a forecast can tell us the weather, but it does not always explain the experience of moving through campus.",
+    75,
+    235,
+    width - 150
   );
 
   const keys = Object.keys(FACTORS);
+  const startX = 95;
+  const y = 365;
 
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
-
-    const x = 360 + i * 34;
-    const y = 270 + i * 18;
-    const w = 245;
-    const h = 52;
-
-    const c = color(FACTORS[key].color);
-    fill(red(c), green(c), blue(c), 80);
-    stroke(FACTORS[key].color);
-    rect(x, y, w, h, 12);
-
-    noStroke();
-    fill("#222");
-    textSize(14);
-    textStyle(BOLD);
-    text(FACTORS[key].label, x + 16, y + 22);
-
-    textStyle(NORMAL);
-    textSize(12);
-    fill("#444");
-    text(FACTORS[key].description, x + 16, y + 40);
-  }
-
-  fill("#333");
-  textSize(15);
-  text(
-    "Takeaway: the forecast is useful, but the campus experience comes from how these layers overlap.",
-    340,
-    490,
-    width - 390
-  );
-}
-
-/* -------------------------
-   View 2: Factor Pattern
--------------------------- */
-
-function drawFactorPattern() {
-  drawTitle(
-    "2. Factor Patterns Across the Year",
-    "Choose one environmental factor and see how it changes month by month."
-  );
-
-  drawFactorSelector(45, 120);
-
-  const factor = selectedFactor;
-  const info = FACTORS[factor];
-
-  const chartX = 70;
-  const chartY = 220;
-  const chartW = width - 120;
-  const chartH = 320;
-
-  drawCard(45, 185, width - 90, 410);
-
-  fill("#222");
-  textSize(20);
-  textStyle(BOLD);
-  text(`${info.label} Across 2025`, chartX, chartY - 15);
-
-  const values = monthlyData.map(d => d[factor]);
-  const minVal = Math.min(...values);
-  const maxVal = Math.max(...values);
-  const padding = maxVal === minVal ? 1 : 0;
-
-  stroke("#D8D0C8");
-  line(chartX, chartY + chartH, chartX + chartW, chartY + chartH);
-  line(chartX, chartY, chartX, chartY + chartH);
-
-  noFill();
-  stroke(info.color);
-  strokeWeight(3);
-  beginShape();
-
-  for (let i = 0; i < monthlyData.length; i++) {
-    const x = map(i, 0, monthlyData.length - 1, chartX, chartX + chartW);
-    const y = map(
-      values[i],
-      minVal - padding,
-      maxVal + padding,
-      chartY + chartH,
-      chartY + 20
-    );
-    vertex(x, y);
-  }
-
-  endShape();
-  strokeWeight(1);
-
-  for (let i = 0; i < monthlyData.length; i++) {
-    const x = map(i, 0, monthlyData.length - 1, chartX, chartX + chartW);
-    const y = map(
-      values[i],
-      minVal - padding,
-      maxVal + padding,
-      chartY + chartH,
-      chartY + 20
-    );
-
-    fill(info.color);
-    noStroke();
-    circle(x, y, 9);
-
-    fill("#555");
-    textSize(12);
-    textAlign(CENTER);
-    text(monthlyData[i].monthName, x, chartY + chartH + 25);
-  }
-
-  textAlign(LEFT);
-  fill("#555");
-  textSize(13);
-  text(`Higher: ${nf(maxVal, 1, 1)} ${info.unit}`, chartX + chartW - 145, chartY + 10);
-  text(`Lower: ${nf(minVal, 1, 1)} ${info.unit}`, chartX + chartW - 145, chartY + chartH - 10);
-}
-
-function drawFactorSelector(x, y) {
-  const keys = Object.keys(FACTORS);
-
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-
-    drawButton(
-      x + i * 112,
-      y,
-      100,
-      34,
-      FACTORS[key].label,
-      selectedFactor === key,
-      FACTORS[key].color
-    );
-  }
-}
-
-function handleFactorButtons() {
-  const keys = Object.keys(FACTORS);
-  const x = 45;
-  const y = 120;
-
-  for (let i = 0; i < keys.length; i++) {
-    const bx = x + i * 112;
-
-    if (mouseX > bx && mouseX < bx + 100 && mouseY > y && mouseY < y + 34) {
-      selectedFactor = keys[i];
-    }
-  }
-}
-
-/* -------------------------
-   View 3: Month Profile
--------------------------- */
-
-function drawMonthProfile() {
-  drawTitle(
-    "3. Compare Factors Within a Month",
-    "Select a month to see which environmental layers are most present."
-  );
-
-  drawMonthSelector(45, 120);
-
-  const month = monthlyData[selectedMonth] || monthlyData[0];
-
-  drawCard(50, 180, width - 100, 430);
-
-  fill("#222");
-  textSize(22);
-  textStyle(BOLD);
-  text(`${month.monthName} Weather Profile`, 80, 225);
-
-  textStyle(NORMAL);
-  fill("#555");
-  textSize(14);
-  text(
-    "This view compares one month across all six factors, without turning them into one score.",
-    80,
-    250
-  );
-
-  const keys = Object.keys(FACTORS);
-
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    const info = FACTORS[key];
-
-    const x = 95;
-    const y = 310 + i * 44;
-    const barW = width - 310;
-    const barH = 20;
-
-    const allMonthlyVals = monthlyData.map(d => d[key]);
-    const minVal = Math.min(...allMonthlyVals);
-    const maxVal = Math.max(...allMonthlyVals);
-
-    const val = month[key];
-    const w = maxVal === minVal ? barW / 2 : map(val, minVal, maxVal, 20, barW);
-
-    fill("#333");
-    textSize(13);
-    textStyle(BOLD);
-    text(info.label, x, y - 5);
-
-    fill("#EFEAE2");
-    noStroke();
-    rect(x + 160, y - 18, barW, barH, 10);
-
-    fill(info.color);
-    rect(x + 160, y - 18, w, barH, 10);
-
-    fill("#333");
-    textStyle(NORMAL);
-    text(`${nf(val, 1, 1)} ${info.unit}`, x + 175 + barW, y - 3);
-  }
-}
-
-function drawMonthSelector(x, y) {
-  for (let i = 0; i < monthlyData.length; i++) {
-    const label = monthlyData[i] ? monthlyData[i].monthName : "";
-
-    drawButton(
-      x + i * 57,
-      y,
-      48,
-      30,
-      label,
-      selectedMonth === i,
-      "#6D5DF6"
-    );
-  }
-}
-
-function handleMonthButtons() {
-  const x = 45;
-  const y = 120;
-
-  for (let i = 0; i < monthlyData.length; i++) {
-    const bx = x + i * 57;
-
-    if (mouseX > bx && mouseX < bx + 48 && mouseY > y && mouseY < y + 30) {
-      selectedMonth = i;
-    }
-  }
-}
-
-/* -------------------------
-   View 4: Weekly Lens
--------------------------- */
-
-function drawWeeklyLens() {
-  drawTitle(
-    "4. Build Your Weekly Weather Lens",
-    "Choose the factors that matter to your routine. Days with overlapping selected layers become darker."
-  );
-
-  drawLayerSelector(45, 120);
-
-  const start = Math.min(selectedWeekStart, weatherData.length - 7);
-  const week = weatherData.slice(start, start + 7);
-
-  drawCard(50, 190, width - 100, 420);
-
-  for (let i = 0; i < week.length; i++) {
-    const d = week[i];
-    const cardW = (width - 160) / 7;
-    const x = 80 + i * cardW;
-    const y = 240;
-
-    const overlap = countSelectedOverlap(d);
-
-    fill(255);
-    stroke("#DDD");
-    rect(x, y, cardW - 12, 250, 16);
-
-    if (overlap > 0) {
-      noStroke();
-      fill(110, 93, 246, 40 + overlap * 38);
-      rect(x, y, cardW - 12, 250, 16);
-    }
-
-    fill("#222");
-    noStroke();
-    textSize(14);
-    textStyle(BOLD);
-    text(d.monthName + " " + d.day, x + 12, y + 30);
-
-    textStyle(NORMAL);
-    textSize(12);
-    fill("#555");
-    text(d.conditions, x + 12, y + 52, cardW - 30);
-
-    let yy = y + 95;
-
-    Object.keys(FACTORS).forEach(key => {
-      if (selectedLayers[key] && d.layers[key]) {
-        fill(FACTORS[key].color);
-        circle(x + 18, yy - 4, 8);
-
-        fill("#333");
-        textSize(11);
-        text(FACTORS[key].label, x + 30, yy);
-
-        yy += 22;
-      }
-    });
-  }
-
-  fill("#555");
-  textSize(13);
-  text(
-    "Darker cards do not mean a formal score. They show that more of your selected conditions are present on the same day.",
-    80,
-    545,
-    width - 160
-  );
-}
-
-function drawLayerSelector(x, y) {
-  const keys = Object.keys(FACTORS);
-
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-
-    drawButton(
-      x + i * 112,
-      y,
-      100,
-      34,
-      FACTORS[key].label,
-      selectedLayers[key],
-      FACTORS[key].color
-    );
-  }
-}
-
-function handleLayerButtons() {
-  const keys = Object.keys(FACTORS);
-  const x = 45;
-  const y = 120;
-
-  for (let i = 0; i < keys.length; i++) {
-    const bx = x + i * 112;
-
-    if (mouseX > bx && mouseX < bx + 100 && mouseY > y && mouseY < y + 34) {
-      selectedLayers[keys[i]] = !selectedLayers[keys[i]];
-    }
-  }
-}
-
-function countSelectedOverlap(d) {
-  let count = 0;
-
-  Object.keys(selectedLayers).forEach(key => {
-    if (selectedLayers[key] && d.layers[key]) {
-      count++;
-    }
-  });
-
-  return count;
-}
-
-/* -------------------------
-   View 5: Day in Context
--------------------------- */
-
-function drawDayContext() {
-  drawTitle(
-    "5. A Day in Context",
-    "The detail view explains a selected day through raw values and active weather layers."
-  );
-
-  const day = weatherData[Math.min(304, weatherData.length - 1)];
-
-  drawCard(65, 150, width - 130, 450);
-
-  fill("#222");
-  textSize(24);
-  textStyle(BOLD);
-  text(`${day.date}: ${day.conditions}`, 95, 200, width - 190);
-
-  textStyle(NORMAL);
-  fill("#555");
-  textSize(14);
-  text(day.description, 95, 230, width - 190);
-
-  const details = [
-    ["Rain", `${nf(day.precip, 1, 2)} in`, "rain"],
-    ["Cloud Cover", `${nf(day.cloudcover, 1, 0)}%`, "cloud"],
-    ["Daylight", `${nf(day.daylightHours, 1, 1)} hrs`, "daylight"],
-    ["Solar Energy", `${nf(day.solarenergy, 1, 1)} MJ/m²`, "solar"],
-    ["Wind", `${nf(day.windspeed, 1, 1)} mph`, "wind"],
-    ["Feels Like", `${nf(day.feelslike, 1, 1)}°F`, "temp"]
-  ];
-
-  for (let i = 0; i < details.length; i++) {
-    const [label, value, key] = details[i];
-
-    const x = 105 + (i % 2) * 300;
-    const y = 315 + Math.floor(i / 2) * 78;
+    const x = startX + i * 92;
 
     fill(FACTORS[key].color);
     noStroke();
-    circle(x, y, 18);
+    circle(x, y, 34);
 
     fill("#222");
-    textSize(15);
-    textStyle(BOLD);
-    text(label, x + 28, y - 6);
+    textSize(18);
+    textAlign(CENTER, CENTER);
+    text(FACTORS[key].icon, x, y);
 
+    fill("#333");
+    textSize(12);
     textStyle(NORMAL);
-    fill("#555");
-    text(value, x + 28, y + 16);
+    text(FACTORS[key].label, x, y + 38);
   }
+
+  textAlign(LEFT, BASELINE);
 
   fill("#F3EFE8");
   noStroke();
-  rect(95, 535, width - 190, 48, 12);
+  rect(80, 525, width - 160, 45, 12);
 
   fill("#333");
   textSize(14);
   text(
-    "Interpretation: this day may feel harder because several layers appear together, such as wet ground, gray sky, short daylight, or wind.",
-    115,
-    562,
-    width - 230
+    "Not a score. Not one cause. More layers, more context.",
+    105,
+    553,
+    width - 210
+  );
+}
+
+/* -------------------------
+   Section 1: Viz 1 Weather Layers
+-------------------------- */
+
+function drawWeatherLayersPanel() {
+  const day = pickExampleDay();
+
+  drawMainTitle(
+    "1  BEYOND THE FORECAST: WEATHER LAYERS",
+    "A forecast shows numbers, but it does not always connect how those conditions overlap in daily life."
+  );
+
+  drawSectionNumber("1", 39, 43);
+
+  const leftX = 42;
+  const topY = 128;
+  const leftW = 260;
+  const cardH = 390;
+
+  const arrowX = leftX + leftW + 34;
+
+  const rightX = arrowX + 56;
+  const rightW = width - rightX - 42;
+
+  drawForecastCard(day, leftX, topY, leftW, cardH);
+
+  drawConnectionArrow(arrowX, topY + cardH / 2);
+
+  drawLayerStack(day, rightX, topY, rightW, cardH);
+
+  drawVizOneTakeaway(topY + cardH + 28);
+}
+
+function pickExampleDay() {
+  const target = weatherData.find(d => d.monthName === "Nov" && d.day === 15);
+  if (target) return target;
+
+  return weatherData[Math.min(304, weatherData.length - 1)];
+}
+
+function drawForecastCard(day, x, y, w, h) {
+  fill("#2f276f");
+  noStroke();
+  textSize(14);
+  textStyle(BOLD);
+  text("WHAT THE FORECAST SHOWS", x, y - 12);
+
+  drawCard(x, y, w, h, 16);
+
+  fill("#F8FBFF");
+  stroke("#B6CDE5");
+  rect(x + 18, y + 25, w - 36, h - 50, 14);
+
+  noStroke();
+  fill("#333");
+  textSize(13);
+  textStyle(BOLD);
+  text(day.date, x + 34, y + 58);
+
+  textSize(36);
+  textStyle(BOLD);
+  fill("#222");
+  text(`${Math.round(day.feelslike)}°F`, x + 34, y + 112);
+
+  textSize(34);
+  textAlign(CENTER, CENTER);
+  text("🌧️", x + w - 68, y + 98);
+  textAlign(LEFT, BASELINE);
+
+  fill("#444");
+  textSize(15);
+  textStyle(NORMAL);
+  text(day.conditions, x + 34, y + 145, w - 68);
+
+  drawMiniDivider(x + 30, y + 165, x + w - 30, y + 165);
+
+  const rows = [
+    ["💧", "Rain", `${nf(day.precip, 1, 2)} in`],
+    ["☁️", "Cloud", `${Math.round(day.cloudcover)}%`],
+    ["〰️", "Wind", `${nf(day.windspeed, 1, 1)} mph`],
+    ["🌅", "Sunrise", formatTime(day.sunrise)],
+    ["🌇", "Sunset", formatTime(day.sunset)]
+  ];
+
+  let rowY = y + 205;
+
+  for (let i = 0; i < rows.length; i++) {
+    const [icon, label, value] = rows[i];
+
+    fill("#333");
+    textSize(15);
+    text(icon, x + 34, rowY);
+
+    fill("#555");
+    textSize(13);
+    text(label, x + 65, rowY);
+
+    fill("#222");
+    textAlign(RIGHT, BASELINE);
+    text(value, x + w - 34, rowY);
+    textAlign(LEFT, BASELINE);
+
+    rowY += 37;
+  }
+}
+
+function drawConnectionArrow(x, y) {
+  stroke("#444");
+  strokeWeight(2);
+  line(x - 18, y, x + 18, y);
+  line(x + 18, y, x + 8, y - 8);
+  line(x + 18, y, x + 8, y + 8);
+  strokeWeight(1);
+
+  noStroke();
+  fill("#555");
+  textSize(12);
+  textAlign(CENTER);
+  text("but what does it connect?", x, y + 34);
+  textAlign(LEFT);
+}
+
+function drawLayerStack(day, x, y, w, h) {
+  fill("#2f276f");
+  noStroke();
+  textSize(14);
+  textStyle(BOLD);
+  text("WHAT IT DOESN'T CONNECT", x, y - 12);
+
+  drawCard(x, y, w, h, 16);
+
+  const layerKeys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
+  const layerH = 46;
+  const gap = 10;
+  const stackX = x + 28;
+  const stackY = y + 35;
+  const stackW = w - 56;
+
+  for (let i = 0; i < layerKeys.length; i++) {
+    const key = layerKeys[i];
+    const info = FACTORS[key];
+    const yy = stackY + i * (layerH + gap);
+
+    const active = day.layers[key];
+    const c = color(info.color);
+
+    if (active) {
+      fill(red(c), green(c), blue(c), 80);
+      stroke(info.color);
+    } else {
+      fill(red(c), green(c), blue(c), 25);
+      stroke(red(c), green(c), blue(c), 100);
+    }
+
+    rect(stackX, yy, stackW, layerH, 12);
+
+    noStroke();
+    fill("#222");
+    textSize(18);
+    textAlign(CENTER, CENTER);
+    text(info.icon, stackX + 28, yy + layerH / 2);
+
+    textAlign(LEFT, CENTER);
+    textSize(13);
+    textStyle(BOLD);
+    fill("#222");
+    text(info.label, stackX + 60, yy + layerH / 2 - 8);
+
+    textStyle(NORMAL);
+    textSize(11);
+    fill("#555");
+    text(info.description, stackX + 60, yy + layerH / 2 + 10);
+
+    if (active) {
+      fill("#2f276f");
+      textSize(11);
+      textStyle(BOLD);
+      textAlign(RIGHT, CENTER);
+      text("active", stackX + stackW - 18, yy + layerH / 2);
+      textAlign(LEFT, BASELINE);
+    }
+  }
+
+  fill("#444");
+  textSize(13);
+  textStyle(NORMAL);
+  text(
+    "A day can feel hard when several ordinary layers appear together, even if no single number looks extreme.",
+    x + 30,
+    y + h - 45,
+    w - 60
+  );
+}
+
+function drawVizOneTakeaway(y) {
+  drawCard(45, y, width - 90, 70, 14);
+
+  fill("#2f276f");
+  textSize(15);
+  textStyle(BOLD);
+  text("Takeaway", 70, y + 28);
+
+  fill("#333");
+  textSize(14);
+  textStyle(NORMAL);
+  text(
+    "The forecast is useful, but the campus experience comes from how rain, cloud cover, daylight, solar energy, wind, and temperature comfort overlap.",
+    150,
+    y + 28,
+    width - 210
+  );
+}
+
+/* -------------------------
+   Placeholder panels for later commits
+-------------------------- */
+
+function drawPlaceholderPanel() {
+  const titles = {
+    2: "2  FACTOR PATTERNS ACROSS THE YEAR",
+    3: "3  COMPARE FACTORS WITHIN A MONTH",
+    4: "4  BUILD YOUR WEEKLY WEATHER LENS",
+    5: "5  DAY IN CONTEXT",
+    6: "TAKEAWAY"
+  };
+
+  drawMainTitle(
+    titles[activeSection] || "NEXT VIEW",
+    "This panel is intentionally left as a placeholder for the next implementation commit."
+  );
+
+  drawCard(70, 150, width - 140, 320, 18);
+
+  fill("#2f276f");
+  textSize(24);
+  textStyle(BOLD);
+  text("Coming in the next commit", 105, 220);
+
+  fill("#444");
+  textSize(16);
+  textStyle(NORMAL);
+  text(
+    "This project is being implemented step by step so the commit history clearly shows progress from one visualization to the next.",
+    105,
+    270,
+    width - 210
+  );
+
+  fill("#F3EFE8");
+  noStroke();
+  rect(105, 350, width - 210, 52, 12);
+
+  fill("#333");
+  textSize(14);
+  text(
+    "Current completed view: Viz 1 — Beyond the Forecast: Weather Layers",
+    130,
+    382
   );
 }
