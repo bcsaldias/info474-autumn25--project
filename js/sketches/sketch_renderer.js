@@ -14,14 +14,29 @@
                 manager.data = data;
             }
 
-            computeLayout([]);
-            return Promise.resolve(manager.data);
+            return fetch('data/yelp_filtered/yelp_restaurants_philadelphia_zips.json')
+                .then(function (response) { return response.json(); })
+                .then(function (data) {
+                    computeLayout(data);
+                    manager.yelpReviewData = window.VizYelpReviews.prepareData(data);
+                    return manager.data;
+                })
+                .catch(function () {
+                    computeLayout([]);
+                    manager.yelpReviewData = window.VizYelpReviews.prepareData([]);
+                    return manager.data;
+                });
         },
 
         draw: function (p, manager, ai, progress) {
 
             if (ai === 0 || ai === 1) {
                 window.VizTitle.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai === 2) {
+                window.VizYelpReviews.draw(p, manager, ai, progress);
                 return;
             }
 
