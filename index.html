@@ -1,125 +1,149 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>IMT 561 Data Visualization: Design and Development</title>
-  <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
-  <link rel="stylesheet" type="text/css" href="css/style.css" />
+  <meta charset="UTF-8" />
+
+  <title>Beyond the Forecast</title>
+
+  <meta name="description" content="Beyond the Forecast: What Environmental Factors Make Seattle Weather Feel Hard?" />
+  <meta name="author" content="Kexuan Feng" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="css/bootstrap.min.css" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
   <header id="site-header">
-    <span id="site-title">Your Project Title</span>
-    <span id="site-course">IMT 561 Data Visualization: Design and Development</span>
-    <span id="debug-state"></span>
-  </header>
-  <div class="container">
-    <div id='graphic'>
-      <div id='sections'>
-        <section class="step" data-active-index="0">
-          <div class="title">IMT 561 Final Project</div>
-          Here is a template to work on your final project.<br /><br />
-          Your mission is to create an <b>interactive article using P5.js</b>.
-        </section>
-        <section class="step" data-active-index="1">
-          <div class="title">Sections</div>
-          Note that each section in index.html corresponds to a section in the
-          scrolling article. You can add or remove sections as needed.
-        </section>
-        <section class="step" data-active-index="2">
-          <div class="title">No visualization</div>
-          You don't need to have a visualization for every section. Some sections may simply be text.
-        </section>
-        <section class="step" data-active-index="3">
-          <div class="title">Narrative</div>
-          These sections will tell a story. You can use them to explain the visualization, provide context,
-          or share insights.
-        </section>
-        <section class="step" data-active-index="4">
-          <div class="title">Be creative</div>
-          Surprise your readers with interesting interactions, animations, or data visualizations.
-        </section>
-        <section class="step" data-active-index="5">
-          <div class="title">Same visualization multiple sections</div>
-          Some visualizations may be relevant to multiple sections. You can reuse the same visualization
-          across different sections to reinforce key points. Or build on the previous visualization to just add on.
-        </section>
-        <div id="extra-space">
-        </div>
-        <section class="step" data-active-index="6">
-          <div class="title">Examples</div>
-          There is two examples in this code. One is a grid of circles that changes color
-          based on the section index. The other is a scatter plot and bar chart that
-          shows random data points. You can modify or replace these examples with your own visualizations.
-          Make sure you read both source files to understand how they work.
-        </section>
-        <section class="step" data-active-index="7">
-          <div class="title">Best of Luck in the Project!</div>
-          You are now ready to start building your interactive article. Good luck!
-        </section>
-        <section class="step" data-active-index="8" data-layout="full-text">
-          <div class="title">Full-text section</div>
-          Add <code>data-layout="full-text"</code> to a section to hide the visualization and
-          give the text the full width of the screen. Use this for introductions, transitions,
-          or any moment where the data should step aside and the writing takes center stage.<br /><br />
-          This is a good place for a pull quote, a key finding stated plainly, or a paragraph
-          that needs room to breathe without competing with a chart.
-        </section>
-        <section class="step" data-active-index="9" data-layout="full-viz">
-          <div class="title">Full-visualization section</div>
-          Add <code>data-layout="full-viz"</code> to a section to expand the visualization
-          to the full screen width. The text column disappears and the sketch fills the space.
-          Use this for a dramatic reveal, a dense chart that needs every pixel, or a
-          cinematic moment in your story.
-        </section>
-        <section class="step author-section" data-active-index="10" data-layout="full-text">
-          <div class="title">About the Authors</div>
-          <div class="authors">
-            <div class="author">
-              <div class="author-name">Author One</div>
-              <div class="author-bio">Brief bio or affiliation. Describe your background, research interests, or role in this project.</div>
-            </div>
-            <div class="author">
-              <div class="author-name">Author Two</div>
-              <div class="author-bio">Brief bio or affiliation. Describe your background, research interests, or role in this project.</div>
-            </div>
-          </div>
-        </section>
-      </div>
-      <div id='vis' class='vis-hidden'>
-      </div>
-      <div id="extra-space">
-      </div>
+    <h1 id="site-title">Beyond the Forecast</h1>
+    <div id="site-subtitle">
+      What environmental factors make Seattle weather feel hard for campus life?
     </div>
-  </div>
+  </header>
 
+  <main>
+    <section id="intro">
+      <h1>Seattle weather is not just rain.</h1>
 
-  <!-- p5.js (using CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.min.js"></script>
-  <!-- helpers (data/loading, scroller, visual controller) -->
-  <script src="js/helpers/data_loader.js"></script>
-  <script src="js/helpers/scroller.js"></script>
-  <script src="js/helpers/visual_controller.js"></script>
+      <p>
+        A standard forecast gives us useful numbers: temperature, precipitation,
+        cloud cover, wind speed, sunrise time, and sunset time. But those numbers
+        do not always explain how a day actually feels when students walk across
+        campus, wait for buses, attend evening classes, or move between indoor
+        and outdoor spaces.
+      </p>
 
-  <!-- orchestrator (wires scroller -> sketch) -->
-  <script src="js/helpers/sections.js"></script>
+      <p>
+        This interactive article explores the gap between forecast numbers and
+        lived campus experience. Instead of creating one universal weather
+        difficulty score, we show the environmental layers that shape a Seattle
+        campus day.
+      </p>
 
-  <!-- sketches (manager) -->
-  <script src="js/sketches/sketch_manager.js"></script>
+      <div class="tag-row">
+        <div class="tag">Rain</div>
+        <div class="tag">Cloud cover</div>
+        <div class="tag">Daylight</div>
+        <div class="tag">Solar energy</div>
+        <div class="tag">Wind</div>
+        <div class="tag">Temperature comfort</div>
+      </div>
+    </section>
 
-  <!-- sketches (example renderer) -->
-  <script src="js/sketches/examples/sketch_grid.js"></script>
+    <section id="graphic">
+      <div id="sections">
+        <section class="step" data-active-index="0">
+          <div class="title">Opening Question</div>
+          Seattle weather is often described as “rainy,” but rain alone does not
+          explain why some campus days feel harder than others.
+          <br /><br />
+          This project asks:
+          <b>what environmental factors make Seattle weather feel hard?</b>
+        </section>
 
-  <!-- sketches (renderers): UPDATE HERE FOR PROJECT -->
-  <script src="js/sketches/viz/viz_title.js"></script>
-  <script src="js/sketches/viz/viz_progress_color.js"></script>
-  <script src="js/sketches/viz/viz_scatter.js"></script>
-  <script src="js/sketches/viz/viz_bar.js"></script>
-  <script src="js/sketches/viz/viz_weather_week.js"></script>
-  <script src="js/sketches/sketch_renderer.js"></script>
+        <section class="step" data-active-index="1">
+          <div class="title">1. Beyond the Forecast: Weather Layers</div>
+          A standard forecast gives us separate numbers: temperature,
+          precipitation, cloud cover, wind speed, sunrise time, and sunset time.
+          These numbers are useful, but they do not always show how the day
+          actually feels when students move through campus.
+          <br /><br />
+          This first visualization compares
+          <b>what the forecast shows</b> with
+          <b>what it does not connect</b>. The goal is to make the six weather
+          layers visible before moving into yearly patterns and interaction.
+        </section>
 
+        <section class="step" data-active-index="2">
+          <div class="title">2. Factor Patterns Across the Year</div>
+          Before comparing many factors together, this view lets readers focus on one
+          environmental layer at a time. Users can choose rain, cloud cover, daylight,
+          solar energy, wind, or temperature comfort, and then see how that factor changes
+          across 2025.
+          <br /><br />
+          This matters because each factor has its own seasonal rhythm. Rain and cloud
+          cover may be more noticeable in colder months, while daylight and solar energy
+          change more gradually across the year. By separating the factors first, readers
+          can see that Seattle weather is not shaped by one condition alone.
+          <br /><br />
+          This view works as the bridge between the opening idea and the later comparison
+          views. It helps users understand the yearly pattern before asking how multiple
+          conditions overlap within a month or week.
+        </section>
+        
+        <section class="step" data-active-index="3">
+          <div class="title">3. Monthly Weather Layer Profile</div>
+          A month can feel difficult for different reasons, but directly comparing raw
+          weather values would be misleading because each factor uses a different unit.
+          Rain is measured in inches, cloud cover is a percentage, daylight is measured
+          in hours, and wind is measured in miles per hour.
+          <br /><br />
+          In this view, each bar shows the selected month’s <b>relative intensity</b>
+          within that factor’s yearly range. For example, a taller rain bar means that
+          this month is rainier compared with other months in 2025, not that rain uses
+          the same scale as daylight or wind.
+          <br /><br />
+          The label below each bar also shows <b>flagged days</b>. A flagged day means
+          that the factor crossed our prototype experience threshold. This separates two
+          ideas: <b>how strong</b> a factor is on average, and <b>how often</b> it appears
+          during the month.
+        </section>
 
+        <section class="step" data-active-index="4">
+          <div class="title">4. Build Your Weekly Weather Lens</div>
+          Users will choose the factors that matter most to their own routine.
+          Days with more selected overlapping factors will become visually darker.
+        </section>
+
+        <section class="step" data-active-index="5">
+          <div class="title">5. Day in Context</div>
+          Finally, users will inspect one selected day and see the raw weather
+          values behind it.
+        </section>
+
+        <section class="step" data-active-index="6">
+          <div class="title">Takeaway</div>
+          This project does not create one universal weather difficulty score.
+          Instead, it keeps the factors visible and helps users understand how
+          weather experience is layered, contextual, and personal.
+        </section>
+      </div>
+
+      <div id="vis"></div>
+    </section>
+
+    <section id="closing">
+      <h2>Final Takeaway</h2>
+      <p>
+        The main goal of this project is to help users move beyond a simple
+        “Seattle is rainy” explanation. By separating and reconnecting different
+        weather layers, the article helps students understand why some days feel
+        harder than the forecast suggests.
+      </p>
+    </section>
+  </main>
+
+  <script src="js/libraries/p5.js"></script>
+  <script src="js/sketches/weather/weather_project.js"></script>
 </body>
-
 </html>
