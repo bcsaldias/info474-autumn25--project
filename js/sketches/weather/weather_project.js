@@ -290,12 +290,12 @@ function drawMainTitle(title, subtitle) {
   noStroke();
   textSize(25);
   textStyle(BOLD);
-  text(title, 42, 48, width - 84);
+  text(title, 68, 48, width - 110);
 
   textStyle(NORMAL);
   textSize(13);
   fill("#555");
-  text(subtitle, 42, 80, width - 84);
+  text(subtitle, 68, 80, width - 110);
 }
 
 function drawSectionNumber(num, x, y) {
@@ -384,6 +384,19 @@ function getFactorExplanation(factorKey) {
   return explanations[factorKey];
 }
 
+function getShortFactorExplanation(factorKey) {
+  const explanations = {
+    rain: "Rain is higher in colder months and lower in summer. This shows that rainy feeling is seasonal, not constant.",
+    cloud: "Cloud cover stays high in many colder months, which can make days feel gray even without heavy rain.",
+    daylight: "Daylight changes gradually through the year and reaches its lowest point in winter.",
+    solar: "Solar energy drops in winter, helping explain why some days feel dim even when rain is light.",
+    wind: "Wind is less seasonal than daylight, but it still affects walking, waiting, and outdoor comfort.",
+    temp: "Temperature comfort shows how the air feels, especially when combined with wind, rain, or low daylight."
+  };
+
+  return explanations[factorKey];
+}
+
 /* -------------------------
    Section 0: Opening panel
 -------------------------- */
@@ -458,7 +471,7 @@ function drawWeatherLayersPanel() {
   const day = pickExampleDay();
 
   drawMainTitle(
-    "1  BEYOND THE FORECAST: WEATHER LAYERS",
+    "BEYOND THE FORECAST: WEATHER LAYERS",
     "A forecast shows numbers, but it does not always connect how those conditions overlap in daily life."
   );
 
@@ -680,8 +693,8 @@ function drawVizOneTakeaway(y) {
 
 function drawYearlyFactorPatternPanel() {
   drawMainTitle(
-    "2  FACTOR PATTERNS ACROSS THE YEAR",
-    "Choose a factor to explore how it changes through 2025."
+    "FACTOR PATTERNS ACROSS THE YEAR",
+    "Choose one weather layer to explore its pattern through 2025."
   );
 
   drawSectionNumber("2", 38, 43);
@@ -738,7 +751,7 @@ function drawYearlyLineChart() {
 
   const x = 70;
   const y = 230;
-  const w = width - 300;
+  const w = width - 345;
   const h = Math.min(300, height - 390);
 
   drawCard(x - 25, y - 35, w + 50, h + 85, 16);
@@ -821,23 +834,23 @@ function drawYearlyLineChart() {
 function drawYearlyAnnotationCard() {
   const info = FACTORS[selectedFactor];
 
-  const x = width - 205;
-  const y = 245;
-  const w = 165;
-  const h = 255;
+  const x = width - 235;
+  const y = 255;
+  const w = 190;
+  const h = 250;
 
   drawCard(x, y, w, h, 16);
 
   fill("#2f276f");
   noStroke();
-  textSize(15);
+  textSize(14);
   textStyle(BOLD);
-  text("EXAMPLE", x + 18, y + 32);
+  text("WHAT TO NOTICE", x + 18, y + 30);
 
   fill("#222");
-  textSize(20);
+  textSize(22);
   textAlign(CENTER);
-  text(info.icon, x + w / 2, y + 70);
+  text(info.icon, x + w / 2, y + 68);
   textAlign(LEFT);
 
   fill("#333");
@@ -846,9 +859,9 @@ function drawYearlyAnnotationCard() {
   text(info.label, x + 18, y + 100);
 
   fill("#555");
-  textSize(12);
+  textSize(11.5);
   textStyle(NORMAL);
-  text(getFactorExplanation(selectedFactor), x + 18, y + 124, w - 36);
+  text(getShortFactorExplanation(selectedFactor), x + 18, y + 123, w - 36);
 }
 
 /* -------------------------
@@ -857,7 +870,7 @@ function drawYearlyAnnotationCard() {
 
 function drawMonthlyComparisonPanel() {
   drawMainTitle(
-    "3  MONTHLY WEATHER LAYER PROFILE",
+    "MONTHLY WEATHER LAYER PROFILE",
     "Bars show relative intensity. Flagged days show how often each layer crossed an experience threshold."
   );
 
@@ -919,7 +932,7 @@ function drawMonthlyBars() {
 
   const chartX = 50;
   const chartY = 180;
-  const chartW = width - 335;
+  const chartW = width - 365;
   const chartH = Math.min(370, height - 300);
 
   drawCard(chartX, chartY, chartW, chartH, 18);
@@ -943,7 +956,7 @@ function drawMonthlyBars() {
   const baseY = chartY + chartH - 85;
   const maxBarH = Math.max(95, chartH - 220);
   const startX = chartX + 90;
-  const gap = Math.max(58, (chartW - 160) / 6);
+  const gap = Math.max(54, (chartW - 155) / 6);
   const barW = 28;
 
   drawRelativeIntensityAxis(chartX + 35, baseY - maxBarH, maxBarH);
@@ -1030,10 +1043,10 @@ function drawRelativeIntensityAxis(x, y, h) {
 }
 
 function drawThresholdLegend() {
-  const x = width - 260;
-  const y = 190;
-  const w = 210;
-  const h = 260;
+  const x = width - 285;
+  const y = 205;
+  const w = 235;
+  const h = 300;
 
   drawCard(x, y, w, h, 14);
 
@@ -1044,52 +1057,52 @@ function drawThresholdLegend() {
   text("HOW WE FLAG DAYS", x + 18, y + 28);
 
   fill("#555");
-  textSize(11);
+  textSize(10.8);
   textStyle(NORMAL);
   text(
-    "A flagged day means this weather layer crossed our prototype experience threshold.",
+    "Flagged days are days that crossed our prototype experience thresholds.",
     x + 18,
-    y + 50,
+    y + 52,
     w - 36
   );
 
   const rules = [
     ["💧", "Rain", "precip ≥ 0.05 in"],
-    ["☁️", "Cloud", "cloud ≥ 75%"],
-    ["☀️", "Daylight", "≤ 9.5 hrs"],
-    ["🌤️", "Solar", "≤ 4 MJ/m²"],
-    ["〰️", "Wind", "≥ 12 mph"],
-    ["🌡️", "Temp", "≤45°F or ≥78°F"]
+    ["☁️", "Cloud", "cloud cover ≥ 75%"],
+    ["☀️", "Daylight", "daylight ≤ 9.5 hrs"],
+    ["🌤️", "Solar", "solar energy ≤ 4 MJ/m²"],
+    ["〰️", "Wind", "wind speed ≥ 12 mph"],
+    ["🌡️", "Temp", "feels like ≤45°F or ≥78°F"]
   ];
 
-  let yy = y + 93;
+  let yy = y + 88;
 
   for (let i = 0; i < rules.length; i++) {
     const [icon, label, rule] = rules[i];
 
     fill("#333");
-    textSize(12);
+    textSize(11.5);
     textStyle(BOLD);
     text(`${icon} ${label}`, x + 18, yy);
 
     fill("#666");
-    textSize(11);
+    textSize(10.5);
     textStyle(NORMAL);
-    text(rule, x + 105, yy);
+    text(rule, x + 34, yy + 15);
 
-    yy += 22;
+    yy += 34;
   }
 
   fill("#F3EFE8");
   noStroke();
-  rect(x + 16, y + h - 50, w - 32, 34, 10);
+  rect(x + 16, y + h - 44, w - 32, 30, 9);
 
   fill("#444");
-  textSize(10.5);
+  textSize(10);
   text(
-    "Thresholds are for exploration, not a universal weather score.",
+    "Used for exploration, not a universal weather score.",
     x + 28,
-    y + h - 36,
+    y + h - 28,
     w - 56
   );
 }
@@ -1122,15 +1135,19 @@ function drawMonthlyTakeaway() {
 
 function drawPlaceholderPanel() {
   const titles = {
-    4: "4  BUILD YOUR WEEKLY WEATHER LENS",
-    5: "5  DAY IN CONTEXT",
+    4: "BUILD YOUR WEEKLY WEATHER LENS",
+    5: "DAY IN CONTEXT",
     6: "TAKEAWAY"
   };
+
+  const sectionNum = activeSection.toString();
 
   drawMainTitle(
     titles[activeSection] || "NEXT VIEW",
     "This panel is intentionally left as a placeholder for the next implementation commit."
   );
+
+  drawSectionNumber(sectionNum, 38, 43);
 
   drawCard(70, 150, width - 140, 320, 18);
 
