@@ -80,7 +80,11 @@ function preload() {
 }
 
 function setup() {
-  const canvas = createCanvas(windowWidth * 0.58, windowHeight * 0.82);
+  const visContainer = document.getElementById("vis");
+  const canvasW = Math.max(720, visContainer.clientWidth);
+  const canvasH = Math.min(760, Math.max(640, windowHeight * 0.86));
+
+  const canvas = createCanvas(canvasW, canvasH);
   canvas.parent("vis");
 
   textFont("Arial");
@@ -111,7 +115,11 @@ function draw() {
 }
 
 function windowResized() {
-  resizeCanvas(windowWidth * 0.58, windowHeight * 0.82);
+  const visContainer = document.getElementById("vis");
+  const canvasW = Math.max(720, visContainer.clientWidth);
+  const canvasH = Math.min(760, Math.max(640, windowHeight * 0.86));
+
+  resizeCanvas(canvasW, canvasH);
 }
 
 function mousePressed() {
@@ -218,9 +226,10 @@ function buildMonthlyData() {
 
     if (!days.length) continue;
 
-    const monthSummary = {
+    monthlyData.push({
       month: m,
       monthName: days[0].monthName,
+
       rain: average(days, "precip"),
       cloud: average(days, "cloudcover"),
       daylight: average(days, "daylightHours"),
@@ -234,9 +243,7 @@ function buildMonthlyData() {
       solarActiveDays: countActive(days, "solar"),
       windActiveDays: countActive(days, "wind"),
       tempActiveDays: countActive(days, "temp")
-    };
-
-    monthlyData.push(monthSummary);
+    });
   }
 
   console.log("Monthly data:", monthlyData);
@@ -281,14 +288,14 @@ function drawLoading() {
 function drawMainTitle(title, subtitle) {
   fill("#222");
   noStroke();
-  textSize(26);
+  textSize(25);
   textStyle(BOLD);
-  text(title, 34, 46, width - 68);
+  text(title, 42, 48, width - 84);
 
   textStyle(NORMAL);
   textSize(13);
   fill("#555");
-  text(subtitle, 34, 78, width - 68);
+  text(subtitle, 42, 80, width - 84);
 }
 
 function drawSectionNumber(num, x, y) {
@@ -347,21 +354,21 @@ function drawRoundedButton(x, y, w, h, label, icon, active, colorValue) {
   noStroke();
   textAlign(CENTER, CENTER);
 
-  textSize(20);
-  text(icon, x + w / 2, y + 22);
+  textSize(19);
+  text(icon, x + w / 2, y + 21);
 
   fill(active ? "#2f276f" : "#333");
-  textSize(11);
+  textSize(10.5);
   textStyle(active ? BOLD : NORMAL);
-  text(label, x + w / 2, y + h - 15);
+  text(label, x + w / 2, y + h - 14);
 
   textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
 }
 
-function getValuesForFactor(factorKey) {
-  const column = FACTORS[factorKey].column;
-  return monthlyData.map(d => d[factorKey]);
+function normalizeValue(value, minValue, maxValue) {
+  if (maxValue === minValue) return 0.5;
+  return (value - minValue) / (maxValue - minValue);
 }
 
 function getFactorExplanation(factorKey) {
@@ -375,11 +382,6 @@ function getFactorExplanation(factorKey) {
   };
 
   return explanations[factorKey];
-}
-
-function normalizeValue(value, minValue, maxValue) {
-  if (maxValue === minValue) return 0.5;
-  return (value - minValue) / (maxValue - minValue);
 }
 
 /* -------------------------
@@ -460,20 +462,26 @@ function drawWeatherLayersPanel() {
     "A forecast shows numbers, but it does not always connect how those conditions overlap in daily life."
   );
 
-  drawSectionNumber("1", 39, 43);
+  drawSectionNumber("1", 38, 43);
 
-  const leftX = 42;
-  const topY = 128;
-  const leftW = 260;
-  const cardH = 390;
-  const arrowX = leftX + leftW + 34;
-  const rightX = arrowX + 56;
-  const rightW = width - rightX - 42;
+  const margin = 42;
+  const topY = 135;
+  const panelH = height - 245;
 
-  drawForecastCard(day, leftX, topY, leftW, cardH);
-  drawConnectionArrow(arrowX, topY + cardH / 2);
-  drawLayerStack(day, rightX, topY, rightW, cardH);
-  drawVizOneTakeaway(topY + cardH + 28);
+  const forecastW = Math.min(255, width * 0.28);
+  const arrowW = 70;
+  const gap = 24;
+  const layerW = width - margin * 2 - forecastW - arrowW - gap * 2;
+
+  const forecastX = margin;
+  const arrowX = forecastX + forecastW + gap;
+  const layerX = arrowX + arrowW + gap;
+
+  drawForecastCard(day, forecastX, topY, forecastW, panelH);
+  drawConnectionArrow(arrowX + arrowW / 2, topY + panelH / 2);
+  drawLayerStack(day, layerX, topY, layerW, panelH);
+
+  drawVizOneTakeaway(height - 92);
 }
 
 function pickExampleDay() {
@@ -485,38 +493,43 @@ function pickExampleDay() {
 function drawForecastCard(day, x, y, w, h) {
   fill("#2f276f");
   noStroke();
-  textSize(14);
+  textSize(13);
   textStyle(BOLD);
   text("WHAT THE FORECAST SHOWS", x, y - 12);
 
   drawCard(x, y, w, h, 16);
 
+  const innerX = x + 18;
+  const innerY = y + 25;
+  const innerW = w - 36;
+  const innerH = h - 50;
+
   fill("#F8FBFF");
   stroke("#B6CDE5");
-  rect(x + 18, y + 25, w - 36, h - 50, 14);
+  rect(innerX, innerY, innerW, innerH, 14);
 
   noStroke();
   fill("#333");
-  textSize(13);
+  textSize(12);
   textStyle(BOLD);
-  text(day.date, x + 34, y + 58);
-
-  textSize(36);
-  textStyle(BOLD);
-  fill("#222");
-  text(`${Math.round(day.feelslike)}°F`, x + 34, y + 112);
+  text(day.date, innerX + 18, innerY + 42);
 
   textSize(34);
+  textStyle(BOLD);
+  fill("#222");
+  text(`${Math.round(day.feelslike)}°F`, innerX + 18, innerY + 95);
+
+  textSize(30);
   textAlign(CENTER, CENTER);
-  text("🌧️", x + w - 68, y + 98);
+  text("🌧️", innerX + innerW - 42, innerY + 78);
   textAlign(LEFT, BASELINE);
 
   fill("#444");
-  textSize(15);
+  textSize(14);
   textStyle(NORMAL);
-  text(day.conditions, x + 34, y + 145, w - 68);
+  text(day.conditions, innerX + 18, innerY + 132, innerW - 36);
 
-  drawMiniDivider(x + 30, y + 165, x + w - 30, y + 165);
+  drawMiniDivider(innerX + 14, innerY + 150, innerX + innerW - 14, innerY + 150);
 
   const rows = [
     ["💧", "Rain", `${nf(day.precip, 1, 2)} in`],
@@ -526,131 +539,138 @@ function drawForecastCard(day, x, y, w, h) {
     ["🌇", "Sunset", formatTime(day.sunset)]
   ];
 
-  let rowY = y + 205;
+  let rowY = innerY + 190;
 
   for (let i = 0; i < rows.length; i++) {
     const [icon, label, value] = rows[i];
 
     fill("#333");
-    textSize(15);
-    text(icon, x + 34, rowY);
+    textSize(13);
+    text(icon, innerX + 18, rowY);
 
     fill("#555");
-    textSize(13);
-    text(label, x + 65, rowY);
+    textSize(12);
+    text(label, innerX + 48, rowY);
 
     fill("#222");
     textAlign(RIGHT, BASELINE);
-    text(value, x + w - 34, rowY);
+    textSize(12);
+    text(value, innerX + innerW - 18, rowY);
     textAlign(LEFT, BASELINE);
 
-    rowY += 37;
+    rowY += 34;
   }
 }
 
 function drawConnectionArrow(x, y) {
   stroke("#444");
   strokeWeight(2);
-  line(x - 18, y, x + 18, y);
-  line(x + 18, y, x + 8, y - 8);
-  line(x + 18, y, x + 8, y + 8);
+  line(x - 22, y, x + 22, y);
+  line(x + 22, y, x + 10, y - 9);
+  line(x + 22, y, x + 10, y + 9);
   strokeWeight(1);
 
   noStroke();
   fill("#555");
-  textSize(12);
+  textSize(11);
   textAlign(CENTER);
-  text("but what does it connect?", x, y + 34);
-  textAlign(LEFT);
+  text("connects to", x, y + 34);
+  textAlign(LEFT, BASELINE);
 }
 
 function drawLayerStack(day, x, y, w, h) {
   fill("#2f276f");
   noStroke();
-  textSize(14);
+  textSize(13);
   textStyle(BOLD);
   text("WHAT IT DOESN'T CONNECT", x, y - 12);
 
   drawCard(x, y, w, h, 16);
 
   const layerKeys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
-  const layerH = 46;
-  const gap = 10;
-  const stackX = x + 28;
-  const stackY = y + 35;
-  const stackW = w - 56;
+  const innerX = x + 26;
+  const innerY = y + 34;
+  const innerW = w - 52;
+
+  const availableH = h - 96;
+  const gap = 9;
+  const layerH = (availableH - gap * (layerKeys.length - 1)) / layerKeys.length;
 
   for (let i = 0; i < layerKeys.length; i++) {
     const key = layerKeys[i];
     const info = FACTORS[key];
-    const yy = stackY + i * (layerH + gap);
+    const yy = innerY + i * (layerH + gap);
     const active = day.layers[key];
     const c = color(info.color);
 
     if (active) {
-      fill(red(c), green(c), blue(c), 80);
+      fill(red(c), green(c), blue(c), 82);
       stroke(info.color);
     } else {
-      fill(red(c), green(c), blue(c), 25);
-      stroke(red(c), green(c), blue(c), 100);
+      fill(red(c), green(c), blue(c), 24);
+      stroke(red(c), green(c), blue(c), 95);
     }
 
-    rect(stackX, yy, stackW, layerH, 12);
+    rect(innerX, yy, innerW, layerH, 12);
 
     noStroke();
+
     fill("#222");
-    textSize(18);
+    textSize(17);
     textAlign(CENTER, CENTER);
-    text(info.icon, stackX + 28, yy + layerH / 2);
+    text(info.icon, innerX + 30, yy + layerH / 2);
 
     textAlign(LEFT, CENTER);
+    fill("#222");
     textSize(13);
     textStyle(BOLD);
-    fill("#222");
-    text(info.label, stackX + 60, yy + layerH / 2 - 8);
+    text(info.label, innerX + 62, yy + layerH / 2 - 8);
 
-    textStyle(NORMAL);
-    textSize(11);
     fill("#555");
-    text(info.description, stackX + 60, yy + layerH / 2 + 10);
+    textSize(11);
+    textStyle(NORMAL);
+    text(info.description, innerX + 62, yy + layerH / 2 + 10, innerW - 150);
 
     if (active) {
       fill("#2f276f");
-      textSize(11);
+      textSize(10.5);
       textStyle(BOLD);
       textAlign(RIGHT, CENTER);
-      text("active", stackX + stackW - 18, yy + layerH / 2);
+      text("active", innerX + innerW - 18, yy + layerH / 2);
       textAlign(LEFT, BASELINE);
     }
   }
 
   fill("#444");
-  textSize(13);
+  textSize(12);
   textStyle(NORMAL);
   text(
     "A day can feel hard when several ordinary layers appear together, even if no single number looks extreme.",
-    x + 30,
-    y + h - 45,
-    w - 60
+    innerX,
+    y + h - 38,
+    innerW
   );
 }
 
 function drawVizOneTakeaway(y) {
-  drawCard(45, y, width - 90, 70, 14);
+  const x = 42;
+  const w = width - 84;
+
+  drawCard(x, y, w, 64, 14);
 
   fill("#2f276f");
-  textSize(15);
+  textSize(14);
   textStyle(BOLD);
-  text("Takeaway", 70, y + 28);
+  text("Takeaway", x + 26, y + 28);
 
   fill("#333");
-  textSize(14);
+  textSize(12.5);
   textStyle(NORMAL);
   text(
     "The forecast is useful, but the campus experience comes from how rain, cloud cover, daylight, solar energy, wind, and temperature comfort overlap.",
-    150,
-    y + 28,
-    width - 210
+    x + 120,
+    y + 24,
+    w - 150
   );
 }
 
@@ -664,7 +684,7 @@ function drawYearlyFactorPatternPanel() {
     "Choose a factor to explore how it changes through 2025."
   );
 
-  drawSectionNumber("2", 39, 43);
+  drawSectionNumber("2", 38, 43);
 
   drawFactorButtons();
   drawYearlyLineChart();
@@ -674,10 +694,10 @@ function drawYearlyFactorPatternPanel() {
 function drawFactorButtons() {
   const keys = Object.keys(FACTORS);
   const startX = 48;
-  const y = 122;
-  const w = 88;
-  const h = 66;
-  const gap = 14;
+  const y = 118;
+  const w = 84;
+  const h = 64;
+  const gap = 12;
 
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
@@ -699,10 +719,10 @@ function drawFactorButtons() {
 function handleFactorSelection() {
   const keys = Object.keys(FACTORS);
   const startX = 48;
-  const y = 122;
-  const w = 88;
-  const h = 66;
-  const gap = 14;
+  const y = 118;
+  const w = 84;
+  const h = 64;
+  const gap = 12;
 
   for (let i = 0; i < keys.length; i++) {
     const x = startX + i * (w + gap);
@@ -718,10 +738,10 @@ function drawYearlyLineChart() {
 
   const x = 70;
   const y = 230;
-  const w = width - 280;
-  const h = 260;
+  const w = width - 300;
+  const h = Math.min(300, height - 390);
 
-  drawCard(x - 25, y - 35, w + 50, h + 80, 16);
+  drawCard(x - 25, y - 35, w + 50, h + 85, 16);
 
   fill("#222");
   noStroke();
@@ -768,7 +788,6 @@ function drawYearlyLineChart() {
   }
 
   endShape();
-
   strokeWeight(1);
 
   for (let i = 0; i < monthlyData.length; i++) {
@@ -795,17 +814,17 @@ function drawYearlyLineChart() {
   text(
     `Range: ${nf(minVal, 1, 1)}–${nf(maxVal, 1, 1)} ${info.unit}`,
     x,
-    y + h + 55
+    y + h + 58
   );
 }
 
 function drawYearlyAnnotationCard() {
   const info = FACTORS[selectedFactor];
 
-  const x = width - 195;
-  const y = 250;
-  const w = 155;
-  const h = 230;
+  const x = width - 205;
+  const y = 245;
+  const w = 165;
+  const h = 255;
 
   drawCard(x, y, w, h, 16);
 
@@ -833,25 +852,26 @@ function drawYearlyAnnotationCard() {
 }
 
 /* -------------------------
-   Section 3: Viz 3 Monthly comparison
+   Section 3: Viz 3 Monthly Weather Layer Profile
 -------------------------- */
 
 function drawMonthlyComparisonPanel() {
   drawMainTitle(
-    "3  COMPARE FACTORS WITHIN A MONTH",
-    "Select a month to see how all six environmental factors look together."
+    "3  MONTHLY WEATHER LAYER PROFILE",
+    "Bars show relative intensity. Flagged days show how often each layer crossed an experience threshold."
   );
 
-  drawSectionNumber("3", 39, 43);
+  drawSectionNumber("3", 38, 43);
 
   drawMonthButtons();
   drawMonthlyBars();
+  drawThresholdLegend();
   drawMonthlyTakeaway();
 }
 
 function drawMonthButtons() {
   const startX = 50;
-  const y = 120;
+  const y = 118;
   const w = 52;
   const h = 30;
   const gap = 6;
@@ -879,7 +899,7 @@ function drawMonthButtons() {
 
 function handleMonthSelection() {
   const startX = 50;
-  const y = 120;
+  const y = 118;
   const w = 52;
   const h = 30;
   const gap = 6;
@@ -897,29 +917,36 @@ function drawMonthlyBars() {
   const month = monthlyData[selectedMonth] || monthlyData[0];
   const keys = Object.keys(FACTORS);
 
-  drawCard(50, 180, width - 100, 360, 18);
+  const chartX = 50;
+  const chartY = 180;
+  const chartW = width - 335;
+  const chartH = Math.min(370, height - 300);
+
+  drawCard(chartX, chartY, chartW, chartH, 18);
 
   fill("#222");
   noStroke();
-  textSize(20);
+  textSize(19);
   textStyle(BOLD);
-  text(`${month.monthName} Weather Profile`, 80, 225);
+  text(`${month.monthName} Weather Layer Profile`, chartX + 30, chartY + 42);
 
   fill("#555");
-  textSize(13);
+  textSize(12);
   textStyle(NORMAL);
   text(
-    "Each bar is normalized within its own factor, so this view compares relative intensity rather than using one combined score.",
-    80,
-    248,
-    width - 160
+    "Each bar is normalized within its own factor’s yearly range. Labels show average value and flagged days.",
+    chartX + 30,
+    chartY + 65,
+    chartW - 60
   );
 
-  const baseY = 455;
-  const maxBarH = 145;
-  const startX = 95;
-  const gap = 92;
-  const barW = 32;
+  const baseY = chartY + chartH - 85;
+  const maxBarH = Math.max(95, chartH - 220);
+  const startX = chartX + 90;
+  const gap = Math.max(58, (chartW - 160) / 6);
+  const barW = 28;
+
+  drawRelativeIntensityAxis(chartX + 35, baseY - maxBarH, maxBarH);
 
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
@@ -936,57 +963,156 @@ function drawMonthlyBars() {
 
     noStroke();
     textAlign(CENTER, CENTER);
-    textSize(24);
-    text(info.icon, x + barW / 2, 295);
+    textSize(22);
+    text(info.icon, x + barW / 2, baseY - maxBarH - 45);
 
     fill("#333");
-    textSize(12);
+    textSize(10.5);
     textStyle(BOLD);
-    text(info.shortLabel, x + barW / 2, 325);
+    text(info.shortLabel, x + barW / 2, baseY - maxBarH - 18);
 
     fill("#EFEAE2");
     stroke("#D9D2C7");
     rect(x, baseY - maxBarH, barW, maxBarH, 5);
 
     const c = color(info.color);
-    fill(red(c), green(c), blue(c), 80);
+    fill(red(c), green(c), blue(c), 85);
     stroke(info.color);
     rect(x, baseY - barH, barW, barH, 5);
 
     noStroke();
     fill("#333");
-    textSize(12);
+    textSize(10);
     textStyle(NORMAL);
-    text(`${nf(value, 1, 1)} ${info.unit}`, x + barW / 2, baseY + 22);
+    text(`avg: ${nf(value, 1, 1)} ${info.unit}`, x + barW / 2, baseY + 23);
 
-    let activeDays = month[`${key}ActiveDays`];
-    if (activeDays !== undefined) {
-      fill("#666");
-      textSize(11);
-      text(`${activeDays} active days`, x + barW / 2, baseY + 42);
-    }
+    const flaggedDays = month[`${key}ActiveDays`];
+
+    fill("#666");
+    textSize(10);
+    text(`${flaggedDays} flagged`, x + barW / 2, baseY + 41);
   }
 
   textAlign(LEFT, BASELINE);
 }
 
-function drawMonthlyTakeaway() {
-  drawCard(50, 565, width - 100, 58, 14);
+function drawRelativeIntensityAxis(x, y, h) {
+  stroke("#D8D0C8");
+  strokeWeight(1.2);
+  line(x, y, x, y + h);
+
+  const labels = [
+    ["High", y],
+    ["Med", y + h / 2],
+    ["Low", y + h]
+  ];
+
+  noStroke();
+  fill("#666");
+  textSize(10.5);
+  textAlign(RIGHT, CENTER);
+
+  for (let i = 0; i < labels.length; i++) {
+    const [label, yy] = labels[i];
+    text(label, x - 8, yy);
+  }
+
+  textAlign(CENTER, CENTER);
+  push();
+  translate(x - 38, y + h / 2);
+  rotate(-HALF_PI);
+  fill("#555");
+  textSize(10.5);
+  text("Relative intensity", 0, 0);
+  pop();
+
+  textAlign(LEFT, BASELINE);
+}
+
+function drawThresholdLegend() {
+  const x = width - 260;
+  const y = 190;
+  const w = 210;
+  const h = 260;
+
+  drawCard(x, y, w, h, 14);
 
   fill("#2f276f");
   noStroke();
   textSize(14);
   textStyle(BOLD);
-  text("Why this matters", 75, 590);
+  text("HOW WE FLAG DAYS", x + 18, y + 28);
+
+  fill("#555");
+  textSize(11);
+  textStyle(NORMAL);
+  text(
+    "A flagged day means this weather layer crossed our prototype experience threshold.",
+    x + 18,
+    y + 50,
+    w - 36
+  );
+
+  const rules = [
+    ["💧", "Rain", "precip ≥ 0.05 in"],
+    ["☁️", "Cloud", "cloud ≥ 75%"],
+    ["☀️", "Daylight", "≤ 9.5 hrs"],
+    ["🌤️", "Solar", "≤ 4 MJ/m²"],
+    ["〰️", "Wind", "≥ 12 mph"],
+    ["🌡️", "Temp", "≤45°F or ≥78°F"]
+  ];
+
+  let yy = y + 93;
+
+  for (let i = 0; i < rules.length; i++) {
+    const [icon, label, rule] = rules[i];
+
+    fill("#333");
+    textSize(12);
+    textStyle(BOLD);
+    text(`${icon} ${label}`, x + 18, yy);
+
+    fill("#666");
+    textSize(11);
+    textStyle(NORMAL);
+    text(rule, x + 105, yy);
+
+    yy += 22;
+  }
+
+  fill("#F3EFE8");
+  noStroke();
+  rect(x + 16, y + h - 50, w - 32, 34, 10);
+
+  fill("#444");
+  textSize(10.5);
+  text(
+    "Thresholds are for exploration, not a universal weather score.",
+    x + 28,
+    y + h - 36,
+    w - 56
+  );
+}
+
+function drawMonthlyTakeaway() {
+  const y = height - 92;
+
+  drawCard(50, y, width - 100, 62, 14);
+
+  fill("#2f276f");
+  noStroke();
+  textSize(14);
+  textStyle(BOLD);
+  text("Why this matters", 75, y + 25);
 
   fill("#333");
   textSize(13);
   textStyle(NORMAL);
   text(
-    "Different combinations create different types of hard days. A month may feel difficult because of rain, grayness, short daylight, wind, or several of them together.",
-    190,
-    590,
-    width - 250
+    "This view separates strength from frequency: a factor can be intense on average, frequent across many days, or both.",
+    205,
+    y + 25,
+    width - 260
   );
 }
 
