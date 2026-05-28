@@ -76,18 +76,37 @@
 
         <section class="step" data-active-index="2">
           <div class="title">2. Factor Patterns Across the Year</div>
-          Next, users will choose one environmental factor and see how it changes
+          Before comparing many factors together, this view lets readers focus on one
+          environmental layer at a time. Users can choose rain, cloud cover, daylight,
+          solar energy, wind, or temperature comfort, and then see how that factor changes
           across 2025.
           <br /><br />
-          This section will be implemented in the next commit.
-        </section>
-
-        <section class="step" data-active-index="3">
-          <div class="title">3. Compare Factors Within a Month</div>
-          Later, users will select a month and compare all six environmental
-          factors side by side.
+          This matters because each factor has its own seasonal rhythm. Rain and cloud
+          cover may be more noticeable in colder months, while daylight and solar energy
+          change more gradually across the year. By separating the factors first, readers
+          can see that Seattle weather is not shaped by one condition alone.
           <br /><br />
-          This section will be implemented after the yearly factor view.
+          This view works as the bridge between the opening idea and the later comparison
+          views. It helps users understand the yearly pattern before asking how multiple
+          conditions overlap within a month or week.
+        </section>
+        
+        <section class="step" data-active-index="3">
+          <div class="title">3. Monthly Weather Layer Profile</div>
+          A month can feel difficult for different reasons, but directly comparing raw
+          weather values would be misleading because each factor uses a different unit.
+          Rain is measured in inches, cloud cover is a percentage, daylight is measured
+          in hours, and wind is measured in miles per hour.
+          <br /><br />
+          In this view, each bar shows the selected month’s <b>relative intensity</b>
+          within that factor’s yearly range. For example, a taller rain bar means that
+          this month is rainier compared with other months in 2025, not that rain uses
+          the same scale as daylight or wind.
+          <br /><br />
+          The label below each bar also shows <b>flagged days</b>. A flagged day means
+          that the factor crossed our prototype experience threshold. This separates two
+          ideas: <b>how strong</b> a factor is on average, and <b>how often</b> it appears
+          during the month.
         </section>
 
         <section class="step" data-active-index="4">
