@@ -829,7 +829,7 @@ function drawVizOneTakeaway(y) {
 function drawYearlyFactorPatternPanel() {
   drawMainTitle(
     "FACTOR PATTERNS ACROSS THE YEAR",
-    "Choose one weather layer to explore its pattern through 2025."
+    "Choose one weather layer to see how it changes through 2025. This view shows patterns, not a weather difficulty score."
   );
 
   drawSectionNumber("2", 38, 43);
@@ -841,11 +841,11 @@ function drawYearlyFactorPatternPanel() {
 
 function drawFactorButtons() {
   const keys = Object.keys(FACTORS);
-  const startX = 48;
+  const startX = 52;
   const y = 118;
-  const w = 84;
-  const h = 64;
-  const gap = 12;
+  const w = 82;
+  const h = 62;
+  const gap = 10;
 
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
@@ -866,11 +866,11 @@ function drawFactorButtons() {
 
 function handleFactorSelection() {
   const keys = Object.keys(FACTORS);
-  const startX = 48;
+  const startX = 52;
   const y = 118;
-  const w = 84;
-  const h = 64;
-  const gap = 12;
+  const w = 82;
+  const h = 62;
+  const gap = 10;
 
   for (let i = 0; i < keys.length; i++) {
     const x = startX + i * (w + gap);
@@ -881,67 +881,198 @@ function handleFactorSelection() {
   }
 }
 
+function getYearlyMetricInfo(factorKey) {
+  const info = FACTORS[factorKey];
+
+  if (factorKey === "temp") {
+    return {
+      title: "Temperature Comfort Days Across 2025",
+      subtitle: "Monthly count of days outside the prototype comfort range",
+      yLabel: "Flagged days",
+      unit: "days",
+      valueKey: "tempActiveDays",
+      explanation:
+        "Temperature is shown as comfort days, not average temperature. A month is higher when more days fall outside the prototype comfort range.",
+      readingNote:
+        "For temperature, higher means more days outside the comfort range, not simply hotter weather."
+    };
+  }
+
+  const metricMap = {
+    rain: {
+      title: "Rain Across 2025",
+      subtitle: "Monthly average precipitation",
+      yLabel: "Average precipitation",
+      unit: "in/day",
+      valueKey: "rain"
+    },
+    cloud: {
+      title: "Cloud Cover Across 2025",
+      subtitle: "Monthly average cloud cover",
+      yLabel: "Average cloud cover",
+      unit: "%",
+      valueKey: "cloud"
+    },
+    daylight: {
+      title: "Daylight Across 2025",
+      subtitle: "Monthly average daylight hours",
+      yLabel: "Daylight",
+      unit: "hrs/day",
+      valueKey: "daylight"
+    },
+    solar: {
+      title: "Solar Energy Across 2025",
+      subtitle: "Monthly average solar energy",
+      yLabel: "Solar energy",
+      unit: "MJ/m²",
+      valueKey: "solar"
+    },
+    wind: {
+      title: "Wind Across 2025",
+      subtitle: "Monthly average wind speed",
+      yLabel: "Wind speed",
+      unit: "mph",
+      valueKey: "wind"
+    }
+  };
+
+  return {
+    ...metricMap[factorKey],
+    explanation: getYearlyAnnotationText(factorKey),
+    readingNote:
+      "This line uses the selected factor’s real unit, so the chart shows seasonal pattern rather than one combined score."
+  };
+}
+
+function getYearlyValue(monthData, factorKey) {
+  const metric = getYearlyMetricInfo(factorKey);
+  return monthData[metric.valueKey];
+}
+
+function formatYearlyValue(value, factorKey) {
+  const metric = getYearlyMetricInfo(factorKey);
+
+  if (factorKey === "rain") {
+    return `${nf(value, 1, 2)} ${metric.unit}`;
+  }
+
+  if (factorKey === "cloud") {
+    return `${nf(value, 1, 0)}%`;
+  }
+
+  if (factorKey === "daylight") {
+    return `${nf(value, 1, 1)} hrs`;
+  }
+
+  if (factorKey === "solar") {
+    return `${nf(value, 1, 1)} MJ/m²`;
+  }
+
+  if (factorKey === "wind") {
+    return `${nf(value, 1, 1)} mph`;
+  }
+
+  if (factorKey === "temp") {
+    return `${nf(value, 1, 0)} days`;
+  }
+
+  return `${nf(value, 1, 1)} ${metric.unit}`;
+}
+
 function drawYearlyLineChart() {
   const info = FACTORS[selectedFactor];
+  const metric = getYearlyMetricInfo(selectedFactor);
 
-  const x = 70;
-  const y = 230;
-  const w = width - 345;
-  const h = Math.min(300, height - 390);
+  const chartX = 62;
+  const chartY = 225;
+  const chartW = width - 315;
+  const chartH = Math.min(315, height - 395);
 
-  drawCard(x - 25, y - 35, w + 50, h + 85, 16);
+  drawCard(chartX - 22, chartY - 42, chartW + 44, chartH + 118, 18);
 
   fill("#222");
   noStroke();
-  textSize(17);
+  textSize(18);
   textStyle(BOLD);
-  text(`${info.label} Across 2025`, x, y - 8);
+  text(metric.title, chartX, chartY - 16);
 
-  const values = monthlyData.map(d => d[selectedFactor]);
-  const minVal = Math.min(...values);
-  const maxVal = Math.max(...values);
-  const padding = maxVal === minVal ? 1 : 0;
+  fill("#555");
+  textSize(11.8);
+  textStyle(NORMAL);
+  text(metric.subtitle, chartX, chartY + 5);
 
+  const values = monthlyData.map(d => getYearlyValue(d, selectedFactor));
+  let minVal = Math.min(...values);
+  let maxVal = Math.max(...values);
+
+  if (selectedFactor === "temp") {
+    minVal = 0;
+    maxVal = Math.max(1, maxVal);
+  }
+
+  const range = maxVal - minVal || 1;
+  const paddedMin = selectedFactor === "temp" ? 0 : minVal - range * 0.08;
+  const paddedMax = maxVal + range * 0.08;
+
+  const plotX = chartX + 54;
+  const plotY = chartY + 56;
+  const plotW = chartW - 78;
+  const plotH = chartH - 28;
+
+  // Grid and y-axis value labels
   stroke("#E7E0D6");
   strokeWeight(1);
 
   for (let i = 0; i <= 4; i++) {
-    const gy = y + map(i, 0, 4, 0, h);
-    line(x, gy, x + w, gy);
+    const gy = plotY + map(i, 0, 4, 0, plotH);
+    line(plotX, gy, plotX + plotW, gy);
+
+    const labelValue = map(i, 0, 4, paddedMax, paddedMin);
+    noStroke();
+    fill("#666");
+    textSize(10.5);
+    textAlign(RIGHT, CENTER);
+    text(formatAxisValue(labelValue, selectedFactor), plotX - 10, gy);
+    stroke("#E7E0D6");
   }
 
   for (let i = 0; i < monthlyData.length; i++) {
-    const gx = map(i, 0, monthlyData.length - 1, x, x + w);
-    line(gx, y, gx, y + h);
+    const gx = map(i, 0, monthlyData.length - 1, plotX, plotX + plotW);
+    line(gx, plotY, gx, plotY + plotH);
   }
 
-  fill("#555");
+  // Y-axis label
   noStroke();
-  textSize(12);
-  textAlign(RIGHT, CENTER);
-  text("High", x - 12, y + 5);
-  text("Low", x - 12, y + h - 5);
-  textAlign(LEFT, BASELINE);
+  fill("#555");
+  textSize(10.5);
+  textAlign(CENTER, CENTER);
+  push();
+  translate(chartX + 8, plotY + plotH / 2);
+  rotate(-HALF_PI);
+  text(`${metric.yLabel} (${metric.unit})`, 0, 0);
+  pop();
 
+  // Line
   noFill();
   stroke(info.color);
   strokeWeight(3);
   beginShape();
 
   for (let i = 0; i < monthlyData.length; i++) {
-    const value = monthlyData[i][selectedFactor];
-    const px = map(i, 0, monthlyData.length - 1, x, x + w);
-    const py = map(value, minVal - padding, maxVal + padding, y + h, y + 20);
+    const value = getYearlyValue(monthlyData[i], selectedFactor);
+    const px = map(i, 0, monthlyData.length - 1, plotX, plotX + plotW);
+    const py = map(value, paddedMin, paddedMax, plotY + plotH, plotY);
     vertex(px, py);
   }
 
   endShape();
   strokeWeight(1);
 
+  // Points and month labels
   for (let i = 0; i < monthlyData.length; i++) {
-    const value = monthlyData[i][selectedFactor];
-    const px = map(i, 0, monthlyData.length - 1, x, x + w);
-    const py = map(value, minVal - padding, maxVal + padding, y + h, y + 20);
+    const value = getYearlyValue(monthlyData[i], selectedFactor);
+    const px = map(i, 0, monthlyData.length - 1, plotX, plotX + plotW);
+    const py = map(value, paddedMin, paddedMax, plotY + plotH, plotY);
 
     fill("#FFFFFF");
     stroke(info.color);
@@ -950,53 +1081,133 @@ function drawYearlyLineChart() {
 
     noStroke();
     fill("#555");
-    textSize(12);
-    textAlign(CENTER);
-    text(monthlyData[i].monthName[0], px, y + h + 25);
+    textSize(11);
+    textAlign(CENTER, CENTER);
+    text(monthlyData[i].monthName[0], px, plotY + plotH + 24);
   }
 
+  // Current range note
   textAlign(LEFT, BASELINE);
-
   fill("#555");
-  textSize(12);
+  textSize(11);
+  textStyle(NORMAL);
   text(
-    `Range: ${nf(minVal, 1, 1)}–${nf(maxVal, 1, 1)} ${info.unit}`,
-    x,
-    y + h + 58
+    `Observed range: ${formatYearlyValue(minVal, selectedFactor)} – ${formatYearlyValue(maxVal, selectedFactor)}`,
+    plotX,
+    plotY + plotH + 58
   );
+
+  // Chart reading note
+  fill("#F3EFE8");
+  noStroke();
+  rect(plotX, plotY + plotH + 76, plotW, 34, 10);
+
+  fill("#444");
+  textSize(10.8);
+  text(
+    metric.readingNote,
+    plotX + 14,
+    plotY + plotH + 97,
+    plotW - 28
+  );
+
+  textAlign(LEFT, BASELINE);
+}
+
+function formatAxisValue(value, factorKey) {
+  if (factorKey === "rain") {
+    return nf(value, 1, 2);
+  }
+
+  if (factorKey === "cloud") {
+    return `${nf(value, 1, 0)}%`;
+  }
+
+  if (factorKey === "daylight") {
+    return nf(value, 1, 1);
+  }
+
+  if (factorKey === "solar") {
+    return nf(value, 1, 1);
+  }
+
+  if (factorKey === "wind") {
+    return nf(value, 1, 1);
+  }
+
+  if (factorKey === "temp") {
+    return nf(value, 1, 0);
+  }
+
+  return nf(value, 1, 1);
 }
 
 function drawYearlyAnnotationCard() {
   const info = FACTORS[selectedFactor];
+  const metric = getYearlyMetricInfo(selectedFactor);
 
-  const x = width - 235;
-  const y = 255;
-  const w = 190;
-  const h = 250;
+  const x = width - 225;
+  const y = 235;
+  const w = 180;
+  const h = 320;
 
   drawCard(x, y, w, h, 16);
 
   fill("#2f276f");
   noStroke();
-  textSize(14);
+  textSize(13.5);
   textStyle(BOLD);
-  text("WHAT TO NOTICE", x + 18, y + 30);
+  text("WHAT TO NOTICE", x + 18, y + 28);
 
   fill("#222");
-  textSize(22);
+  textSize(24);
   textAlign(CENTER);
-  text(info.icon, x + w / 2, y + 68);
+  text(info.icon, x + w / 2, y + 70);
   textAlign(LEFT);
 
   fill("#333");
   textSize(13);
   textStyle(BOLD);
-  text(info.label, x + 18, y + 100);
+  text(info.label, x + 18, y + 102);
 
   fill("#555");
-  textSize(11.5);
+  textSize(11.2);
   textStyle(NORMAL);
-  text(getShortFactorExplanation(selectedFactor), x + 18, y + 123, w - 36);
+  text(metric.explanation, x + 18, y + 126, w - 36);
+
+  drawMiniDivider(x + 18, y + h - 92, x + w - 18, y + h - 92);
+
+  fill("#2f276f");
+  textSize(11.2);
+  textStyle(BOLD);
+  text("Data shown", x + 18, y + h - 65);
+
+  fill("#555");
+  textSize(10.8);
+  textStyle(NORMAL);
+  text(
+    `${metric.yLabel}, measured in ${metric.unit}.`,
+    x + 18,
+    y + h - 45,
+    w - 36
+  );
+}
+
+function getYearlyAnnotationText(factorKey) {
+  const explanations = {
+    rain:
+      "Rain is shown as monthly average precipitation. This lets readers see that rainfall is seasonal rather than equally high all year.",
+    cloud:
+      "Cloud cover is shown as monthly average percent. It helps explain gray days even when precipitation is not heavy.",
+    daylight:
+      "Daylight is shown in hours. This factor has a strong seasonal rhythm and changes how morning and evening routines feel.",
+    solar:
+      "Solar energy shows the strength of sunlight reaching the city. It can stay low even on days that are not actively rainy.",
+    wind:
+      "Wind is shown as monthly average wind speed. It matters for walking, waiting outside, and moving between buildings."
+  };
+
+  return explanations[factorKey] || "";
 }
 
 /* -------------------------
