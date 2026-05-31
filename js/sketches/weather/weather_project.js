@@ -365,7 +365,21 @@ function drawMiniDivider(x1, y1, x2, y2) {
 
 function formatTime(timeText) {
   if (!timeText) return "N/A";
-  return timeText.toString().slice(0, 5);
+
+  const str = timeText.toString().trim();
+
+  // Handles values like "2025-11-15T07:18:00" or "2025-11-15 07:18:00"
+  const timeMatch = str.match(/(\d{1,2}):(\d{2})/);
+  if (!timeMatch) return str;
+
+  let hour = Number(timeMatch[1]);
+  const minute = timeMatch[2];
+  const suffix = hour >= 12 ? "PM" : "AM";
+
+  hour = hour % 12;
+  if (hour === 0) hour = 12;
+
+  return `${hour}:${minute} ${suffix}`;
 }
 
 function drawRoundedButton(x, y, w, h, label, icon, active, colorValue) {
@@ -498,28 +512,29 @@ function drawWeatherLayersPanel() {
 
   drawMainTitle(
     "BEYOND THE FORECAST: WEATHER LAYERS",
-    "This view separates a normal forecast into visible layers, without turning them into one fixed score."
+    "A forecast shows useful numbers, but it does not show how those conditions layer together during a campus day."
   );
 
   drawSectionNumber("1", 38, 43);
 
-  const margin = 44;
-  const topY = 122;
-  const bottomNoteH = 70;
-  const panelH = height - topY - bottomNoteH - 42;
+  const margin = 46;
+  const topY = 130;
+  const panelH = height - 250;
 
-  const gap = 28;
-  const forecastW = Math.min(310, width * 0.34);
-  const layerW = width - margin * 2 - forecastW - gap - 48;
+  const forecastW = Math.min(280, width * 0.3);
+  const arrowW = 78;
+  const gap = 24;
+  const layerW = width - margin * 2 - forecastW - arrowW - gap * 2;
 
   const forecastX = margin;
-  const layerX = forecastX + forecastW + gap + 48;
+  const arrowX = forecastX + forecastW + gap;
+  const layerX = arrowX + arrowW + gap;
 
   drawForecastCard(day, forecastX, topY, forecastW, panelH);
-  drawConnectionArrow(forecastX + forecastW + gap / 2 + 24, topY + panelH / 2);
+  drawConnectionArrow(arrowX + arrowW / 2, topY + panelH / 2);
   drawLayerStack(day, layerX, topY, layerW, panelH);
 
-  drawVizOneTakeaway(height - bottomNoteH - 18);
+  drawVizOneTakeaway(height - 92);
 }
 
 function pickExampleDay() {
@@ -547,17 +562,17 @@ function drawForecastCard(day, x, y, w, h) {
   textStyle(BOLD);
   text("WHAT THE FORECAST SHOWS", x, y - 12);
 
-  drawCard(x, y, w, h, 18);
+  drawCard(x, y, w, h, 16);
 
-  const innerX = x + 22;
-  const innerY = y + 26;
-  const innerW = w - 44;
-  const innerH = h - 52;
+  const innerX = x + 18;
+  const innerY = y + 24;
+  const innerW = w - 36;
+  const innerH = h - 48;
 
   fill("#F8FBFF");
   stroke("#B6CDE5");
-  strokeWeight(1.3);
-  rect(innerX, innerY, innerW, innerH, 16);
+  strokeWeight(1.2);
+  rect(innerX, innerY, innerW, innerH, 14);
   strokeWeight(1);
 
   noStroke();
@@ -565,24 +580,24 @@ function drawForecastCard(day, x, y, w, h) {
   fill("#333");
   textSize(12);
   textStyle(BOLD);
-  text(day.date, innerX + 18, innerY + 35);
-
-  textSize(38);
-  textStyle(BOLD);
-  fill("#222");
-  text(`${Math.round(day.feelslike)}°F`, innerX + 18, innerY + 86);
+  text(day.date, innerX + 18, innerY + 38);
 
   textSize(34);
+  textStyle(BOLD);
+  fill("#222");
+  text(`${Math.round(day.feelslike)}°F`, innerX + 18, innerY + 90);
+
+  textSize(30);
   textAlign(CENTER, CENTER);
-  text(getForecastIcon(day), innerX + innerW - 43, innerY + 72);
+  text(getForecastIcon(day), innerX + innerW - 42, innerY + 72);
   textAlign(LEFT, BASELINE);
 
   fill("#444");
   textSize(13.5);
   textStyle(NORMAL);
-  text(day.conditions, innerX + 18, innerY + 122, innerW - 36);
+  text(day.conditions, innerX + 18, innerY + 124, innerW - 36);
 
-  drawMiniDivider(innerX + 16, innerY + 142, innerX + innerW - 16, innerY + 142);
+  drawMiniDivider(innerX + 14, innerY + 142, innerX + innerW - 14, innerY + 142);
 
   const rows = [
     ["💧", "Rain", `${nf(day.precip, 1, 2)} in`],
@@ -593,45 +608,48 @@ function drawForecastCard(day, x, y, w, h) {
     ["🌡️", "Feels like", `${nf(day.feelslike, 1, 1)}°F`]
   ];
 
-  let rowY = innerY + 176;
+  let rowY = innerY + 178;
 
   for (let i = 0; i < rows.length; i++) {
     const [icon, label, value] = rows[i];
 
     fill("#333");
-    textSize(13);
+    textSize(12.5);
     text(icon, innerX + 18, rowY);
 
     fill("#555");
-    textSize(12);
+    textSize(11.5);
     text(label, innerX + 48, rowY);
 
     fill("#222");
     textAlign(RIGHT, BASELINE);
-    textSize(12);
+    textSize(11.5);
     text(value, innerX + innerW - 18, rowY);
     textAlign(LEFT, BASELINE);
 
-    rowY += 30;
+    rowY += 28;
   }
+
+  const noteH = 44;
+  const noteY = innerY + innerH - noteH - 14;
 
   fill("#F3EFE8");
   noStroke();
-  rect(innerX + 14, innerY + innerH - 55, innerW - 28, 38, 10);
+  rect(innerX + 14, noteY, innerW - 28, noteH, 10);
 
   fill("#555");
-  textSize(10.5);
+  textSize(10.6);
   textStyle(NORMAL);
   text(
-    "Useful numbers, but still separated from the lived campus experience.",
-    innerX + 28,
-    innerY + innerH - 32,
-    innerW - 56
+    "Useful numbers, but still shown as separate pieces.",
+    innerX + 26,
+    noteY + 17,
+    innerW - 52
   );
 }
 
 function drawConnectionArrow(x, y) {
-  stroke("#444");
+  stroke("#555");
   strokeWeight(2);
   line(x - 22, y, x + 22, y);
   line(x + 22, y, x + 10, y - 9);
@@ -639,11 +657,13 @@ function drawConnectionArrow(x, y) {
   strokeWeight(1);
 
   noStroke();
-  fill("#555");
-  textSize(10.5);
+  fill("#666");
+  textSize(10.3);
   textAlign(CENTER);
-  text("separate numbers", x, y - 22);
-  text("become layers", x, y + 34);
+  text("separate", x, y - 24);
+  text("numbers", x, y - 10);
+  text("become", x, y + 26);
+  text("layers", x, y + 40);
   textAlign(LEFT, BASELINE);
 }
 
@@ -654,26 +674,29 @@ function drawLayerStack(day, x, y, w, h) {
   textStyle(BOLD);
   text("WHAT THE FORECAST DOESN'T CONNECT", x, y - 12);
 
-  drawCard(x, y, w, h, 18);
+  drawCard(x, y, w, h, 16);
 
   const layerKeys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
   const innerX = x + 26;
-  const innerY = y + 28;
+  const innerY = y + 30;
   const innerW = w - 52;
 
   fill("#444");
-  textSize(12.2);
+  noStroke();
+  textSize(11.4);
   textStyle(NORMAL);
   text(
-    "Each row is one layer. Active means the layer crossed our prototype threshold for campus experience.",
+    "Each row is one weather layer. Present means the layer crossed our prototype campus-experience threshold.",
     innerX,
     innerY,
     innerW
   );
 
-  const listY = innerY + 42;
-  const availableH = h - 122;
-  const gap = 8;
+  const noteH = 42;
+  const listY = innerY + 44;
+  const listBottom = y + h - noteH - 24;
+  const availableH = listBottom - listY;
+  const gap = 7;
   const layerH = (availableH - gap * (layerKeys.length - 1)) / layerKeys.length;
 
   for (let i = 0; i < layerKeys.length; i++) {
@@ -684,103 +707,93 @@ function drawLayerStack(day, x, y, w, h) {
     const c = color(info.color);
 
     if (active) {
-      fill(red(c), green(c), blue(c), 88);
+      fill(red(c), green(c), blue(c), 68);
       stroke(info.color);
-      strokeWeight(1.5);
+      strokeWeight(1.4);
     } else {
-      fill(red(c), green(c), blue(c), 24);
-      stroke(red(c), green(c), blue(c), 92);
-      strokeWeight(1);
+      fill("#FBFAF6");
+      stroke("#DED6CA");
+      strokeWeight(1.1);
     }
 
-    rect(innerX, yy, innerW, layerH, 12);
+    rect(innerX, yy, innerW, layerH, 11);
+    strokeWeight(1);
     noStroke();
 
-    fill("#222");
-    textSize(18);
+    fill(active ? "#222" : "#888");
+    textSize(16);
     textAlign(CENTER, CENTER);
-    text(info.icon, innerX + 31, yy + layerH / 2);
+    text(info.icon, innerX + 30, yy + layerH / 2);
 
     textAlign(LEFT, CENTER);
 
-    fill("#222");
-    textSize(12.5);
+    fill(active ? "#222" : "#666");
+    textSize(12.2);
     textStyle(BOLD);
-    text(info.label, innerX + 62, yy + layerH / 2 - 13);
+    text(info.label, innerX + 58, yy + layerH / 2 - 10);
 
-    fill("#555");
-    textSize(10.6);
+    fill(active ? "#444" : "#777");
+    textSize(10.2);
     textStyle(NORMAL);
-    text(getLayerRuleText(key), innerX + 62, yy + layerH / 2 + 3);
+    text(getLayerActualValue(day, key), innerX + 58, yy + layerH / 2 + 8);
 
-    fill("#333");
-    textSize(10.6);
-    textStyle(NORMAL);
-    text(getLayerActualValue(day, key), innerX + 62, yy + layerH / 2 + 18);
-
-    const badgeW = 74;
+    const badgeW = 92;
+    const badgeH = 24;
     const badgeX = innerX + innerW - badgeW - 14;
-    const badgeY = yy + layerH / 2 - 13;
+    const badgeY = yy + layerH / 2 - badgeH / 2;
 
     if (active) {
-      fill("#2f276f");
-      rect(badgeX, badgeY, badgeW, 26, 999);
-      fill("#FFFFFF");
+      fill(red(c), green(c), blue(c), 120);
+      stroke(info.color);
+      rect(badgeX, badgeY, badgeW, badgeH, 999);
+
+      noStroke();
+      fill("#222");
+      textSize(9.8);
       textStyle(BOLD);
-      textSize(10.2);
       textAlign(CENTER, CENTER);
-      text("active", badgeX + badgeW / 2, badgeY + 13);
+      text("layer present", badgeX + badgeW / 2, badgeY + badgeH / 2);
     } else {
       fill("#FFFFFF");
       stroke("#D9D2C7");
-      rect(badgeX, badgeY, badgeW, 26, 999);
+      rect(badgeX, badgeY, badgeW, badgeH, 999);
+
       noStroke();
-      fill("#666");
+      fill("#777");
+      textSize(9.8);
       textStyle(NORMAL);
-      textSize(10.2);
       textAlign(CENTER, CENTER);
-      text("not active", badgeX + badgeW / 2, badgeY + 13);
+      text("not present", badgeX + badgeW / 2, badgeY + badgeH / 2);
     }
 
     textAlign(LEFT, BASELINE);
     textStyle(NORMAL);
   }
 
+  const noteY = y + h - noteH - 14;
+
   fill("#F3EFE8");
   noStroke();
-  rect(innerX, y + h - 54, innerW, 34, 10);
+  rect(innerX, noteY, innerW, noteH, 10);
 
-  fill("#333");
-  textSize(11.2);
+  fill("#444");
+  textSize(10.7);
   textStyle(NORMAL);
   text(
-    "Temperature is treated differently: it becomes a comfort layer only when it is too cold or too hot, not simply when the number is higher.",
+    "Temperature is treated as comfort: it is only flagged when it is too cold or too hot, not simply when the number is higher.",
     innerX + 16,
-    y + h - 33,
+    noteY + 15,
     innerW - 32
   );
 }
 
-function getLayerRuleText(key) {
-  const rules = {
-    rain: "flagged when precipitation is noticeable",
-    cloud: "flagged when cloud cover is high",
-    daylight: "flagged when daylight is short",
-    solar: "flagged when solar energy is low",
-    wind: "flagged when wind may affect outdoor movement",
-    temp: "flagged when feels-like temperature is outside 45–78°F"
-  };
-
-  return rules[key];
-}
-
 function getLayerActualValue(day, key) {
   const values = {
-    rain: `today: ${nf(day.precip, 1, 2)} in`,
+    rain: `today: ${nf(day.precip, 1, 2)} in precipitation`,
     cloud: `today: ${Math.round(day.cloudcover)}% cloud cover`,
     daylight: `today: ${nf(day.daylightHours, 1, 1)} hrs daylight`,
-    solar: `today: ${nf(day.solarenergy, 1, 1)} MJ/m²`,
-    wind: `today: ${nf(day.windspeed, 1, 1)} mph`,
+    solar: `today: ${nf(day.solarenergy, 1, 1)} MJ/m² solar energy`,
+    wind: `today: ${nf(day.windspeed, 1, 1)} mph wind`,
     temp: `today: feels like ${nf(day.feelslike, 1, 1)}°F`
   };
 
@@ -788,24 +801,24 @@ function getLayerActualValue(day, key) {
 }
 
 function drawVizOneTakeaway(y) {
-  const x = 44;
-  const w = width - 88;
+  const x = 42;
+  const w = width - 84;
 
-  drawCard(x, y, w, 62, 14);
+  drawCard(x, y, w, 64, 14);
 
   fill("#2f276f");
-  textSize(13.5);
+  textSize(14);
   textStyle(BOLD);
-  text("Takeaway", x + 24, y + 27);
+  text("Takeaway", x + 26, y + 28);
 
   fill("#333");
   textSize(12.3);
   textStyle(NORMAL);
   text(
-    "The forecast is useful, but campus experience depends on how weather layers appear together. This is not a score; it is a way to make the layers visible.",
-    x + 112,
-    y + 24,
-    w - 140
+    "The forecast is useful, but the campus experience comes from how weather layers appear together. This view keeps those layers visible instead of turning them into one score.",
+    x + 120,
+    y + 21,
+    w - 150
   );
 }
 
