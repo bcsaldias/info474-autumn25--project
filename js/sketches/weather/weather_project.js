@@ -1217,15 +1217,14 @@ function getYearlyAnnotationText(factorKey) {
 function drawMonthlyComparisonPanel() {
   drawMainTitle(
     "MONTHLY WEATHER LAYER PROFILE",
-    "Compare one month across six weather layers. Bars show relative intensity; labels show average value and flagged days."
+    "Compare one month across six weather layers. Bars show how many days each layer was present."
   );
 
   drawSectionNumber("3", 38, 43);
 
   drawMonthButtons();
-  drawMonthlyBars();
-  drawProfileReadingGuide();
-  drawThresholdLegendGrid();
+  drawMonthlyFlaggedDaysProfile();
+  drawMonthlyMethodNote();
   drawMonthlyTakeaway();
 }
 
@@ -1273,14 +1272,14 @@ function handleMonthSelection() {
   }
 }
 
-function drawMonthlyBars() {
+function drawMonthlyFlaggedDaysProfile() {
   const month = monthlyData[selectedMonth] || monthlyData[0];
-  const keys = Object.keys(FACTORS);
+  const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
 
   const chartX = 54;
   const chartY = 190;
   const chartW = width - 108;
-  const chartH = 360;
+  const chartH = 420;
 
   drawCard(chartX, chartY, chartW, chartH, 18);
 
@@ -1294,181 +1293,211 @@ function drawMonthlyBars() {
   textSize(12.2);
   textStyle(NORMAL);
   text(
-    "Each bar is normalized within its own factor’s yearly range, so the chart compares relative intensity rather than raw units.",
+    "Main bars show flagged days in this month. Smaller labels show the monthly average value from the original weather data.",
     chartX + 34,
     chartY + 68,
     chartW - 68
   );
 
-  const axisX = chartX + 58;
-  const plotTop = chartY + 150;
-  const plotBottom = chartY + 255;
-  const maxBarH = plotBottom - plotTop;
+  const plotX = chartX + 76;
+  const plotY = chartY + 128;
+  const plotW = chartW - 128;
+  const plotH = 210;
 
-  drawRelativeIntensityAxis(axisX, plotTop, maxBarH);
+  const maxDays = getDaysInSelectedMonth(month);
+  const maxAxis = max(1, maxDays);
 
-  const startX = chartX + 120;
-  const usableW = chartW - 170;
+  drawFlaggedDaysAxis(plotX, plotY, plotH, maxAxis);
+
+  const usableW = plotW - 55;
   const gap = usableW / keys.length;
-  const barW = 42;
+  const barW = 54;
 
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     const info = FACTORS[key];
 
-    const centerX = startX + i * gap + gap / 2;
+    const centerX = plotX + 58 + i * gap + gap / 2;
     const barX = centerX - barW / 2;
 
-    const values = monthlyData.map(d => d[key]);
-    const minVal = Math.min(...values);
-    const maxVal = Math.max(...values);
-    const value = month[key];
+    const flaggedDays = getMonthlyFlaggedDays(month, key);
+    const barH = map(flaggedDays, 0, maxAxis, 0, plotH);
 
-    const normalized = normalizeValue(value, minVal, maxVal);
-    const barH = map(normalized, 0, 1, 18, maxBarH);
+    const c = color(info.color);
 
-    // Icon
+    // icon
     noStroke();
     textAlign(CENTER, CENTER);
-    textSize(23);
-    text(info.icon, centerX, chartY + 112);
+    textSize(24);
+    text(info.icon, centerX, plotY - 36);
 
-    // Factor label
+    // label
     fill("#333");
     textSize(11.5);
     textStyle(BOLD);
-    text(info.shortLabel, centerX, chartY + 136);
+    text(info.shortLabel, centerX, plotY - 13);
 
-    // Background bar
+    // background bar
     fill("#EFEAE2");
     stroke("#D9D2C7");
-    rect(barX, plotTop, barW, maxBarH, 7);
+    strokeWeight(1);
+    rect(barX, plotY, barW, plotH, 8);
 
-    // Actual relative bar
-    const c = color(info.color);
-    fill(red(c), green(c), blue(c), 85);
+    // actual flagged days bar
+    fill(red(c), green(c), blue(c), 88);
     stroke(info.color);
-    strokeWeight(1.5);
-    rect(barX, plotBottom - barH, barW, barH, 7);
+    strokeWeight(1.6);
+    rect(barX, plotY + plotH - barH, barW, barH, 8);
     strokeWeight(1);
 
-    // Avg value
+    // flagged days number
     noStroke();
-    fill("#333");
-    textSize(10.7);
-    textStyle(NORMAL);
-    text(
-      `avg: ${formatFactorValue(value, info.unit)}`,
-      centerX,
-      plotBottom + 34
-    );
-
-    // Flagged days
-    const flaggedDays = month[`${key}ActiveDays`];
+    fill("#222");
+    textSize(16);
+    textStyle(BOLD);
+    text(`${flaggedDays}`, centerX, plotY + plotH + 28);
 
     fill("#666");
-    textSize(10.7);
-    text(
-      `${flaggedDays} flagged days`,
-      centerX,
-      plotBottom + 55
-    );
+    textSize(10.5);
+    textStyle(NORMAL);
+    text("flagged days", centerX, plotY + plotH + 44);
+
+    // raw monthly average
+    fill("#444");
+    textSize(10.5);
+    text(getMonthlyAverageLabel(month, key), centerX, plotY + plotH + 65);
   }
 
   textAlign(LEFT, BASELINE);
+
+  drawMonthlySelectedInsight(month, chartX + 34, chartY + chartH - 60, chartW - 68);
 }
 
-function formatFactorValue(value, unit) {
-  if (unit === "in") {
-    return `${nf(value, 1, 2)} in`;
-  }
-
-  if (unit === "%") {
-    return `${nf(value, 1, 0)}%`;
-  }
-
-  if (unit === "hrs") {
-    return `${nf(value, 1, 1)} hrs`;
-  }
-
-  if (unit === "MJ/m²") {
-    return `${nf(value, 1, 1)} MJ/m²`;
-  }
-
-  if (unit === "mph") {
-    return `${nf(value, 1, 1)} mph`;
-  }
-
-  if (unit === "°F") {
-    return `${nf(value, 1, 1)}°F`;
-  }
-
-  return `${nf(value, 1, 1)} ${unit}`;
-}
-
-function drawRelativeIntensityAxis(x, y, h) {
+function drawFlaggedDaysAxis(x, y, h, maxDays) {
   stroke("#D8D0C8");
   strokeWeight(1.2);
   line(x, y, x, y + h);
 
-  const labels = [
-    ["High", y],
-    ["Med", y + h / 2],
-    ["Low", y + h]
-  ];
+  const ticks = [0, Math.round(maxDays / 2), maxDays];
 
-  noStroke();
-  fill("#666");
-  textSize(10.5);
-  textAlign(RIGHT, CENTER);
+  for (let i = 0; i < ticks.length; i++) {
+    const value = ticks[i];
+    const ty = map(value, 0, maxDays, y + h, y);
 
-  for (let i = 0; i < labels.length; i++) {
-    const [label, yy] = labels[i];
-    text(label, x - 8, yy);
+    stroke("#E8E0D7");
+    line(x, ty, width - 120, ty);
+
+    noStroke();
+    fill("#666");
+    textSize(10.5);
+    textAlign(RIGHT, CENTER);
+    text(value, x - 10, ty);
   }
 
-  textAlign(CENTER, CENTER);
   push();
-  translate(x - 42, y + h / 2);
+  translate(x - 46, y + h / 2);
   rotate(-HALF_PI);
   fill("#555");
-  textSize(10.5);
-  text("Relative intensity", 0, 0);
+  textSize(10.8);
+  textAlign(CENTER, CENTER);
+  text("Flagged days", 0, 0);
   pop();
 
   textAlign(LEFT, BASELINE);
 }
 
-function drawProfileReadingGuide() {
-  const x = 54;
-  const y = 570;
-  const w = width - 108;
-  const h = 54;
+function getDaysInSelectedMonth(month) {
+  if (!weatherData || weatherData.length === 0) return 31;
 
-  drawCard(x, y, w, h, 14);
+  const rows = weatherData.filter(d => d.monthName === month.monthName);
+  return rows.length || 31;
+}
+
+function getMonthlyFlaggedDays(month, key) {
+  if (!month) return 0;
+
+  if (key === "temp") {
+    return Number(
+      month.tempActiveDays ??
+      month.tempDiscomfortActiveDays ??
+      month.temperatureComfortActiveDays ??
+      0
+    );
+  }
+
+  return Number(month[`${key}ActiveDays`] ?? 0);
+}
+
+function getMonthlyAverageLabel(month, key) {
+  if (key === "rain") {
+    return `avg ${nf(month.rain, 1, 2)} in`;
+  }
+
+  if (key === "cloud") {
+    return `avg ${nf(month.cloud, 1, 0)}%`;
+  }
+
+  if (key === "daylight") {
+    return `avg ${nf(month.daylight, 1, 1)} hrs`;
+  }
+
+  if (key === "solar") {
+    return `avg ${nf(month.solar, 1, 1)} MJ/m²`;
+  }
+
+  if (key === "wind") {
+    return `avg ${nf(month.wind, 1, 1)} mph`;
+  }
+
+  if (key === "temp") {
+    return `comfort range`;
+  }
+
+  return "";
+}
+
+function drawMonthlySelectedInsight(month, x, y, w) {
+  const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
+
+  let highestKey = keys[0];
+  let highestValue = getMonthlyFlaggedDays(month, highestKey);
+
+  for (let i = 1; i < keys.length; i++) {
+    const value = getMonthlyFlaggedDays(month, keys[i]);
+
+    if (value > highestValue) {
+      highestValue = value;
+      highestKey = keys[i];
+    }
+  }
+
+  const info = FACTORS[highestKey];
+
+  fill("#F3EFE8");
+  noStroke();
+  rect(x, y, w, 38, 10);
 
   fill("#2f276f");
-  noStroke();
-  textSize(13.5);
+  textSize(12);
   textStyle(BOLD);
-  text("How to read this profile", x + 26, y + 22);
+  text("What stands out", x + 16, y + 24);
 
   fill("#333");
-  textSize(12.2);
+  textSize(11.5);
   textStyle(NORMAL);
   text(
-    "Tall bars show layers that are relatively high for this month. Flagged days show how often each layer crossed the prototype threshold.",
-    x + 205,
-    y + 22,
-    w - 235
+    `${info.label} appears most often in ${month.monthName}, with ${highestValue} flagged days. This shows which layer shaped the month most frequently.`,
+    x + 140,
+    y + 24,
+    w - 160
   );
 }
 
-function drawThresholdLegendGrid() {
+function drawMonthlyMethodNote() {
   const x = 54;
-  const y = 645;
+  const y = 635;
   const w = width - 108;
-  const h = 118;
+  const h = 128;
 
   drawCard(x, y, w, h, 16);
 
@@ -1476,16 +1505,16 @@ function drawThresholdLegendGrid() {
   noStroke();
   textSize(14);
   textStyle(BOLD);
-  text("How we flag days", x + 24, y + 30);
+  text("How flagged days are defined", x + 24, y + 30);
 
   fill("#555");
   textSize(11.3);
   textStyle(NORMAL);
   text(
-    "A flagged day crosses a prototype experience threshold. These thresholds are exploratory, not a universal weather score.",
+    "A flagged day means that a layer crossed our prototype campus-experience threshold. These thresholds are used for exploration, not as a universal weather score.",
     x + 24,
     y + 52,
-    310
+    330
   );
 
   const rules = [
@@ -1494,14 +1523,14 @@ function drawThresholdLegendGrid() {
     ["☀️", "Daylight", "daylight ≤ 9.5 hrs"],
     ["🌤️", "Solar", "solar energy ≤ 4 MJ/m²"],
     ["〰️", "Wind", "wind speed ≥ 12 mph"],
-    ["🌡️", "Temp", "feels like ≤45°F / ≥78°F"]
+    ["🌡️", "Temp Comfort", "feels like ≤45°F or ≥78°F"]
   ];
 
-  const gridX = x + 380;
+  const gridX = x + 390;
   const gridY = y + 24;
-  const cardW = (w - 420) / 3;
-  const cardH = 35;
-  const rowGap = 12;
+  const cardW = (w - 430) / 3;
+  const cardH = 36;
+  const rowGap = 14;
 
   for (let i = 0; i < rules.length; i++) {
     const [icon, label, rule] = rules[i];
@@ -1517,12 +1546,12 @@ function drawThresholdLegendGrid() {
     rect(cx, cy, cardW, cardH, 10);
 
     fill("#333");
-    textSize(11);
+    textSize(10.8);
     textStyle(BOLD);
     text(`${icon} ${label}`, cx + 12, cy + 14);
 
     fill("#666");
-    textSize(10.5);
+    textSize(10.2);
     textStyle(NORMAL);
     text(rule, cx + 12, cy + 29);
   }
@@ -1530,9 +1559,9 @@ function drawThresholdLegendGrid() {
 
 function drawMonthlyTakeaway() {
   const x = 54;
-  const y = 785;
+  const y = 790;
   const w = width - 108;
-  const h = 56;
+  const h = 58;
 
   drawCard(x, y, w, h, 14);
 
@@ -1540,38 +1569,16 @@ function drawMonthlyTakeaway() {
   noStroke();
   textSize(13.5);
   textStyle(BOLD);
-  text("Why this matters", x + 28, y + 22);
+  text("Why this matters", x + 28, y + 23);
 
   fill("#333");
   textSize(12.2);
   textStyle(NORMAL);
   text(
-    "This view separates strength from frequency: a factor can be high on average, frequent across many days, or both.",
+    "This profile separates frequency from raw intensity. A month can stand out because one layer appears often, even if no single weather number looks extreme.",
     x + 190,
-    y + 22,
+    y + 23,
     w - 225
-  );
-}
-
-function drawMonthlyTakeaway() {
-  const y = height - 76;
-
-  drawCard(54, y, width - 108, 50, 14);
-
-  fill("#2f276f");
-  noStroke();
-  textSize(13.5);
-  textStyle(BOLD);
-  text("Why this matters", 82, y + 31);
-
-  fill("#333");
-  textSize(12.5);
-  textStyle(NORMAL);
-  text(
-    "This view separates strength from frequency: a factor can be intense on average, frequent across many days, or both.",
-    220,
-    y + 31,
-    width - 285
   );
 }
 
