@@ -5,6 +5,17 @@ let monthlyData = [];
 let activeSection = 0;
 let selectedFactor = "rain";
 let selectedMonth = 10; // November
+let currentCanvasHeight = 760;
+
+const VIZ_HEIGHTS = {
+  0: 720,   // Opening panel
+  1: 760,   // Viz 1: weather layers
+  2: 780,   // Viz 2: yearly factor pattern
+  3: 1060,  // Viz 3: monthly layer profile needs more vertical room
+  4: 820,   // Viz 4: weekly weather lens
+  5: 850,   // Viz 5: day in context
+  6: 720    // Closing takeaway
+};
 
 let selectedWeekStart = 0;
 let selectedDayGlobalIndex = 0;
@@ -94,18 +105,24 @@ function preload() {
 function setup() {
   const visContainer = document.getElementById("vis");
   const canvasW = Math.max(720, visContainer.clientWidth);
-  const canvasH = Math.min(1040, Math.max(880, windowHeight * 0.96));
 
-  const canvas = createCanvas(canvasW, canvasH);
+  currentCanvasHeight = getTargetCanvasHeight();
+
+  const canvas = createCanvas(canvasW, currentCanvasHeight);
   canvas.parent("vis");
 
+  updateVisContainerHeight();
+
   textFont("Arial");
+
   processWeatherData();
   buildMonthlyData();
   setupSectionObserver();
 }
 
 function draw() {
+  resizeCanvasForActiveSection();
+
   background("#FAF7F0");
 
   if (!weatherData.length) {
@@ -135,9 +152,11 @@ function draw() {
 function windowResized() {
   const visContainer = document.getElementById("vis");
   const canvasW = Math.max(720, visContainer.clientWidth);
-  const canvasH = Math.min(1040, Math.max(880, windowHeight * 0.96));
 
-  resizeCanvas(canvasW, canvasH);
+  currentCanvasHeight = getTargetCanvasHeight();
+
+  resizeCanvas(canvasW, currentCanvasHeight);
+  updateVisContainerHeight();
 }
 
 function mousePressed() {
@@ -155,6 +174,34 @@ function mousePressed() {
 
   if (activeSection === 5) {
     handleDayContextInteraction();
+  }
+}
+
+/* -------------------------
+   Canvas sizing helpers
+-------------------------- */
+
+function getTargetCanvasHeight() {
+  return VIZ_HEIGHTS[activeSection] || 760;
+}
+
+function updateVisContainerHeight() {
+  const visContainer = document.getElementById("vis");
+
+  if (visContainer) {
+    visContainer.style.minHeight = `${currentCanvasHeight}px`;
+  }
+}
+
+function resizeCanvasForActiveSection() {
+  const targetHeight = getTargetCanvasHeight();
+  const visContainer = document.getElementById("vis");
+  const targetWidth = Math.max(720, visContainer ? visContainer.clientWidth : width);
+
+  if (currentCanvasHeight !== targetHeight || width !== targetWidth) {
+    currentCanvasHeight = targetHeight;
+    resizeCanvas(targetWidth, currentCanvasHeight);
+    updateVisContainerHeight();
   }
 }
 
