@@ -114,7 +114,7 @@ body {
   height: calc(100vh - 56px);
   min-height: 650px;
   max-height: 820px;
-  overflow: visible;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;

@@ -77,7 +77,7 @@ const FACTORS = {
     column: "feelslike",
     unit: "°F",
     activeColumn: "tempDiscomfortActive",
-    description: "How temperature feels on the body"
+    description: "Outside a prototype comfort range"
   }
 };
 
@@ -498,35 +498,46 @@ function drawWeatherLayersPanel() {
 
   drawMainTitle(
     "BEYOND THE FORECAST: WEATHER LAYERS",
-    "A forecast shows numbers, but it does not always connect how those conditions overlap in daily life."
+    "This view separates a normal forecast into visible layers, without turning them into one fixed score."
   );
 
   drawSectionNumber("1", 38, 43);
 
-  const margin = 42;
-  const topY = 135;
-  const panelH = height - 245;
+  const margin = 44;
+  const topY = 122;
+  const bottomNoteH = 70;
+  const panelH = height - topY - bottomNoteH - 42;
 
-  const forecastW = Math.min(255, width * 0.28);
-  const arrowW = 70;
-  const gap = 24;
-  const layerW = width - margin * 2 - forecastW - arrowW - gap * 2;
+  const gap = 28;
+  const forecastW = Math.min(310, width * 0.34);
+  const layerW = width - margin * 2 - forecastW - gap - 48;
 
   const forecastX = margin;
-  const arrowX = forecastX + forecastW + gap;
-  const layerX = arrowX + arrowW + gap;
+  const layerX = forecastX + forecastW + gap + 48;
 
   drawForecastCard(day, forecastX, topY, forecastW, panelH);
-  drawConnectionArrow(arrowX + arrowW / 2, topY + panelH / 2);
+  drawConnectionArrow(forecastX + forecastW + gap / 2 + 24, topY + panelH / 2);
   drawLayerStack(day, layerX, topY, layerW, panelH);
 
-  drawVizOneTakeaway(height - 92);
+  drawVizOneTakeaway(height - bottomNoteH - 18);
 }
 
 function pickExampleDay() {
   const target = weatherData.find(d => d.monthName === "Nov" && d.day === 15);
   if (target) return target;
   return weatherData[Math.min(304, weatherData.length - 1)];
+}
+
+function getForecastIcon(day) {
+  const condition = (day.conditions || "").toLowerCase();
+
+  if (condition.includes("rain")) return "🌧️";
+  if (condition.includes("cloud") || condition.includes("overcast")) return "☁️";
+  if (condition.includes("clear")) return "☀️";
+  if (condition.includes("snow")) return "❄️";
+  if (condition.includes("fog")) return "🌫️";
+
+  return "🌤️";
 }
 
 function drawForecastCard(day, x, y, w, h) {
@@ -536,49 +547,53 @@ function drawForecastCard(day, x, y, w, h) {
   textStyle(BOLD);
   text("WHAT THE FORECAST SHOWS", x, y - 12);
 
-  drawCard(x, y, w, h, 16);
+  drawCard(x, y, w, h, 18);
 
-  const innerX = x + 18;
-  const innerY = y + 25;
-  const innerW = w - 36;
-  const innerH = h - 50;
+  const innerX = x + 22;
+  const innerY = y + 26;
+  const innerW = w - 44;
+  const innerH = h - 52;
 
   fill("#F8FBFF");
   stroke("#B6CDE5");
-  rect(innerX, innerY, innerW, innerH, 14);
+  strokeWeight(1.3);
+  rect(innerX, innerY, innerW, innerH, 16);
+  strokeWeight(1);
 
   noStroke();
+
   fill("#333");
   textSize(12);
   textStyle(BOLD);
-  text(day.date, innerX + 18, innerY + 42);
+  text(day.date, innerX + 18, innerY + 35);
 
-  textSize(34);
+  textSize(38);
   textStyle(BOLD);
   fill("#222");
-  text(`${Math.round(day.feelslike)}°F`, innerX + 18, innerY + 95);
+  text(`${Math.round(day.feelslike)}°F`, innerX + 18, innerY + 86);
 
-  textSize(30);
+  textSize(34);
   textAlign(CENTER, CENTER);
-  text("🌧️", innerX + innerW - 42, innerY + 78);
+  text(getForecastIcon(day), innerX + innerW - 43, innerY + 72);
   textAlign(LEFT, BASELINE);
 
   fill("#444");
-  textSize(14);
+  textSize(13.5);
   textStyle(NORMAL);
-  text(day.conditions, innerX + 18, innerY + 132, innerW - 36);
+  text(day.conditions, innerX + 18, innerY + 122, innerW - 36);
 
-  drawMiniDivider(innerX + 14, innerY + 150, innerX + innerW - 14, innerY + 150);
+  drawMiniDivider(innerX + 16, innerY + 142, innerX + innerW - 16, innerY + 142);
 
   const rows = [
     ["💧", "Rain", `${nf(day.precip, 1, 2)} in`],
-    ["☁️", "Cloud", `${Math.round(day.cloudcover)}%`],
+    ["☁️", "Cloud cover", `${Math.round(day.cloudcover)}%`],
     ["〰️", "Wind", `${nf(day.windspeed, 1, 1)} mph`],
     ["🌅", "Sunrise", formatTime(day.sunrise)],
-    ["🌇", "Sunset", formatTime(day.sunset)]
+    ["🌇", "Sunset", formatTime(day.sunset)],
+    ["🌡️", "Feels like", `${nf(day.feelslike, 1, 1)}°F`]
   ];
 
-  let rowY = innerY + 190;
+  let rowY = innerY + 176;
 
   for (let i = 0; i < rows.length; i++) {
     const [icon, label, value] = rows[i];
@@ -597,8 +612,22 @@ function drawForecastCard(day, x, y, w, h) {
     text(value, innerX + innerW - 18, rowY);
     textAlign(LEFT, BASELINE);
 
-    rowY += 34;
+    rowY += 30;
   }
+
+  fill("#F3EFE8");
+  noStroke();
+  rect(innerX + 14, innerY + innerH - 55, innerW - 28, 38, 10);
+
+  fill("#555");
+  textSize(10.5);
+  textStyle(NORMAL);
+  text(
+    "Useful numbers, but still separated from the lived campus experience.",
+    innerX + 28,
+    innerY + innerH - 32,
+    innerW - 56
+  );
 }
 
 function drawConnectionArrow(x, y) {
@@ -611,9 +640,10 @@ function drawConnectionArrow(x, y) {
 
   noStroke();
   fill("#555");
-  textSize(11);
+  textSize(10.5);
   textAlign(CENTER);
-  text("connects to", x, y + 34);
+  text("separate numbers", x, y - 22);
+  text("become layers", x, y + 34);
   textAlign(LEFT, BASELINE);
 }
 
@@ -622,94 +652,160 @@ function drawLayerStack(day, x, y, w, h) {
   noStroke();
   textSize(13);
   textStyle(BOLD);
-  text("WHAT IT DOESN'T CONNECT", x, y - 12);
+  text("WHAT THE FORECAST DOESN'T CONNECT", x, y - 12);
 
-  drawCard(x, y, w, h, 16);
+  drawCard(x, y, w, h, 18);
 
   const layerKeys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
   const innerX = x + 26;
-  const innerY = y + 34;
+  const innerY = y + 28;
   const innerW = w - 52;
 
-  const availableH = h - 96;
-  const gap = 9;
+  fill("#444");
+  textSize(12.2);
+  textStyle(NORMAL);
+  text(
+    "Each row is one layer. Active means the layer crossed our prototype threshold for campus experience.",
+    innerX,
+    innerY,
+    innerW
+  );
+
+  const listY = innerY + 42;
+  const availableH = h - 122;
+  const gap = 8;
   const layerH = (availableH - gap * (layerKeys.length - 1)) / layerKeys.length;
 
   for (let i = 0; i < layerKeys.length; i++) {
     const key = layerKeys[i];
     const info = FACTORS[key];
-    const yy = innerY + i * (layerH + gap);
+    const yy = listY + i * (layerH + gap);
     const active = day.layers[key];
     const c = color(info.color);
 
     if (active) {
-      fill(red(c), green(c), blue(c), 82);
+      fill(red(c), green(c), blue(c), 88);
       stroke(info.color);
+      strokeWeight(1.5);
     } else {
       fill(red(c), green(c), blue(c), 24);
-      stroke(red(c), green(c), blue(c), 95);
+      stroke(red(c), green(c), blue(c), 92);
+      strokeWeight(1);
     }
 
     rect(innerX, yy, innerW, layerH, 12);
-
     noStroke();
 
     fill("#222");
-    textSize(17);
+    textSize(18);
     textAlign(CENTER, CENTER);
-    text(info.icon, innerX + 30, yy + layerH / 2);
+    text(info.icon, innerX + 31, yy + layerH / 2);
 
     textAlign(LEFT, CENTER);
+
     fill("#222");
-    textSize(13);
+    textSize(12.5);
     textStyle(BOLD);
-    text(info.label, innerX + 62, yy + layerH / 2 - 8);
+    text(info.label, innerX + 62, yy + layerH / 2 - 13);
 
     fill("#555");
-    textSize(11);
+    textSize(10.6);
     textStyle(NORMAL);
-    text(info.description, innerX + 62, yy + layerH / 2 + 10, innerW - 150);
+    text(getLayerRuleText(key), innerX + 62, yy + layerH / 2 + 3);
+
+    fill("#333");
+    textSize(10.6);
+    textStyle(NORMAL);
+    text(getLayerActualValue(day, key), innerX + 62, yy + layerH / 2 + 18);
+
+    const badgeW = 74;
+    const badgeX = innerX + innerW - badgeW - 14;
+    const badgeY = yy + layerH / 2 - 13;
 
     if (active) {
       fill("#2f276f");
-      textSize(10.5);
+      rect(badgeX, badgeY, badgeW, 26, 999);
+      fill("#FFFFFF");
       textStyle(BOLD);
-      textAlign(RIGHT, CENTER);
-      text("active", innerX + innerW - 18, yy + layerH / 2);
-      textAlign(LEFT, BASELINE);
+      textSize(10.2);
+      textAlign(CENTER, CENTER);
+      text("active", badgeX + badgeW / 2, badgeY + 13);
+    } else {
+      fill("#FFFFFF");
+      stroke("#D9D2C7");
+      rect(badgeX, badgeY, badgeW, 26, 999);
+      noStroke();
+      fill("#666");
+      textStyle(NORMAL);
+      textSize(10.2);
+      textAlign(CENTER, CENTER);
+      text("not active", badgeX + badgeW / 2, badgeY + 13);
     }
+
+    textAlign(LEFT, BASELINE);
+    textStyle(NORMAL);
   }
 
-  fill("#444");
-  textSize(12);
+  fill("#F3EFE8");
+  noStroke();
+  rect(innerX, y + h - 54, innerW, 34, 10);
+
+  fill("#333");
+  textSize(11.2);
   textStyle(NORMAL);
   text(
-    "A day can feel hard when several ordinary layers appear together, even if no single number looks extreme.",
-    innerX,
-    y + h - 38,
-    innerW
+    "Temperature is treated differently: it becomes a comfort layer only when it is too cold or too hot, not simply when the number is higher.",
+    innerX + 16,
+    y + h - 33,
+    innerW - 32
   );
 }
 
-function drawVizOneTakeaway(y) {
-  const x = 42;
-  const w = width - 84;
+function getLayerRuleText(key) {
+  const rules = {
+    rain: "flagged when precipitation is noticeable",
+    cloud: "flagged when cloud cover is high",
+    daylight: "flagged when daylight is short",
+    solar: "flagged when solar energy is low",
+    wind: "flagged when wind may affect outdoor movement",
+    temp: "flagged when feels-like temperature is outside 45–78°F"
+  };
 
-  drawCard(x, y, w, 64, 14);
+  return rules[key];
+}
+
+function getLayerActualValue(day, key) {
+  const values = {
+    rain: `today: ${nf(day.precip, 1, 2)} in`,
+    cloud: `today: ${Math.round(day.cloudcover)}% cloud cover`,
+    daylight: `today: ${nf(day.daylightHours, 1, 1)} hrs daylight`,
+    solar: `today: ${nf(day.solarenergy, 1, 1)} MJ/m²`,
+    wind: `today: ${nf(day.windspeed, 1, 1)} mph`,
+    temp: `today: feels like ${nf(day.feelslike, 1, 1)}°F`
+  };
+
+  return values[key];
+}
+
+function drawVizOneTakeaway(y) {
+  const x = 44;
+  const w = width - 88;
+
+  drawCard(x, y, w, 62, 14);
 
   fill("#2f276f");
-  textSize(14);
+  textSize(13.5);
   textStyle(BOLD);
-  text("Takeaway", x + 26, y + 28);
+  text("Takeaway", x + 24, y + 27);
 
   fill("#333");
-  textSize(12.5);
+  textSize(12.3);
   textStyle(NORMAL);
   text(
-    "The forecast is useful, but the campus experience comes from how rain, cloud cover, daylight, solar energy, wind, and temperature comfort overlap.",
-    x + 120,
+    "The forecast is useful, but campus experience depends on how weather layers appear together. This is not a score; it is a way to make the layers visible.",
+    x + 112,
     y + 24,
-    w - 150
+    w - 140
   );
 }
 
