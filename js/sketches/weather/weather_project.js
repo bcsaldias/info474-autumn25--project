@@ -6,13 +6,16 @@ let activeSection = 0;
 let selectedFactor = "rain";
 let selectedMonth = 10; // November
 let currentCanvasHeight = 760;
+let selectedWeekStartIndex = -1;
+let weeklySelectedFactors = ["rain", "cloud", "daylight"];
+let selectedWeeklyDayIndex = 0;
 
 const VIZ_HEIGHTS = {
   0: 720,   // Opening panel
   1: 760,   // Viz 1: weather layers
   2: 780,   // Viz 2: yearly factor pattern
   3: 1060,  // Viz 3: monthly layer profile needs more vertical room
-  4: 820,   // Viz 4: weekly weather lens
+  4: 900,   // Viz 4: weekly weather lens
   5: 850,   // Viz 5: day in context
   6: 720    // Closing takeaway
 };
@@ -170,10 +173,6 @@ function mousePressed() {
 
   if (activeSection === 4) {
     handleWeeklyLensInteraction();
-  }
-
-  if (activeSection === 5) {
-    handleDayContextInteraction();
   }
 }
 
@@ -1685,30 +1684,360 @@ function getMonthlyAverageLabel(month, key) {
 }
 
 /* -------------------------
-   Section 4: Build Your Weekly Weather Lens
+   Section 4: Viz 4 Weekly Weather Lens
 -------------------------- */
 
-function getWeekDays() {
-  if (!weatherData.length) return [];
+function drawWeeklyWeatherLensPanel() {
+  ensureWeeklyLensInitialized();
 
-  const maxStart = Math.max(0, weatherData.length - 7);
-  selectedWeekStart = constrain(selectedWeekStart, 0, maxStart);
+  drawMainTitle(
+    "BUILD YOUR WEEKLY WEATHER LENS",
+    "Choose the layers that matter to your campus routine and see which days match your selected concerns."
+  );
 
-  return weatherData.slice(selectedWeekStart, selectedWeekStart + 7);
+  drawSectionNumber("4", 38, 43);
+
+  drawWeeklyFactorControls();
+  drawWeeklyTimeline();
+  drawWeeklyDayDetail();
+  drawWeeklyLensGuide();
+  drawWeeklyLensTakeaway();
 }
 
-function getSelectedLayerKeys() {
-  return Object.keys(selectedLayers).filter(key => selectedLayers[key]);
+function ensureWeeklyLensInitialized() {
+  if (!weatherData.length) return;
+
+  if (selectedWeekStartIndex >= 0) return;
+
+  // Default to a November week because it usually shows layered Seattle conditions.
+  const targetIndex = weatherData.findIndex(d => d.monthName === "Nov" && d.day >= 10);
+
+  if (targetIndex >= 0) {
+    selectedWeekStartIndex = targetIndex;
+  } else {
+    selectedWeekStartIndex = 0;
+  }
+
+  selectedWeeklyDayIndex = 0;
 }
 
-function getActiveLayerCount(day) {
-  let count = 0;
-  const keys = Object.keys(selectedLayers);
+function getCurrentWeekDays() {
+  ensureWeeklyLensInitialized();
+
+  if (selectedWeekStartIndex < 0) return [];
+
+  return weatherData.slice(selectedWeekStartIndex, selectedWeekStartIndex + 7);
+}
+
+function drawWeeklyFactorControls() {
+  const x = 54;
+  const y = 118;
+  const w = width - 108;
+  const h = 138;
+
+  drawCard(x, y, w, h, 18);
+
+  fill("#2f276f");
+  noStroke();
+  textSize(15);
+  textStyle(BOLD);
+  text("Choose your weather layers", x + 26, y + 32);
+
+  fill("#555");
+  textSize(11.5);
+  textStyle(NORMAL);
+  text(
+    "Select the factors that matter most to your routine. The weekly view updates based on your choices.",
+    x + 26,
+    y + 55,
+    w - 52
+  );
+
+  const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
+  const buttonY = y + 78;
+  const buttonW = 116;
+  const buttonH = 38;
+  const gap = 12;
+  const startX = x + 26;
 
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
+    const info = FACTORS[key];
 
-    if (selectedLayers[key] && day.layers[key]) {
+    const bx = startX + i * (buttonW + gap);
+    const active = weeklySelectedFactors.includes(key);
+    const c = color(info.color);
+
+    if (active) {
+      fill(red(c), green(c), blue(c), 78);
+      stroke(info.color);
+      strokeWeight(1.5);
+    } else {
+      fill("#FFFFFF");
+      stroke("#D9D2C7");
+      strokeWeight(1);
+    }
+
+    rect(bx, buttonY, buttonW, buttonH, 12);
+
+    noStroke();
+    fill(active ? "#222" : "#666");
+    textAlign(CENTER, CENTER);
+    textSize(15);
+    text(info.icon, bx + 20, buttonY + buttonH / 2);
+
+    textSize(10.8);
+    textStyle(active ? BOLD : NORMAL);
+    text(info.shortLabel, bx + 67, buttonY + buttonH / 2);
+
+    textAlign(LEFT, BASELINE);
+    textStyle(NORMAL);
+  }
+}
+
+function handleWeeklyLensInteraction() {
+  handleWeeklyFactorToggle();
+  handleWeekNavigation();
+  handleWeeklyDaySelection();
+}
+
+function handleWeeklyFactorToggle() {
+  const x = 54;
+  const y = 118;
+  const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
+
+  const buttonY = y + 78;
+  const buttonW = 116;
+  const buttonH = 38;
+  const gap = 12;
+  const startX = x + 26;
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const bx = startX + i * (buttonW + gap);
+
+    if (
+      mouseX >= bx &&
+      mouseX <= bx + buttonW &&
+      mouseY >= buttonY &&
+      mouseY <= buttonY + buttonH
+    ) {
+      if (weeklySelectedFactors.includes(key)) {
+        // Keep at least one selected layer so the chart always has meaning.
+        if (weeklySelectedFactors.length > 1) {
+          weeklySelectedFactors = weeklySelectedFactors.filter(k => k !== key);
+        }
+      } else {
+        weeklySelectedFactors.push(key);
+      }
+    }
+  }
+}
+
+function handleWeekNavigation() {
+  const y = 284;
+  const leftX = 54;
+  const rightX = width - 134;
+  const buttonW = 80;
+  const buttonH = 34;
+
+  if (
+    mouseX >= leftX &&
+    mouseX <= leftX + buttonW &&
+    mouseY >= y &&
+    mouseY <= y + buttonH
+  ) {
+    selectedWeekStartIndex = max(0, selectedWeekStartIndex - 7);
+    selectedWeeklyDayIndex = 0;
+  }
+
+  if (
+    mouseX >= rightX &&
+    mouseX <= rightX + buttonW &&
+    mouseY >= y &&
+    mouseY <= y + buttonH
+  ) {
+    selectedWeekStartIndex = min(
+      max(0, weatherData.length - 7),
+      selectedWeekStartIndex + 7
+    );
+    selectedWeeklyDayIndex = 0;
+  }
+}
+
+function handleWeeklyDaySelection() {
+  const week = getCurrentWeekDays();
+  if (!week.length) return;
+
+  const chartX = 54;
+  const chartY = 338;
+  const chartW = width - 108;
+  const cardGap = 12;
+  const cardW = (chartW - cardGap * 6) / 7;
+  const cardH = 210;
+
+  for (let i = 0; i < week.length; i++) {
+    const x = chartX + i * (cardW + cardGap);
+    const y = chartY;
+
+    if (
+      mouseX >= x &&
+      mouseX <= x + cardW &&
+      mouseY >= y &&
+      mouseY <= y + cardH
+    ) {
+      selectedWeeklyDayIndex = i;
+    }
+  }
+}
+
+function drawWeeklyTimeline() {
+  const week = getCurrentWeekDays();
+  if (!week.length) return;
+
+  const navY = 284;
+
+  drawWeekNavButton(54, navY, "← Prev");
+  drawWeekNavButton(width - 134, navY, "Next →");
+
+  fill("#333");
+  noStroke();
+  textSize(15);
+  textStyle(BOLD);
+  textAlign(CENTER, CENTER);
+
+  const firstDay = week[0];
+  const lastDay = week[week.length - 1];
+
+  text(
+    `${firstDay.monthName} ${firstDay.day} – ${lastDay.monthName} ${lastDay.day}, 2025`,
+    width / 2,
+    navY + 18
+  );
+
+  textAlign(LEFT, BASELINE);
+
+  const chartX = 54;
+  const chartY = 338;
+  const chartW = width - 108;
+  const cardGap = 12;
+  const cardW = (chartW - cardGap * 6) / 7;
+  const cardH = 210;
+
+  for (let i = 0; i < week.length; i++) {
+    const day = week[i];
+    const x = chartX + i * (cardW + cardGap);
+    const y = chartY;
+    const count = getSelectedLayerCount(day);
+    const selected = i === selectedWeeklyDayIndex;
+
+    drawWeeklyDayCard(day, x, y, cardW, cardH, count, selected);
+  }
+}
+
+function drawWeekNavButton(x, y, label) {
+  fill("#FFFFFF");
+  stroke("#D9D2C7");
+  strokeWeight(1);
+  rect(x, y, 80, 34, 12);
+
+  noStroke();
+  fill("#333");
+  textSize(11.5);
+  textStyle(BOLD);
+  textAlign(CENTER, CENTER);
+  text(label, x + 40, y + 17);
+  textAlign(LEFT, BASELINE);
+  textStyle(NORMAL);
+}
+
+function drawWeeklyDayCard(day, x, y, w, h, count, selected) {
+  const maxSelected = max(1, weeklySelectedFactors.length);
+  const intensity = count / maxSelected;
+
+  const base = color("#F7F1E7");
+  const dark = color("#7A6A58");
+  const bg = lerpColor(base, dark, intensity * 0.55);
+
+  fill(bg);
+  stroke(selected ? "#2f276f" : "#D9D2C7");
+  strokeWeight(selected ? 2.4 : 1.1);
+  rect(x, y, w, h, 16);
+  strokeWeight(1);
+
+  noStroke();
+
+  fill(selected ? "#2f276f" : "#333");
+  textAlign(CENTER, CENTER);
+  textSize(12);
+  textStyle(BOLD);
+  text(getShortWeekday(day.dateObj), x + w / 2, y + 24);
+
+  fill("#555");
+  textSize(10.8);
+  textStyle(NORMAL);
+  text(`${day.monthName} ${day.day}`, x + w / 2, y + 43);
+
+  fill("#222");
+  textSize(24);
+  textStyle(BOLD);
+  text(`${count}`, x + w / 2, y + 78);
+
+  fill("#555");
+  textSize(10.5);
+  textStyle(NORMAL);
+  text("selected", x + w / 2, y + 99);
+  text("layers", x + w / 2, y + 114);
+
+  drawWeeklyLayerDots(day, x + w / 2, y + 145);
+
+  fill("#333");
+  textSize(10.2);
+  text(
+    `${Math.round(day.feelslike)}°F`,
+    x + w / 2,
+    y + h - 23
+  );
+
+  textAlign(LEFT, BASELINE);
+}
+
+function drawWeeklyLayerDots(day, centerX, y) {
+  const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
+  const dotGap = 13;
+  const startX = centerX - (keys.length - 1) * dotGap / 2;
+
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i];
+    const info = FACTORS[key];
+    const isSelected = weeklySelectedFactors.includes(key);
+    const isPresent = day.layers[key];
+
+    if (isSelected && isPresent) {
+      fill(info.color);
+      stroke(info.color);
+    } else if (isSelected && !isPresent) {
+      fill("#FFFFFF");
+      stroke(info.color);
+    } else {
+      fill("#E2DBD0");
+      stroke("#D0C7BC");
+    }
+
+    strokeWeight(1);
+    circle(startX + i * dotGap, y, 8);
+  }
+
+  strokeWeight(1);
+}
+
+function getSelectedLayerCount(day) {
+  let count = 0;
+
+  for (let i = 0; i < weeklySelectedFactors.length; i++) {
+    const key = weeklySelectedFactors[i];
+
+    if (day.layers[key]) {
       count++;
     }
   }
@@ -1716,373 +2045,167 @@ function getActiveLayerCount(day) {
   return count;
 }
 
-function getDayLabel(day) {
-  return day.dateObj.toLocaleString("en-US", { weekday: "short" });
+function getShortWeekday(dateObj) {
+  if (!dateObj || isNaN(dateObj.getTime())) return "";
+
+  return dateObj.toLocaleString("en-US", { weekday: "short" });
 }
 
-function getShortDateLabel(day) {
-  return day.dateObj.toLocaleString("en-US", {
-    month: "short",
-    day: "numeric"
-  });
-}
+function drawWeeklyDayDetail() {
+  const week = getCurrentWeekDays();
+  if (!week.length) return;
 
-function getWeatherEmoji(day) {
-  if (day.precip >= 0.05 && day.windspeed >= 12) return "🌧️";
-  if (day.precip >= 0.05) return "🌦️";
-  if (day.cloudcover >= 75) return "☁️";
-  if (day.solarenergy >= 10) return "☀️";
-  return "🌤️";
-}
+  const day = week[selectedWeeklyDayIndex] || week[0];
 
-function drawWeeklyWeatherLensPanel() {
-  drawMainTitle(
-    "BUILD YOUR WEEKLY WEATHER LENS",
-    "Choose the weather layers that matter most to your routine. Days become darker when selected layers overlap."
-  );
+  const x = 54;
+  const y = 575;
+  const w = width - 108;
+  const h = 120;
 
-  drawSectionNumber("4", 38, 43);
-
-  drawLayerSelectorPanel();
-  drawWeekNavigator();
-  drawWeeklyForecastCards();
-  drawWeeklyLensTakeaway();
-}
-
-function drawLayerSelectorPanel() {
-  const x = 50;
-  const y = 125;
-  const w = 270;
-  const h = 430;
-
-  drawCard(x, y, w, h, 18);
+  drawCard(x, y, w, h, 16);
 
   fill("#2f276f");
   noStroke();
   textSize(14);
   textStyle(BOLD);
-  text("SELECT WEATHER LAYERS", x + 22, y + 32);
-
-  fill("#555");
-  textSize(11);
-  textStyle(NORMAL);
-  textLeading(16);
-  text(
-    "Pick the conditions that affect your campus routine most. This does not create a score. It only highlights overlap.",
-    x + 22,
-    y + 58,
-    w - 44
-  );
-
-  const keys = Object.keys(FACTORS);
-
-  // Start the rows lower than the description, but high enough to fit all 6 factors.
-  const firstRowY = y + 140;
-  const rowGap = 42;
-
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    const info = FACTORS[key];
-    const active = selectedLayers[key];
-
-    const rowX = x + 18;
-    const rowY = firstRowY + i * rowGap;
-
-    if (active) {
-      drawSoftCard(rowX, rowY - 20, w - 36, 31, info.color, 9);
-    }
-
-    stroke(active ? info.color : "#BFB7AD");
-    strokeWeight(1.3);
-    fill(active ? info.color : "#FFFFFF");
-    rect(rowX, rowY - 14, 18, 18, 5);
-
-    if (active) {
-      noStroke();
-      fill("#FFFFFF");
-      textSize(13);
-      textStyle(BOLD);
-      text("✓", rowX + 4, rowY);
-    }
-
-    noStroke();
-    fill("#222");
-    textSize(13);
-    textStyle(active ? BOLD : NORMAL);
-
-    // Shorten the last label so it fits better.
-    const label = key === "temp" ? "Temp Comfort" : info.label;
-    text(`${info.icon}  ${label}`, rowX + 32, rowY);
-  }
-
-  // Move legend below all six factors.
-  const legendY = y + h - 55;
-
-  fill("#F3EFE8");
-  noStroke();
-  rect(x + 18, legendY, w - 36, 34, 10);
-
-  fill("#444");
-  textSize(10.5);
-  textStyle(NORMAL);
-  text("Darker days = more selected layers overlap.", x + 28, legendY + 22);
-}
-
-function drawWeekNavigator() {
-  const week = getWeekDays();
-  if (!week.length) return;
-
-  const x = 345;
-  const y = 125;
+  text("Selected day", x + 24, y + 30);
 
   fill("#222");
-  noStroke();
-  textSize(16);
+  textSize(18);
   textStyle(BOLD);
-  text("Weekly forecast view", x, y + 5);
+  text(`${getShortWeekday(day.dateObj)}, ${day.monthName} ${day.day}`, x + 24, y + 60);
 
   fill("#555");
-  textSize(12);
+  textSize(11.5);
   textStyle(NORMAL);
   text(
-    `${getShortDateLabel(week[0])} – ${getShortDateLabel(week[week.length - 1])}, 2025`,
-    x,
-    y + 28
+    "The details below show which of your selected layers were present on this day.",
+    x + 24,
+    y + 84,
+    280
   );
 
-  drawSmallButton(x + 315, y - 12, 82, 30, "← Prev");
-  drawSmallButton(x + 407, y - 12, 82, 30, "Next →");
-}
+  const selectedKeys = weeklySelectedFactors;
+  const gridX = x + 360;
+  const gridY = y + 24;
+  const chipW = 130;
+  const chipH = 32;
+  const gap = 12;
 
-function drawSmallButton(x, y, w, h, label) {
-  fill("#FFFFFF");
-  stroke("#D9D2C7");
-  rect(x, y, w, h, 9);
+  for (let i = 0; i < selectedKeys.length; i++) {
+    const key = selectedKeys[i];
+    const info = FACTORS[key];
+    const present = day.layers[key];
 
-  noStroke();
-  fill("#333");
-  textSize(11);
-  textStyle(BOLD);
-  textAlign(CENTER, CENTER);
-  text(label, x + w / 2, y + h / 2);
-  textAlign(LEFT, BASELINE);
-}
+    const col = i % 3;
+    const row = Math.floor(i / 3);
 
-function getWeeklyCardLayout() {
-  const x = 345;
-  const y = 180;
+    const cx = gridX + col * (chipW + gap);
+    const cy = gridY + row * (chipH + 12);
 
-  // Leave enough space on the right side so the last card does not get cut off.
-  const rightPadding = 55;
-  const availableW = width - x - rightPadding;
+    const c = color(info.color);
 
-  const gap = 10;
-  const cardW = (availableW - gap * 6) / 7;
-  const cardH = 285;
-
-  return {
-    x: x,
-    y: y,
-    cardW: cardW,
-    cardH: cardH,
-    gap: gap
-  };
-}
-
-function drawWeeklyForecastCards() {
-  const week = getWeekDays();
-  const layout = getWeeklyCardLayout();
-
-  const x = layout.x;
-  const y = layout.y;
-  const cardW = layout.cardW;
-  const cardH = layout.cardH;
-  const gap = layout.gap;
-
-  for (let i = 0; i < week.length; i++) {
-    const day = week[i];
-    const cx = x + i * (cardW + gap);
-    const overlap = getActiveLayerCount(day);
-    const alpha = map(overlap, 0, 4, 0, 145);
-
-    drawCard(cx, y, cardW, cardH, 14);
-
-    if (overlap > 0) {
-      noStroke();
-      fill(46, 40, 95, constrain(alpha, 45, 175));
-      rect(cx, y, cardW, cardH, 14);
+    if (present) {
+      fill(red(c), green(c), blue(c), 78);
+      stroke(info.color);
+    } else {
+      fill("#FFFFFF");
+      stroke("#D9D2C7");
     }
 
-    if (selectedDayGlobalIndex === weatherData.indexOf(day)) {
-      noFill();
-      stroke("#2f276f");
-      strokeWeight(3);
-      rect(cx - 2, y - 2, cardW + 4, cardH + 4, 16);
-      strokeWeight(1);
-    }
-
-    const darkText = overlap >= 2;
+    rect(cx, cy, chipW, chipH, 10);
 
     noStroke();
-    fill(darkText ? "#FFFFFF" : "#222");
-    textAlign(CENTER, CENTER);
-
-    textSize(14);
-    textStyle(BOLD);
-    text(getDayLabel(day), cx + cardW / 2, y + 28);
-
+    fill(present ? "#222" : "#666");
     textSize(10.5);
-    textStyle(NORMAL);
-    fill(darkText ? "#F6F1E8" : "#555");
-    text(getShortDateLabel(day), cx + cardW / 2, y + 52);
+    textStyle(present ? BOLD : NORMAL);
+    text(`${info.icon} ${info.shortLabel}`, cx + 12, cy + 20);
 
-    textSize(23);
-    fill(darkText ? "#FFFFFF" : "#222");
-    text(getWeatherEmoji(day), cx + cardW / 2, y + 92);
-
-    // Weather values
-    textSize(9.3);
-    textStyle(NORMAL);
-    fill(darkText ? "#FFFFFF" : "#333");
-
-    text(`Rain ${nf(day.precip, 1, 2)} in`, cx + cardW / 2, y + 130);
-    text(`Cloud ${Math.round(day.cloudcover)}%`, cx + cardW / 2, y + 153);
-    text(`Day ${nf(day.daylightHours, 1, 1)}h`, cx + cardW / 2, y + 176);
-    text(`Wind ${nf(day.windspeed, 1, 1)} mph`, cx + cardW / 2, y + 199);
-    text(`Feel ${Math.round(day.feelslike)}°F`, cx + cardW / 2, y + 222);
-
-    fill(darkText ? "#FFFFFF" : "#2f276f");
+    fill(present ? "#2f276f" : "#777");
+    textAlign(RIGHT, BASELINE);
     textSize(10);
-    textStyle(BOLD);
-    text(
-      `${overlap} layer${overlap === 1 ? "" : "s"}`,
-      cx + cardW / 2,
-      y + 255
-    );
+    text(present ? "present" : "not present", cx + chipW - 10, cy + 20);
+    textAlign(LEFT, BASELINE);
   }
 
-  textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
+}
+
+function drawWeeklyLensGuide() {
+  const x = 54;
+  const y = 720;
+  const w = width - 108;
+  const h = 86;
+
+  drawCard(x, y, w, h, 14);
+
+  fill("#2f276f");
+  noStroke();
+  textSize(13.5);
+  textStyle(BOLD);
+  text("How to read this view", x + 24, y + 29);
+
+  fill("#333");
+  textSize(11.8);
+  textStyle(NORMAL);
+  text(
+    "Each day card counts only the layers you selected. A darker day means more of your selected layers were present, not that the day is universally worse.",
+    x + 190,
+    y + 25,
+    w - 225
+  );
+
+  drawWeeklyDotLegend(x + 190, y + 58);
+}
+
+function drawWeeklyDotLegend(x, y) {
+  const items = [
+    ["selected + present", "#4D3F8F", true],
+    ["selected + not present", "#FFFFFF", true],
+    ["not selected", "#D8D0C4", false]
+  ];
+
+  let currentX = x;
+
+  for (let i = 0; i < items.length; i++) {
+    const [label, fillColor, outlined] = items[i];
+
+    fill(fillColor);
+    stroke(outlined ? "#4D3F8F" : "#D0C7BC");
+    circle(currentX, y, 9);
+
+    noStroke();
+    fill("#555");
+    textSize(10.5);
+    text(label, currentX + 10, y + 4);
+
+    currentX += 145;
+  }
 }
 
 function drawWeeklyLensTakeaway() {
-  const y = height - 92;
+  const x = 54;
+  const y = 830;
+  const w = width - 108;
+  const h = 50;
 
-  drawCard(50, y, width - 100, 62, 14);
+  drawCard(x, y, w, h, 14);
 
   fill("#2f276f");
   noStroke();
-  textSize(14);
+  textSize(13.5);
   textStyle(BOLD);
-  text("Interaction", 75, y + 25);
+  text("Why this matters", x + 24, y + 30);
 
   fill("#333");
-  textSize(12.5);
+  textSize(12.1);
   textStyle(NORMAL);
   text(
-    "Click weather layers, then click a day. Darker shading means more selected conditions overlap.",
-    180,
-    y + 25,
-    width - 250
+    "The same week can look different depending on whether a reader cares most about wet walking, low daylight, gray skies, wind, or temperature comfort.",
+    x + 165,
+    y + 30,
+    w - 195
   );
-}
-
-function handleWeeklyLensInteraction() {
-  if (handleLayerClick()) return;
-  if (handleWeekButtonClick()) return;
-  handleWeeklyDayClick();
-}
-
-function handleLayerClick() {
-  const panelX = 50;
-  const panelY = 125;
-  const panelW = 270;
-
-  const rowX = panelX + 18;
-  const rowW = panelW - 36;
-
-  // Must match drawLayerSelectorPanel()
-  const firstRowY = panelY + 140;
-  const rowH = 31;
-  const rowGap = 42;
-
-  const keys = Object.keys(FACTORS);
-
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-
-    const hitX = rowX;
-    const hitY = firstRowY + i * rowGap - 20;
-
-    if (
-      mouseX >= hitX &&
-      mouseX <= hitX + rowW &&
-      mouseY >= hitY &&
-      mouseY <= hitY + rowH
-    ) {
-      selectedLayers[key] = !selectedLayers[key];
-      return true;
-    }
-  }
-
-  return false;
-}
-
-function handleWeekButtonClick() {
-  const x = 345;
-  const y = 125;
-  const maxStart = Math.max(0, weatherData.length - 7);
-
-  if (
-    mouseX >= x + 315 &&
-    mouseX <= x + 397 &&
-    mouseY >= y - 12 &&
-    mouseY <= y + 18
-  ) {
-    selectedWeekStart = Math.max(0, selectedWeekStart - 7);
-    selectedDayGlobalIndex = selectedWeekStart;
-    return true;
-  }
-
-  if (
-    mouseX >= x + 407 &&
-    mouseX <= x + 489 &&
-    mouseY >= y - 12 &&
-    mouseY <= y + 18
-  ) {
-    selectedWeekStart = Math.min(maxStart, selectedWeekStart + 7);
-    selectedDayGlobalIndex = selectedWeekStart;
-    return true;
-  }
-
-  return false;
-}
-
-function handleWeeklyDayClick() {
-  const week = getWeekDays();
-  const layout = getWeeklyCardLayout();
-
-  const x = layout.x;
-  const y = layout.y;
-  const cardW = layout.cardW;
-  const cardH = layout.cardH;
-  const gap = layout.gap;
-
-  for (let i = 0; i < week.length; i++) {
-    const cx = x + i * (cardW + gap);
-
-    if (
-      mouseX >= cx &&
-      mouseX <= cx + cardW &&
-      mouseY >= y &&
-      mouseY <= y + cardH
-    ) {
-      selectedDayGlobalIndex = weatherData.indexOf(week[i]);
-      return true;
-    }
-  }
-
-  return false;
 }
 
 /* -------------------------
