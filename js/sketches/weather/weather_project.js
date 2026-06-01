@@ -12,7 +12,7 @@ let selectedWeeklyDayIndex = 0;
 let selectedContextDayIndex = -1;
 
 const VIZ_HEIGHTS = {
-  0: 720,   // Opening panel
+  0: 620,   // Opening panel
   1: 760,   // Viz 1: weather layers
   2: 780,   // Viz 2: yearly factor pattern
   3: 1060,  // Viz 3: monthly layer profile needs more vertical room
@@ -493,65 +493,278 @@ function getShortFactorExplanation(factorKey) {
 -------------------------- */
 
 function drawOpeningPanel() {
-  drawMainTitle(
-    "BEYOND THE FORECAST",
-    "What environmental factors make Seattle weather feel hard?"
-  );
+  background("#FAF7F0");
 
-  drawCard(45, 125, width - 90, 365, 18);
+  const cardX = 64;
+  const cardY = 46;
+  const cardW = width - 128;
+  const cardH = 520;
 
-  fill("#2f276f");
-  textSize(22);
+  drawCard(cardX, cardY, cardW, cardH, 24);
+
+  // Header
+  fill("#222");
+  noStroke();
   textStyle(BOLD);
-  text("Seattle weather is not just rain.", 75, 185, width - 150);
+  textSize(30);
+  text("BEYOND THE FORECAST", cardX + 38, cardY + 62);
 
+  fill("#555");
   textStyle(NORMAL);
-  fill("#444");
-  textSize(17);
+  textSize(14);
   text(
-    "This project starts from a simple idea: a forecast can tell us the weather, but it does not always explain the experience of moving through campus.",
-    75,
-    235,
-    width - 150
+    "A roadmap for reading Seattle weather as layers, not as one score.",
+    cardX + 38,
+    cardY + 90
   );
 
-  const keys = Object.keys(FACTORS);
-  const startX = 95;
-  const y = 365;
+  drawOpeningRoadmap(cardX + 38, cardY + 128, cardW - 76, 300);
 
-  for (let i = 0; i < keys.length; i++) {
-    const key = keys[i];
-    const x = startX + i * 92;
-
-    fill(FACTORS[key].color);
-    noStroke();
-    circle(x, y, 34);
-
-    fill("#222");
-    textSize(18);
-    textAlign(CENTER, CENTER);
-    text(FACTORS[key].icon, x, y);
-
-    fill("#333");
-    textSize(12);
-    textStyle(NORMAL);
-    text(FACTORS[key].shortLabel, x, y + 38);
-  }
-
-  textAlign(LEFT, BASELINE);
+  // Bottom takeaway strip
+  const stripX = cardX + 38;
+  const stripY = cardY + cardH - 70;
+  const stripW = cardW - 76;
+  const stripH = 44;
 
   fill("#F3EFE8");
   noStroke();
-  rect(80, 525, width - 160, 45, 12);
+  rect(stripX, stripY, stripW, stripH, 12);
 
   fill("#333");
-  textSize(14);
+  textSize(13.5);
+  textStyle(BOLD);
+  textAlign(CENTER, CENTER);
   text(
     "Not a score. Not one cause. More layers, more context.",
-    105,
-    553,
-    width - 210
+    stripX + stripW / 2,
+    stripY + stripH / 2
   );
+
+  textAlign(LEFT, BASELINE);
+  textStyle(NORMAL);
+}
+
+function drawOpeningRoadmap(x, y, w, h) {
+  const sectionH = 78;
+  const gap = 22;
+
+  drawRoadmapSection(
+    x,
+    y,
+    w,
+    sectionH,
+    "1",
+    "Forecast numbers",
+    "A normal forecast gives separate measurements.",
+    ["55°F", "0.01 in rain", "99% cloud", "15.6 mph wind", "sunrise / sunset"]
+  );
+
+  drawDownArrow(x + w / 2, y + sectionH + 8);
+
+  drawRoadmapSection(
+    x,
+    y + sectionH + gap,
+    w,
+    sectionH,
+    "2",
+    "Weather layers",
+    "We translate those measurements into visible conditions.",
+    ["💧 Rain", "☁️ Cloud", "☀️ Daylight", "🌤️ Solar", "〰️ Wind", "🌡️ Temp comfort"]
+  );
+
+  drawDownArrow(x + w / 2, y + sectionH * 2 + gap + 8);
+
+  drawRoadmapSection(
+    x,
+    y + sectionH * 2 + gap * 2,
+    w,
+    sectionH,
+    "3",
+    "Explore context",
+    "Readers move from broad seasonal patterns to one specific day.",
+    ["Year", "Month", "Week", "Day"]
+  );
+}
+
+function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
+  fill("#FFFFFF");
+  stroke("#DED6CA");
+  strokeWeight(1.2);
+  rect(x, y, w, h, 16);
+
+  // Number circle
+  fill("#4D3F8F");
+  noStroke();
+  circle(x + 28, y + 28, 28);
+
+  fill("#FFFFFF");
+  textSize(13);
+  textStyle(BOLD);
+  textAlign(CENTER, CENTER);
+  text(num, x + 28, y + 28);
+
+  textAlign(LEFT, BASELINE);
+
+  fill("#2f276f");
+  textSize(14.5);
+  textStyle(BOLD);
+  text(title, x + 52, y + 28);
+
+  fill("#555");
+  textSize(11.2);
+  textStyle(NORMAL);
+  text(subtitle, x + 52, y + 48);
+
+  const pillStartX = x + 330;
+  const pillY = y + 20;
+  const pillGap = 8;
+
+  let currentX = pillStartX;
+
+  for (let i = 0; i < items.length; i++) {
+    const label = items[i];
+    const pillW = getRoadmapPillWidth(label);
+
+    fill("#FBFAF6");
+    stroke("#DED6CA");
+    strokeWeight(1);
+    rect(currentX, pillY, pillW, 34, 10);
+
+    noStroke();
+    fill("#333");
+    textSize(10.5);
+    textStyle(BOLD);
+    textAlign(CENTER, CENTER);
+    text(label, currentX + pillW / 2, pillY + 17);
+
+    currentX += pillW + pillGap;
+  }
+
+  textAlign(LEFT, BASELINE);
+  textStyle(NORMAL);
+}
+
+function getRoadmapPillWidth(label) {
+  if (label.length <= 5) return 62;
+  if (label.length <= 9) return 88;
+  if (label.length <= 13) return 112;
+  return 132;
+}
+
+function drawDownArrow(x, y) {
+  stroke("#8B8175");
+  strokeWeight(2);
+  line(x, y, x, y + 16);
+  line(x, y + 16, x - 6, y + 10);
+  line(x, y + 16, x + 6, y + 10);
+  noStroke();
+}
+
+function drawOpeningDataTransformation(x, y, w, h) {
+  const colGap = 28;
+  const colW = (w - colGap * 2 - 60) / 3;
+
+  const col1X = x + 30;
+  const col2X = col1X + colW + colGap + 30;
+  const col3X = col2X + colW + colGap + 30;
+
+  const topY = y + 42;
+
+  drawOpeningColumn(
+    col1X,
+    topY,
+    colW,
+    "1",
+    "Forecast numbers",
+    [
+      "55°F temperature",
+      "0.01 in rain",
+      "99% cloud cover",
+      "15.6 mph wind",
+      "Sunrise / sunset"
+    ]
+  );
+
+  drawOpeningColumn(
+    col2X,
+    topY,
+    colW,
+    "2",
+    "Weather layers",
+    [
+      "💧 Rain",
+      "☁️ Cloud cover",
+      "☀️ Daylight",
+      "🌤️ Solar energy",
+      "〰️ Wind",
+      "🌡️ Temp comfort"
+    ]
+  );
+
+  drawOpeningColumn(
+    col3X,
+    topY,
+    colW,
+    "3",
+    "Explore context",
+    [
+      "Yearly patterns",
+      "Monthly profile",
+      "Weekly lens",
+      "Day in context"
+    ]
+  );
+
+  drawOpeningArrow(col1X + colW + 10, y + h / 2);
+  drawOpeningArrow(col2X + colW + 10, y + h / 2);
+}
+
+function drawOpeningColumn(x, y, w, num, title, items) {
+  // Number circle
+  fill("#4D3F8F");
+  noStroke();
+  circle(x + 15, y - 4, 28);
+
+  fill("#FFFFFF");
+  textSize(13);
+  textStyle(BOLD);
+  textAlign(CENTER, CENTER);
+  text(num, x + 15, y - 4);
+
+  textAlign(LEFT, BASELINE);
+
+  fill("#2f276f");
+  textSize(15);
+  textStyle(BOLD);
+  text(title, x + 38, y + 2);
+
+  const listY = y + 34;
+
+  for (let i = 0; i < items.length; i++) {
+    const itemY = listY + i * 34;
+
+    fill("#FBFAF6");
+    stroke("#DED6CA");
+    strokeWeight(1);
+    rect(x, itemY, w, 26, 8);
+
+    noStroke();
+    fill("#333");
+    textSize(11.5);
+    textStyle(NORMAL);
+    text(items[i], x + 12, itemY + 17);
+  }
+}
+
+function drawOpeningArrow(x, y) {
+  stroke("#8B8175");
+  strokeWeight(2);
+  line(x, y, x + 32, y);
+
+  line(x + 32, y, x + 24, y - 7);
+  line(x + 32, y, x + 24, y + 7);
+
+  noStroke();
 }
 
 /* -------------------------
