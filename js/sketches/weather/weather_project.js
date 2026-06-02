@@ -1286,7 +1286,13 @@ function drawYearlyLineChart() {
   const chartW = width - 315;
   const chartH = Math.min(315, height - 395);
 
-  drawCard(chartX - 22, chartY - 42, chartW + 44, chartH + 118, 18);
+  // Make the main chart card taller so the bottom note stays inside the box
+  const cardX = chartX - 22;
+  const cardY = chartY - 42;
+  const cardW = chartW + 44;
+  const cardH = chartH + 190;
+
+  drawCard(cardX, cardY, cardW, cardH, 18);
 
   fill("#222");
   noStroke();
@@ -1295,7 +1301,7 @@ function drawYearlyLineChart() {
   text(metric.title, chartX, chartY - 16);
 
   fill("#555");
-  textSize(11.8);
+  textSize(12.5);
   textStyle(NORMAL);
   text(metric.subtitle, chartX, chartY + 5);
 
@@ -1317,7 +1323,7 @@ function drawYearlyLineChart() {
   const plotW = chartW - 78;
   const plotH = chartH - 28;
 
-  // Grid and y-axis value labels
+  // Grid and y-axis labels
   stroke("#E7E0D6");
   strokeWeight(1);
 
@@ -1384,31 +1390,40 @@ function drawYearlyLineChart() {
     text(monthlyData[i].monthName[0], px, plotY + plotH + 24);
   }
 
-  // Current range note
+  // Observed range inside the chart card
   textAlign(LEFT, BASELINE);
   fill("#555");
-  textSize(11);
+  noStroke();
+  textSize(11.5);
   textStyle(NORMAL);
   text(
     `Observed range: ${formatYearlyValue(minVal, selectedFactor)} – ${formatYearlyValue(maxVal, selectedFactor)}`,
     plotX,
-    plotY + plotH + 58
+    plotY + plotH + 55
   );
 
-  // Chart reading note
+  // Bottom note inside the chart card
+  const noteX = plotX;
+  const noteY = plotY + plotH + 72;
+  const noteW = plotW;
+  const noteH = 42;
+
   fill("#F3EFE8");
   noStroke();
-  rect(plotX, plotY + plotH + 76, plotW, 34, 10);
+  rect(noteX, noteY, noteW, noteH, 10);
 
   fill("#444");
-  textSize(10.8);
+  textSize(11.5);
+  textStyle(NORMAL);
+  textLeading(15);
   text(
     metric.readingNote,
-    plotX + 14,
-    plotY + plotH + 97,
-    plotW - 28
+    noteX + 16,
+    noteY + 12,
+    noteW - 32
   );
 
+  textLeading(13);
   textAlign(LEFT, BASELINE);
 }
 
@@ -1447,48 +1462,53 @@ function drawYearlyAnnotationCard() {
   const x = width - 225;
   const y = 235;
   const w = 180;
-  const h = 320;
+  const h = 345;
 
   drawCard(x, y, w, h, 16);
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5);
+  textSize(15.5);
   textStyle(BOLD);
-  text("WHAT TO NOTICE", x + 18, y + 28);
+  text("WHAT TO NOTICE", x + 18, y + 30);
 
   fill("#222");
-  textSize(24);
+  textSize(28);
   textAlign(CENTER);
-  text(info.icon, x + w / 2, y + 70);
+  text(info.icon, x + w / 2, y + 75);
   textAlign(LEFT);
 
   fill("#333");
-  textSize(13);
+  textSize(15);
   textStyle(BOLD);
-  text(info.label, x + 18, y + 102);
+  text(info.label, x + 18, y + 112);
 
   fill("#555");
-  textSize(11.2);
+  textSize(12.5);
   textStyle(NORMAL);
-  text(metric.explanation, x + 18, y + 126, w - 36);
+  textLeading(16);
+  text(metric.explanation, x + 18, y + 138, w - 36);
 
-  drawMiniDivider(x + 18, y + h - 92, x + w - 18, y + h - 92);
+  drawMiniDivider(x + 18, y + h - 100, x + w - 18, y + h - 100);
 
   fill("#2f276f");
-  textSize(11.2);
+  textSize(12.5);
   textStyle(BOLD);
-  text("Data shown", x + 18, y + h - 65);
+  text("Data shown", x + 18, y + h - 70);
 
   fill("#555");
-  textSize(10.8);
+  textSize(12.3);
   textStyle(NORMAL);
   text(
     `${metric.yLabel}, measured in ${metric.unit}.`,
     x + 18,
-    y + h - 45,
+    y + h - 48,
     w - 36
   );
+
+  textLeading(13);
+  textAlign(LEFT, BASELINE);
+  textStyle(NORMAL);
 }
 
 function getYearlyAnnotationText(factorKey) {
