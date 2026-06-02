@@ -799,9 +799,11 @@ function drawWeatherLayersPanel() {
   const topY = 130;
   const panelH = height - 250;
 
-  const forecastW = Math.min(280, width * 0.3);
-  const arrowW = 78;
-  const gap = 24;
+  // Make the left card slightly narrower and give the arrow more space.
+  const forecastW = Math.min(260, width * 0.28);
+  const arrowW = 120;
+  const gap = 30;
+
   const layerW = width - margin * 2 - forecastW - arrowW - gap * 2;
 
   const forecastX = margin;
@@ -927,22 +929,37 @@ function drawForecastCard(day, x, y, w, h) {
 }
 
 function drawConnectionArrow(x, y) {
+  // Main arrow
   stroke("#555");
   strokeWeight(2);
-  line(x - 22, y, x + 22, y);
-  line(x + 22, y, x + 10, y - 9);
-  line(x + 22, y, x + 10, y + 9);
+  line(x - 34, y, x + 34, y);
+  line(x + 34, y, x + 22, y - 9);
+  line(x + 34, y, x + 22, y + 9);
   strokeWeight(1);
 
+  // Small label above arrow
   noStroke();
-  fill("#666");
-  textSize(10.3);
-  textAlign(CENTER);
-  text("separate", x, y - 24);
-  text("numbers", x, y - 10);
-  text("become", x, y + 26);
-  text("layers", x, y + 40);
+  fill("#F3EFE8");
+  rect(x - 42, y - 48, 84, 28, 9);
+
+  fill("#555");
+  textSize(10.5);
+  textStyle(BOLD);
+  textAlign(CENTER, CENTER);
+  text("connect", x, y - 34);
+
+  // Small label below arrow
+  fill("#F3EFE8");
+  noStroke();
+  rect(x - 42, y + 22, 84, 28, 9);
+
+  fill("#555");
+  textSize(10.5);
+  textStyle(BOLD);
+  text("as layers", x, y + 36);
+
   textAlign(LEFT, BASELINE);
+  textStyle(NORMAL);
 }
 
 function drawLayerStack(day, x, y, w, h) {
@@ -970,9 +987,12 @@ function drawLayerStack(day, x, y, w, h) {
     innerW
   );
 
-  const noteH = 42;
-  const listY = innerY + 44;
-  const listBottom = y + h - noteH - 24;
+  // Make the bottom note taller and give the layer list less vertical space.
+  const noteH = 62;
+  const listY = innerY + 48;
+  const noteY = y + h - noteH - 18;
+  const listBottom = noteY - 14;
+
   const availableH = listBottom - listY;
   const gap = 7;
   const layerH = (availableH - gap * (layerKeys.length - 1)) / layerKeys.length;
@@ -1048,21 +1068,23 @@ function drawLayerStack(day, x, y, w, h) {
     textStyle(NORMAL);
   }
 
-  const noteY = y + h - noteH - 14;
-
+  // Bottom note box
   fill("#F3EFE8");
   noStroke();
-  rect(innerX, noteY, innerW, noteH, 10);
+  rect(innerX, noteY, innerW, noteH, 12);
 
   fill("#444");
-  textSize(10.7);
+  textSize(10.8);
   textStyle(NORMAL);
+  textLeading(15);
   text(
-    "Temperature is treated as comfort: it is only flagged when it is too cold or too hot, not simply when the number is higher.",
+    "Temperature is treated as comfort. It is only flagged when it is too cold or too hot, not simply when the number is higher.",
     innerX + 16,
-    noteY + 15,
+    noteY + 18,
     innerW - 32
   );
+
+  textLeading(13);
 }
 
 function getLayerActualValue(day, key) {
