@@ -518,7 +518,7 @@ function drawOpeningPanel() {
     cardY + 90
   );
 
-  drawOpeningRoadmap(cardX + 38, cardY + 128, cardW - 76, 300);
+  drawOpeningRoadmap(cardX + 38, cardY + 128, cardW - 76, 320);
 
   // Bottom takeaway strip
   const stripX = cardX + 38;
@@ -545,8 +545,8 @@ function drawOpeningPanel() {
 }
 
 function drawOpeningRoadmap(x, y, w, h) {
-  const sectionH = 78;
-  const gap = 22;
+  const sectionH = 86;
+  const gap = 24;
 
   drawRoadmapSection(
     x,
@@ -559,7 +559,7 @@ function drawOpeningRoadmap(x, y, w, h) {
     ["55°F", "0.01 in rain", "99% cloud", "15.6 mph wind", "sunrise / sunset"]
   );
 
-  drawDownArrow(x + w / 2, y + sectionH + 8);
+  drawDownArrow(x + w / 2, y + sectionH + 6);
 
   drawRoadmapSection(
     x,
@@ -569,10 +569,10 @@ function drawOpeningRoadmap(x, y, w, h) {
     "2",
     "Weather layers",
     "We translate those measurements into visible conditions.",
-    ["💧 Rain", "☁️ Cloud", "☀️ Daylight", "🌤️ Solar", "〰️ Wind", "🌡️ Temp comfort"]
+    ["Rain", "Cloud", "Daylight", "Solar", "Wind", "Temp comfort"]
   );
 
-  drawDownArrow(x + w / 2, y + sectionH * 2 + gap + 8);
+  drawDownArrow(x + w / 2, y + sectionH * 2 + gap + 6);
 
   drawRoadmapSection(
     x,
@@ -581,7 +581,7 @@ function drawOpeningRoadmap(x, y, w, h) {
     sectionH,
     "3",
     "Explore context",
-    "Readers move from broad seasonal patterns to one specific day.",
+    "Readers move from broad patterns to one specific day.",
     ["Year", "Month", "Week", "Day"]
   );
 }
@@ -595,16 +595,17 @@ function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
   // Number circle
   fill("#4D3F8F");
   noStroke();
-  circle(x + 28, y + 28, 28);
+  circle(x + 28, y + 30, 28);
 
   fill("#FFFFFF");
   textSize(13);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
-  text(num, x + 28, y + 28);
+  text(num, x + 28, y + 30);
 
   textAlign(LEFT, BASELINE);
 
+  // Left text area
   fill("#2f276f");
   textSize(14.5);
   textStyle(BOLD);
@@ -613,29 +614,41 @@ function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
   fill("#555");
   textSize(11.2);
   textStyle(NORMAL);
-  text(subtitle, x + 52, y + 48);
+  text(subtitle, x + 52, y + 48, 260);
 
-  const pillStartX = x + 330;
-  const pillY = y + 20;
+  // Pill area
+  const pillAreaX = x + 360;
+  const pillAreaY = y + 18;
+  const pillAreaW = w - 390;
+
+  let currentX = pillAreaX;
+  let currentY = pillAreaY;
+
+  const pillH = 28;
   const pillGap = 8;
-
-  let currentX = pillStartX;
+  const rowGap = 8;
 
   for (let i = 0; i < items.length; i++) {
     const label = items[i];
     const pillW = getRoadmapPillWidth(label);
 
+    // Wrap to second row if it would go outside the card
+    if (currentX + pillW > pillAreaX + pillAreaW) {
+      currentX = pillAreaX;
+      currentY += pillH + rowGap;
+    }
+
     fill("#FBFAF6");
     stroke("#DED6CA");
     strokeWeight(1);
-    rect(currentX, pillY, pillW, 34, 10);
+    rect(currentX, currentY, pillW, pillH, 9);
 
     noStroke();
     fill("#333");
-    textSize(10.5);
+    textSize(10);
     textStyle(BOLD);
     textAlign(CENTER, CENTER);
-    text(label, currentX + pillW / 2, pillY + 17);
+    text(label, currentX + pillW / 2, currentY + pillH / 2);
 
     currentX += pillW + pillGap;
   }
@@ -645,10 +658,11 @@ function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
 }
 
 function getRoadmapPillWidth(label) {
-  if (label.length <= 5) return 62;
-  if (label.length <= 9) return 88;
-  if (label.length <= 13) return 112;
-  return 132;
+  if (label.length <= 4) return 58;
+  if (label.length <= 7) return 72;
+  if (label.length <= 10) return 94;
+  if (label.length <= 14) return 116;
+  return 126;
 }
 
 function drawDownArrow(x, y) {
