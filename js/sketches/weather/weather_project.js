@@ -2522,30 +2522,33 @@ function handleDayContextInteraction() {
 
 function handleContextDaySelector() {
   const days = getContextDayOptions();
+  if (!days.length) return;
 
-  const x = 54;
-  const y = 118;
-  const w = width - 108;
+  const layout = getContextArrowSelectorLayout();
 
-  const cardW = 82;
-  const cardH = 48;
-  const gap = 8;
-  const totalW = days.length * cardW + (days.length - 1) * gap;
-  const startX = x + w - totalW - 24;
-  const startY = y + 25;
+  const firstIndex = days[0].index;
+  const lastIndex = days[days.length - 1].index;
 
-  for (let i = 0; i < days.length; i++) {
-    const dayIndex = days[i].index;
-    const bx = startX + i * (cardW + gap);
+  // Previous day button
+  if (
+    mouseX >= layout.prevX &&
+    mouseX <= layout.prevX + layout.arrowW &&
+    mouseY >= layout.buttonY &&
+    mouseY <= layout.buttonY + layout.buttonH
+  ) {
+    selectedContextDayIndex = max(firstIndex, selectedContextDayIndex - 1);
+    return;
+  }
 
-    if (
-      mouseX >= bx &&
-      mouseX <= bx + cardW &&
-      mouseY >= startY &&
-      mouseY <= startY + cardH
-    ) {
-      selectedContextDayIndex = dayIndex;
-    }
+  // Next day button
+  if (
+    mouseX >= layout.nextX &&
+    mouseX <= layout.nextX + layout.arrowW &&
+    mouseY >= layout.buttonY &&
+    mouseY <= layout.buttonY + layout.buttonH
+  ) {
+    selectedContextDayIndex = min(lastIndex, selectedContextDayIndex + 1);
+    return;
   }
 }
 
@@ -2579,14 +2582,19 @@ function getContextDayOptions() {
 
 function drawContextDaySelector() {
   const days = getContextDayOptions();
+  if (!days.length) return;
 
-  const x = 54;
-  const y = 118;
-  const w = width - 108;
-  const h = 98;
+  const day = getSelectedContextDay();
+  const layout = getContextArrowSelectorLayout();
+
+  const x = layout.x;
+  const y = layout.y;
+  const w = layout.w;
+  const h = layout.h;
 
   drawCard(x, y, w, h, 16);
 
+  // Left text block
   fill("#2f276f");
   noStroke();
   textSize(14);
@@ -2596,47 +2604,129 @@ function drawContextDaySelector() {
   fill("#555");
   textSize(11.2);
   textStyle(NORMAL);
+  textLeading(15);
   text(
-    "This uses the same week from the weekly lens when available.",
+    "Use the arrows to move through the same week from the weekly lens.",
     x + 24,
-    y + 54,
-    300
+    y + 52,
+    250
   );
 
-  const cardW = 82;
-  const cardH = 48;
-  const gap = 8;
-  const totalW = days.length * cardW + (days.length - 1) * gap;
-  const startX = x + w - totalW - 24;
-  const startY = y + 25;
+  // Previous day button
+  drawContextArrowButton(
+    layout.prevX,
+    layout.buttonY,
+    layout.arrowW,
+    layout.buttonH,
+    "←",
+    "Previous"
+  );
 
-  for (let i = 0; i < days.length; i++) {
-    const option = days[i];
-    const day = option.day;
-    const bx = startX + i * (cardW + gap);
-    const active = option.index === selectedContextDayIndex;
+  // Selected day card
+  fill("#4D3F8F");
+  stroke("#4D3F8F");
+  strokeWeight(1.2);
+  rect(layout.dayCardX, layout.buttonY, layout.dayCardW, layout.buttonH, 12);
 
-    fill(active ? "#4D3F8F" : "#FFFFFF");
-    stroke(active ? "#4D3F8F" : "#D9D2C7");
-    strokeWeight(1);
-    rect(bx, startY, cardW, cardH, 12);
+  noStroke();
+  fill("#FFFFFF");
+  textAlign(CENTER, CENTER);
 
-    noStroke();
-    textAlign(CENTER, CENTER);
+  textSize(13);
+  textStyle(BOLD);
+  text(getShortWeekday(day.dateObj), layout.dayCardX + layout.dayCardW / 2, layout.buttonY + 20);
 
-    fill(active ? "#FFFFFF" : "#333");
-    textSize(10.5);
-    textStyle(BOLD);
-    text(getShortWeekday(day.dateObj), bx + cardW / 2, startY + 17);
+  textSize(11);
+  textStyle(NORMAL);
+  text(`${day.monthName} ${day.day}`, layout.dayCardX + layout.dayCardW / 2, layout.buttonY + 42);
 
-    fill(active ? "#FFFFFF" : "#666");
-    textSize(10);
-    textStyle(NORMAL);
-    text(`${day.monthName} ${day.day}`, bx + cardW / 2, startY + 34);
-  }
+  // Next day button
+  drawContextArrowButton(
+    layout.nextX,
+    layout.buttonY,
+    layout.arrowW,
+    layout.buttonH,
+    "→",
+    "Next"
+  );
 
+  textLeading(13);
   textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
+}
+
+function getContextArrowSelectorLayout() {
+  const x = 54;
+  const y = 118;
+  const w = width - 108;
+  const h = 112;
+
+  // Keep the left text block separate from the controls
+  const controlStartX = x + 330;
+  const controlY = y + 30;
+
+  const arrowW = 88;
+  const dayCardW = 170;
+  const buttonH = 54;
+  const gap = 14;
+
+  const totalControlW = arrowW + gap + dayCardW + gap + arrowW;
+  const centeredStartX = x + w - totalControlW - 34;
+
+  return {
+    x: x,
+    y: y,
+    w: w,
+    h: h,
+    buttonY: controlY,
+    arrowW: arrowW,
+    dayCardW: dayCardW,
+    buttonH: buttonH,
+    prevX: centeredStartX,
+    dayCardX: centeredStartX + arrowW + gap,
+    nextX: centeredStartX + arrowW + gap + dayCardW + gap
+  };
+}
+
+function drawContextArrowButton(x, y, w, h, arrow, label) {
+  fill("#FFFFFF");
+  stroke("#D9D2C7");
+  strokeWeight(1.2);
+  rect(x, y, w, h, 12);
+
+  noStroke();
+  fill("#333");
+  textAlign(CENTER, CENTER);
+
+  textSize(16);
+  textStyle(BOLD);
+  text(arrow, x + w / 2, y + 20);
+
+  textSize(9.5);
+  textStyle(NORMAL);
+  text(label, x + w / 2, y + 39);
+
+  textAlign(LEFT, BASELINE);
+}
+
+function getContextDayButtonLayout(cardX, cardY, cardW, dayCount) {
+  const textBlockW = 230;
+  const startX = cardX + 24 + textBlockW;
+  const y = cardY + 29;
+  const rightPadding = 24;
+  const gap = 10;
+  const buttonH = 54;
+
+  const availableW = cardX + cardW - rightPadding - startX;
+  const buttonW = (availableW - gap * (dayCount - 1)) / dayCount;
+
+  return {
+    startX: startX,
+    y: y,
+    buttonW: buttonW,
+    buttonH: buttonH,
+    gap: gap
+  };
 }
 
 function drawContextOverviewCard() {
@@ -2873,9 +2963,9 @@ function getContextThresholdText(key) {
 
 function drawContextTrustNote() {
   const x = 54;
-  const y = 765;
+  const y = 755;
   const w = width - 108;
-  const h = 88;
+  const h = 76;
 
   drawCard(x, y, w, h, 14);
 
@@ -2883,17 +2973,20 @@ function drawContextTrustNote() {
   noStroke();
   textSize(13.5);
   textStyle(BOLD);
-  text("Why this view builds trust", x + 24, y + 32);
+  text("Why this view builds trust", x + 24, y + 29);
 
   fill("#333");
-  textSize(11.7);
+  textSize(11.3);
   textStyle(NORMAL);
+  textLeading(15);
   text(
-    "Earlier views use color, counts, and layer labels to summarize the data. This detail view shows the actual daily values behind those summaries, so readers can check what each layer is based on.",
+    "This detail view shows the actual daily values behind the earlier summaries, so readers can check what each layer is based on.",
     x + 220,
-    y + 26,
+    y + 22,
     w - 250
   );
+
+  textLeading(13);
 }
 
 function drawContextTakeaway() {
@@ -2901,9 +2994,9 @@ function drawContextTakeaway() {
   const activeCount = getAllActiveLayerCount(day);
 
   const x = 54;
-  const y = 830;
+  const y = 850;
   const w = width - 108;
-  const h = 50;
+  const h = 54;
 
   drawCard(x, y, w, h, 14);
 
@@ -2911,15 +3004,15 @@ function drawContextTakeaway() {
   noStroke();
   textSize(13.5);
   textStyle(BOLD);
-  text("Takeaway", x + 24, y + 30);
+  text("Takeaway", x + 24, y + 24);
 
   fill("#333");
-  textSize(12.1);
+  textSize(11.8);
   textStyle(NORMAL);
   text(
     `This day is not explained by one number alone. It has ${activeCount} active layers, showing how multiple ordinary weather conditions can shape a campus day together.`,
     x + 135,
-    y + 30,
+    y + 19,
     w - 170
   );
 }
