@@ -12,13 +12,11 @@ let selectedWeeklyDayIndex = 0;
 let selectedContextDayIndex = -1;
 
 const VIZ_HEIGHTS = {
-  0: 620,   // Opening panel
-  1: 760,   // Viz 1: weather layers
-  2: 780,   // Viz 2: yearly factor pattern
-  3: 1060,  // Viz 3: monthly layer profile needs more vertical room
-  4: 900,   // Viz 4: weekly weather lens
-  5: 980,   // Viz 5: day in context
-  6: 720    // Closing takeaway
+  1: 860,
+  2: 980,
+  3: 760,
+  4: 860,
+  5: 900
 };
 
 let selectedWeekStart = 0;
@@ -1526,8 +1524,6 @@ function drawMonthlyComparisonPanel() {
   drawMonthlyFlaggedDaysProfile();
   drawMonthlyAverageSummary();
   drawMonthlySelectedInsight();
-  drawMonthlyMethodNote();
-  drawMonthlyTakeaway();
 }
 
 function drawMonthButtons() {
@@ -1580,9 +1576,9 @@ function drawMonthlyFlaggedDaysProfile() {
   const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
 
   const chartX = 54;
-  const chartY = 190;
+  const chartY = 175;
   const chartW = width - 108;
-  const chartH = 390;
+  const chartH = 350;
 
   drawCard(chartX, chartY, chartW, chartH, 18);
 
@@ -1598,14 +1594,14 @@ function drawMonthlyFlaggedDaysProfile() {
   text(
     "Bars show how many days each layer crossed its prototype threshold in this month.",
     chartX + 34,
-    chartY + 68,
+    chartY + 74,
     chartW - 68
   );
 
   const plotX = chartX + 82;
-  const plotY = chartY + 130;
+  const plotY = chartY + 165;
   const plotW = chartW - 145;
-  const plotH = 190;
+  const plotH = 135;
 
   const maxDays = getDaysInSelectedMonth(month);
   const maxAxis = max(1, maxDays);
@@ -1628,42 +1624,41 @@ function drawMonthlyFlaggedDaysProfile() {
 
     const c = color(info.color);
 
-    // Icon
+    // icon
     noStroke();
     textAlign(CENTER, CENTER);
-    textSize(23);
-    text(info.icon, centerX, plotY - 43);
+    textSize(22);
+    text(info.icon, centerX, plotY - 58);
 
-    // Factor label
+    // label
     fill("#333");
     textSize(11.5);
     textStyle(BOLD);
-    text(info.shortLabel, centerX, plotY - 20);
+    text(info.shortLabel, centerX, plotY - 28);
 
-    // Background bar
+    // background bar
     fill("#EFEAE2");
     stroke("#D9D2C7");
     strokeWeight(1);
     rect(barX, plotY, barW, plotH, 8);
 
-    // Actual flagged days bar
+    // filled bar
     fill(red(c), green(c), blue(c), 88);
     stroke(info.color);
     strokeWeight(1.6);
     rect(barX, plotY + plotH - barH, barW, barH, 8);
-    strokeWeight(1);
 
-    // Flagged day number
+    // move these UP so they stay inside the card
     noStroke();
     fill("#222");
     textSize(18);
     textStyle(BOLD);
-    text(`${flaggedDays}`, centerX, plotY + plotH + 30);
+    text(`${flaggedDays}`, centerX, plotY + plotH + 22);
 
     fill("#666");
     textSize(10.5);
     textStyle(NORMAL);
-    text("days", centerX, plotY + plotH + 48);
+    text("days", centerX, plotY + plotH + 40);
   }
 
   textAlign(LEFT, BASELINE);
@@ -1709,7 +1704,7 @@ function drawMonthlyAverageSummary() {
   const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
 
   const x = 54;
-  const y = 600;
+  const y = 545;
   const w = width - 108;
   const h = 78;
 
@@ -1739,17 +1734,17 @@ function drawMonthlyAverageSummary() {
 
     fill("#333");
     textSize(15);
-    text(info.icon, centerX, y + 25);
+    text(info.icon, centerX, y + 22);
 
     fill("#333");
     textSize(10.5);
     textStyle(BOLD);
-    text(info.shortLabel, centerX, y + 43);
+    text(info.shortLabel, centerX, y + 42);
 
     fill("#555");
     textSize(10.2);
     textStyle(NORMAL);
-    text(getMonthlyAverageLabel(month, key), centerX, y + 61);
+    text(getMonthlyAverageLabel(month, key), centerX, y + 60);
   }
 
   textAlign(LEFT, BASELINE);
@@ -1765,7 +1760,6 @@ function drawMonthlySelectedInsight() {
 
   for (let i = 1; i < keys.length; i++) {
     const value = getMonthlyFlaggedDays(month, keys[i]);
-
     if (value > highestValue) {
       highestValue = value;
       highestKey = keys[i];
@@ -1774,10 +1768,11 @@ function drawMonthlySelectedInsight() {
 
   const info = FACTORS[highestKey];
 
+  // moved upward
   const x = 54;
-  const y = 698;
+  const y = 655;
   const w = width - 108;
-  const h = 66;
+  const h = 64;
 
   drawCard(x, y, w, h, 14);
 
@@ -1785,7 +1780,7 @@ function drawMonthlySelectedInsight() {
   noStroke();
   textSize(13.5);
   textStyle(BOLD);
-  text("What stands out", x + 24, y + 27);
+  text("What stands out", x + 24, y + 26);
 
   fill("#333");
   textSize(12.1);
@@ -1800,9 +1795,9 @@ function drawMonthlySelectedInsight() {
 
 function drawMonthlyMethodNote() {
   const x = 54;
-  const y = 786;
+  const y = 735;
   const w = width - 108;
-  const h = 122;
+  const h = 118;
 
   drawCard(x, y, w, h, 16);
 
@@ -1864,9 +1859,9 @@ function drawMonthlyMethodNote() {
 
 function drawMonthlyTakeaway() {
   const x = 54;
-  const y = 930;
+  const y = 870;
   const w = width - 108;
-  const h = 58;
+  const h = 60;
 
   drawCard(x, y, w, h, 14);
 
@@ -1874,7 +1869,7 @@ function drawMonthlyTakeaway() {
   noStroke();
   textSize(13.5);
   textStyle(BOLD);
-  text("Why this matters", x + 28, y + 23);
+  text("Why this matters", x + 28, y + 24);
 
   fill("#333");
   textSize(12.2);
@@ -1910,30 +1905,12 @@ function getMonthlyFlaggedDays(month, key) {
 }
 
 function getMonthlyAverageLabel(month, key) {
-  if (key === "rain") {
-    return `avg ${nf(month.rain, 1, 2)} in`;
-  }
-
-  if (key === "cloud") {
-    return `avg ${nf(month.cloud, 1, 0)}%`;
-  }
-
-  if (key === "daylight") {
-    return `avg ${nf(month.daylight, 1, 1)} hrs`;
-  }
-
-  if (key === "solar") {
-    return `avg ${nf(month.solar, 1, 1)} MJ/m²`;
-  }
-
-  if (key === "wind") {
-    return `avg ${nf(month.wind, 1, 1)} mph`;
-  }
-
-  if (key === "temp") {
-    return `comfort range`;
-  }
-
+  if (key === "rain") return `avg ${nf(month.rain, 1, 2)} in`;
+  if (key === "cloud") return `avg ${nf(month.cloud, 1, 0)}%`;
+  if (key === "daylight") return `avg ${nf(month.daylight, 1, 1)} hrs`;
+  if (key === "solar") return `avg ${nf(month.solar, 1, 1)} MJ/m²`;
+  if (key === "wind") return `avg ${nf(month.wind, 1, 1)} mph`;
+  if (key === "temp") return `comfort range`;
   return "";
 }
 
