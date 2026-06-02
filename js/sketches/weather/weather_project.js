@@ -356,19 +356,19 @@ function setupSectionObserver() {
 
 function drawLoading() {
   fill("#222");
-  textSize(20);
+  textSize(20 * 1.15);
   text("Loading Seattle weather data...", 40, 60);
 }
 
 function drawMainTitle(title, subtitle) {
   fill("#222");
   noStroke();
-  textSize(25);
+  textSize(25 * 1.15);
   textStyle(BOLD);
   text(title, 68, 48, width - 110);
 
   textStyle(NORMAL);
-  textSize(13);
+  textSize(13 * 1.15);
   fill("#555");
   text(subtitle, 68, 80, width - 110);
 }
@@ -379,7 +379,7 @@ function drawSectionNumber(num, x, y) {
   circle(x, y, 26);
 
   fill("#FFFFFF");
-  textSize(14);
+  textSize(14 * 1.15);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
   text(num, x, y + 1);
@@ -443,11 +443,11 @@ function drawRoundedButton(x, y, w, h, label, icon, active, colorValue) {
   noStroke();
   textAlign(CENTER, CENTER);
 
-  textSize(19);
+  textSize(19 * 1.15);
   text(icon, x + w / 2, y + 21);
 
   fill(active ? "#2f276f" : "#333");
-  textSize(10.5);
+  textSize(10.5 * 1.15);
   textStyle(active ? BOLD : NORMAL);
   text(label, x + w / 2, y + h - 14);
 
@@ -504,12 +504,12 @@ function drawOpeningPanel() {
   fill("#222");
   noStroke();
   textStyle(BOLD);
-  textSize(30);
+  textSize(30 * 1.15);
   text("BEYOND THE FORECAST", cardX + 38, cardY + 62);
 
   fill("#555");
   textStyle(NORMAL);
-  textSize(14);
+  textSize(14 * 1.15);
   text(
     "A roadmap for reading Seattle weather as layers, not as one score.",
     cardX + 38,
@@ -529,7 +529,7 @@ function drawOpeningPanel() {
   rect(stripX, stripY, stripW, stripH, 12);
 
   fill("#333");
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
   text(
@@ -596,7 +596,7 @@ function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
   circle(x + 28, y + 30, 28);
 
   fill("#FFFFFF");
-  textSize(13);
+  textSize(13 * 1.15);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
   text(num, x + 28, y + 30);
@@ -605,12 +605,12 @@ function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
 
   // Left text area
   fill("#2f276f");
-  textSize(14.5);
+  textSize(14.5 * 1.15);
   textStyle(BOLD);
   text(title, x + 52, y + 28);
 
   fill("#555");
-  textSize(11.2);
+  textSize(11.2 * 1.15);
   textStyle(NORMAL);
   text(subtitle, x + 52, y + 48, 260);
 
@@ -643,7 +643,7 @@ function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
 
     noStroke();
     fill("#333");
-    textSize(10);
+    textSize(10 * 1.15);
     textStyle(BOLD);
     textAlign(CENTER, CENTER);
     text(label, currentX + pillW / 2, currentY + pillH / 2);
@@ -738,7 +738,7 @@ function drawOpeningColumn(x, y, w, num, title, items) {
   circle(x + 15, y - 4, 28);
 
   fill("#FFFFFF");
-  textSize(13);
+  textSize(13 * 1.15);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
   text(num, x + 15, y - 4);
@@ -746,7 +746,7 @@ function drawOpeningColumn(x, y, w, num, title, items) {
   textAlign(LEFT, BASELINE);
 
   fill("#2f276f");
-  textSize(15);
+  textSize(15 * 1.15);
   textStyle(BOLD);
   text(title, x + 38, y + 2);
 
@@ -762,7 +762,7 @@ function drawOpeningColumn(x, y, w, num, title, items) {
 
     noStroke();
     fill("#333");
-    textSize(11.5);
+    textSize(11.5 * 1.15);
     textStyle(NORMAL);
     text(items[i], x + 12, itemY + 17);
   }
@@ -836,7 +836,7 @@ function getForecastIcon(day) {
 function drawForecastCard(day, x, y, w, h) {
   fill("#2f276f");
   noStroke();
-  textSize(13);
+  textSize(13 * 1.15);
   textStyle(BOLD);
   text("WHAT THE FORECAST SHOWS", x, y - 12);
 
@@ -856,22 +856,22 @@ function drawForecastCard(day, x, y, w, h) {
   noStroke();
 
   fill("#333");
-  textSize(12);
+  textSize(12 * 1.15);
   textStyle(BOLD);
   text(day.date, innerX + 18, innerY + 38);
 
-  textSize(34);
+  textSize(34 * 1.15);
   textStyle(BOLD);
   fill("#222");
   text(`${Math.round(day.feelslike)}°F`, innerX + 18, innerY + 90);
 
-  textSize(30);
+  textSize(30 * 1.15);
   textAlign(CENTER, CENTER);
   text(getForecastIcon(day), innerX + innerW - 42, innerY + 72);
   textAlign(LEFT, BASELINE);
 
   fill("#444");
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(NORMAL);
   text(day.conditions, innerX + 18, innerY + 124, innerW - 36);
 
@@ -892,16 +892,16 @@ function drawForecastCard(day, x, y, w, h) {
     const [icon, label, value] = rows[i];
 
     fill("#333");
-    textSize(12.5);
+    textSize(12.5 * 1.15);
     text(icon, innerX + 18, rowY);
 
     fill("#555");
-    textSize(11.5);
+    textSize(11.5 * 1.15);
     text(label, innerX + 48, rowY);
 
     fill("#222");
     textAlign(RIGHT, BASELINE);
-    textSize(11.5);
+    textSize(11.5 * 1.15);
     text(value, innerX + innerW - 18, rowY);
     textAlign(LEFT, BASELINE);
 
@@ -916,7 +916,7 @@ function drawForecastCard(day, x, y, w, h) {
   rect(innerX + 14, noteY, innerW - 28, noteH, 10);
 
   fill("#555");
-  textSize(10.6);
+  textSize(10.6 * 1.15);
   textStyle(NORMAL);
   text(
     "Useful numbers, but still shown as separate pieces.",
@@ -941,7 +941,7 @@ function drawConnectionArrow(x, y) {
   rect(x - 42, y - 48, 84, 28, 9);
 
   fill("#555");
-  textSize(10.5);
+  textSize(10.5 * 1.15);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
   text("connect", x, y - 34);
@@ -952,7 +952,7 @@ function drawConnectionArrow(x, y) {
   rect(x - 42, y + 22, 84, 28, 9);
 
   fill("#555");
-  textSize(10.5);
+  textSize(10.5 * 1.15);
   textStyle(BOLD);
   text("as layers", x, y + 36);
 
@@ -963,7 +963,7 @@ function drawConnectionArrow(x, y) {
 function drawLayerStack(day, x, y, w, h) {
   fill("#2f276f");
   noStroke();
-  textSize(13);
+  textSize(13 * 1.15);
   textStyle(BOLD);
   text("WHAT THE FORECAST DOESN'T CONNECT", x, y - 12);
 
@@ -976,7 +976,7 @@ function drawLayerStack(day, x, y, w, h) {
 
   fill("#444");
   noStroke();
-  textSize(11.4);
+  textSize(11.4 * 1.15);
   textStyle(NORMAL);
   text(
     "Each row is one weather layer. Present means the layer crossed our prototype campus-experience threshold.",
@@ -1017,19 +1017,19 @@ function drawLayerStack(day, x, y, w, h) {
     noStroke();
 
     fill(active ? "#222" : "#888");
-    textSize(16);
+    textSize(16 * 1.15);
     textAlign(CENTER, CENTER);
     text(info.icon, innerX + 30, yy + layerH / 2);
 
     textAlign(LEFT, CENTER);
 
     fill(active ? "#222" : "#666");
-    textSize(12.2);
+    textSize(12.2 * 1.15);
     textStyle(BOLD);
     text(info.label, innerX + 58, yy + layerH / 2 - 10);
 
     fill(active ? "#444" : "#777");
-    textSize(10.2);
+    textSize(10.2 * 1.15);
     textStyle(NORMAL);
     text(getLayerActualValue(day, key), innerX + 58, yy + layerH / 2 + 8);
 
@@ -1045,7 +1045,7 @@ function drawLayerStack(day, x, y, w, h) {
 
       noStroke();
       fill("#222");
-      textSize(9.8);
+      textSize(9.8 * 1.15);
       textStyle(BOLD);
       textAlign(CENTER, CENTER);
       text("layer present", badgeX + badgeW / 2, badgeY + badgeH / 2);
@@ -1056,7 +1056,7 @@ function drawLayerStack(day, x, y, w, h) {
 
       noStroke();
       fill("#777");
-      textSize(9.8);
+      textSize(9.8 * 1.15);
       textStyle(NORMAL);
       textAlign(CENTER, CENTER);
       text("not present", badgeX + badgeW / 2, badgeY + badgeH / 2);
@@ -1072,7 +1072,7 @@ function drawLayerStack(day, x, y, w, h) {
   rect(innerX, noteY, innerW, noteH, 12);
 
   fill("#444");
-  textSize(10.8);
+  textSize(10.8 * 1.15);
   textStyle(NORMAL);
   textLeading(15);
   text(
@@ -1105,12 +1105,12 @@ function drawVizOneTakeaway(y) {
   drawCard(x, y, w, 64, 14);
 
   fill("#2f276f");
-  textSize(14);
+  textSize(14 * 1.15);
   textStyle(BOLD);
   text("Takeaway", x + 26, y + 28);
 
   fill("#333");
-  textSize(12.3);
+  textSize(12.3 * 1.15);
   textStyle(NORMAL);
   text(
     "The forecast is useful, but the campus experience comes from how weather layers appear together. This view keeps those layers visible instead of turning them into one score.",
@@ -1296,12 +1296,12 @@ function drawYearlyLineChart() {
 
   fill("#222");
   noStroke();
-  textSize(18);
+  textSize(18 * 1.15);
   textStyle(BOLD);
   text(metric.title, chartX, chartY - 16);
 
   fill("#555");
-  textSize(12.5);
+  textSize(12.5 * 1.15);
   textStyle(NORMAL);
   text(metric.subtitle, chartX, chartY + 5);
 
@@ -1334,7 +1334,7 @@ function drawYearlyLineChart() {
     const labelValue = map(i, 0, 4, paddedMax, paddedMin);
     noStroke();
     fill("#666");
-    textSize(10.5);
+    textSize(10.5 * 1.15);
     textAlign(RIGHT, CENTER);
     text(formatAxisValue(labelValue, selectedFactor), plotX - 10, gy);
     stroke("#E7E0D6");
@@ -1348,7 +1348,7 @@ function drawYearlyLineChart() {
   // Y-axis label
   noStroke();
   fill("#555");
-  textSize(10.5);
+  textSize(10.5 * 1.15);
   textAlign(CENTER, CENTER);
   push();
   translate(chartX + 8, plotY + plotH / 2);
@@ -1385,7 +1385,7 @@ function drawYearlyLineChart() {
 
     noStroke();
     fill("#555");
-    textSize(11);
+    textSize(11 * 1.15);
     textAlign(CENTER, CENTER);
     text(monthlyData[i].monthName[0], px, plotY + plotH + 24);
   }
@@ -1394,7 +1394,7 @@ function drawYearlyLineChart() {
   textAlign(LEFT, BASELINE);
   fill("#555");
   noStroke();
-  textSize(11.5);
+  textSize(11.5 * 1.15);
   textStyle(NORMAL);
   text(
     `Observed range: ${formatYearlyValue(minVal, selectedFactor)} – ${formatYearlyValue(maxVal, selectedFactor)}`,
@@ -1413,7 +1413,7 @@ function drawYearlyLineChart() {
   rect(noteX, noteY, noteW, noteH, 10);
 
   fill("#444");
-  textSize(11.5);
+  textSize(11.5 * 1.15);
   textStyle(NORMAL);
   textLeading(15);
   text(
@@ -1468,23 +1468,23 @@ function drawYearlyAnnotationCard() {
 
   fill("#2f276f");
   noStroke();
-  textSize(15.5);
+  textSize(15.5 * 1.15);
   textStyle(BOLD);
   text("WHAT TO NOTICE", x + 18, y + 30);
 
   fill("#222");
-  textSize(28);
+  textSize(28 * 1.15);
   textAlign(CENTER);
   text(info.icon, x + w / 2, y + 75);
   textAlign(LEFT);
 
   fill("#333");
-  textSize(15);
+  textSize(15 * 1.15);
   textStyle(BOLD);
   text(info.label, x + 18, y + 112);
 
   fill("#555");
-  textSize(12.5);
+  textSize(12.5 * 1.15);
   textStyle(NORMAL);
   textLeading(16);
   text(metric.explanation, x + 18, y + 138, w - 36);
@@ -1492,12 +1492,12 @@ function drawYearlyAnnotationCard() {
   drawMiniDivider(x + 18, y + h - 100, x + w - 18, y + h - 100);
 
   fill("#2f276f");
-  textSize(12.5);
+  textSize(12.5 * 1.15);
   textStyle(BOLD);
   text("Data shown", x + 18, y + h - 70);
 
   fill("#555");
-  textSize(12.3);
+  textSize(12.3 * 1.15);
   textStyle(NORMAL);
   text(
     `${metric.yLabel}, measured in ${metric.unit}.`,
@@ -1565,7 +1565,7 @@ function drawMonthButtons() {
 
     noStroke();
     fill(active ? "#FFFFFF" : "#333");
-    textSize(11.5);
+    textSize(11.5 * 1.15);
     textStyle(active ? BOLD : NORMAL);
     textAlign(CENTER, CENTER);
     text(month.monthName, x + w / 2, y + h / 2);
@@ -1604,12 +1604,12 @@ function drawMonthlyFlaggedDaysProfile() {
 
   fill("#222");
   noStroke();
-  textSize(20);
+  textSize(20 * 1.15);
   textStyle(BOLD);
   text(`${month.monthName} Weather Layer Profile`, chartX + 34, chartY + 42);
 
   fill("#555");
-  textSize(12.2);
+  textSize(12.2 * 1.15);
   textStyle(NORMAL);
   text(
     "Bars show how many days each layer crossed its prototype threshold in this month.",
@@ -1647,12 +1647,12 @@ function drawMonthlyFlaggedDaysProfile() {
     // icon
     noStroke();
     textAlign(CENTER, CENTER);
-    textSize(22);
+    textSize(22 * 1.15);
     text(info.icon, centerX, plotY - 58);
 
     // label
     fill("#333");
-    textSize(11.5);
+    textSize(11.5 * 1.15);
     textStyle(BOLD);
     text(info.shortLabel, centerX, plotY - 28);
 
@@ -1671,12 +1671,12 @@ function drawMonthlyFlaggedDaysProfile() {
     // move these UP so they stay inside the card
     noStroke();
     fill("#222");
-    textSize(18);
+    textSize(18 * 1.15);
     textStyle(BOLD);
     text(`${flaggedDays}`, centerX, plotY + plotH + 22);
 
     fill("#666");
-    textSize(10.5);
+    textSize(10.5 * 1.15);
     textStyle(NORMAL);
     text("days", centerX, plotY + plotH + 40);
   }
@@ -1702,7 +1702,7 @@ function drawFlaggedDaysAxis(x, y, h, maxDays, plotW) {
 
     noStroke();
     fill("#666");
-    textSize(10.5);
+    textSize(10.5 * 1.15);
     textAlign(RIGHT, CENTER);
     text(value, x - 12, ty);
   }
@@ -1711,7 +1711,7 @@ function drawFlaggedDaysAxis(x, y, h, maxDays, plotW) {
   translate(x - 50, y + h / 2);
   rotate(-HALF_PI);
   fill("#555");
-  textSize(10.8);
+  textSize(10.8 * 1.15);
   textAlign(CENTER, CENTER);
   text("Flagged days", 0, 0);
   pop();
@@ -1732,12 +1732,12 @@ function drawMonthlyAverageSummary() {
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
   text("Monthly averages", x + 24, y + 29);
 
   fill("#555");
-  textSize(10.8);
+  textSize(10.8 * 1.15);
   textStyle(NORMAL);
   text("Raw values behind the flagged-day view", x + 24, y + 50);
 
@@ -1753,16 +1753,16 @@ function drawMonthlyAverageSummary() {
     textAlign(CENTER, BASELINE);
 
     fill("#333");
-    textSize(15);
+    textSize(15 * 1.15);
     text(info.icon, centerX, y + 22);
 
     fill("#333");
-    textSize(10.5);
+    textSize(10.5 * 1.15);
     textStyle(BOLD);
     text(info.shortLabel, centerX, y + 42);
 
     fill("#555");
-    textSize(10.2);
+    textSize(10.2 * 1.15);
     textStyle(NORMAL);
     text(getMonthlyAverageLabel(month, key), centerX, y + 60);
   }
@@ -1798,12 +1798,12 @@ function drawMonthlySelectedInsight() {
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
   text("What stands out", x + 24, y + 26);
 
   fill("#333");
-  textSize(12.1);
+  textSize(12.1 * 1.15);
   textStyle(NORMAL);
   text(
     `${info.label} appears most often in ${month.monthName}, with ${highestValue} flagged days. This suggests which layer showed up most frequently in this month.`,
@@ -1823,12 +1823,12 @@ function drawMonthlyMethodNote() {
 
   fill("#2f276f");
   noStroke();
-  textSize(14);
+  textSize(14 * 1.15);
   textStyle(BOLD);
   text("How flagged days are defined", x + 24, y + 30);
 
   fill("#555");
-  textSize(11.1);
+  textSize(11.1 * 1.15);
   textStyle(NORMAL);
   text(
     "A flagged day means that a layer crossed our prototype campus-experience threshold. These thresholds are used for exploration, not as a universal weather score.",
@@ -1866,12 +1866,12 @@ function drawMonthlyMethodNote() {
     rect(cx, cy, cardW, cardH, 10);
 
     fill("#333");
-    textSize(10.6);
+    textSize(10.6 * 1.15);
     textStyle(BOLD);
     text(`${icon} ${label}`, cx + 12, cy + 13);
 
     fill("#666");
-    textSize(10);
+    textSize(10 * 1.15);
     textStyle(NORMAL);
     text(rule, cx + 12, cy + 27);
   }
@@ -1887,12 +1887,12 @@ function drawMonthlyTakeaway() {
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
   text("Why this matters", x + 28, y + 24);
 
   fill("#333");
-  textSize(12.2);
+  textSize(12.2 * 1.15);
   textStyle(NORMAL);
   text(
     "This profile separates frequency from raw intensity. A month can stand out because one layer appears often, even if no single weather number looks extreme.",
@@ -1990,12 +1990,12 @@ function drawWeeklyFactorControls() {
 
   fill("#2f276f");
   noStroke();
-  textSize(15);
+  textSize(15 * 1.15);
   textStyle(BOLD);
   text("Choose your weather layers", x + 26, y + 32);
 
   fill("#555");
-  textSize(11.5);
+  textSize(11.5 * 1.15);
   textStyle(NORMAL);
   text(
     "Select the factors that matter most to your routine. The weekly view updates based on your choices.",
@@ -2038,10 +2038,10 @@ function drawWeeklyFactorControls() {
     fill(active ? "#222" : "#666");
     textAlign(CENTER, CENTER);
 
-    textSize(14);
+    textSize(14 * 1.15);
     text(info.icon, bx + buttonW * 0.25, buttonY + buttonH / 2);
 
-    textSize(10.5);
+    textSize(10.5 * 1.15);
     textStyle(active ? BOLD : NORMAL);
     text(info.shortLabel, bx + buttonW * 0.62, buttonY + buttonH / 2);
 
@@ -2161,7 +2161,7 @@ function drawWeeklyTimeline() {
 
   fill("#333");
   noStroke();
-  textSize(15);
+  textSize(15 * 1.15);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
 
@@ -2203,7 +2203,7 @@ function drawWeekNavButton(x, y, label) {
 
   noStroke();
   fill("#333");
-  textSize(11.5);
+  textSize(11.5 * 1.15);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
   text(label, x + 40, y + 17);
@@ -2229,22 +2229,22 @@ function drawWeeklyDayCard(day, x, y, w, h, count, selected) {
 
   fill(selected ? "#2f276f" : "#333");
   textAlign(CENTER, CENTER);
-  textSize(12);
+  textSize(12 * 1.15);
   textStyle(BOLD);
   text(getShortWeekday(day.dateObj), x + w / 2, y + 22);
 
   fill("#555");
-  textSize(10.5);
+  textSize(10.5 * 1.15);
   textStyle(NORMAL);
   text(`${day.monthName} ${day.day}`, x + w / 2, y + 40);
 
   fill("#222");
-  textSize(23);
+  textSize(23 * 1.15);
   textStyle(BOLD);
   text(`${count}`, x + w / 2, y + 68);
 
   fill("#555");
-  textSize(10);
+  textSize(10 * 1.15);
   textStyle(NORMAL);
   text("selected", x + w / 2, y + 89);
   text("layers", x + w / 2, y + 104);
@@ -2252,7 +2252,7 @@ function drawWeeklyDayCard(day, x, y, w, h, count, selected) {
   drawWeeklyLayerDots(day, x + w / 2, y + 132);
 
   fill("#333");
-  textSize(10.2);
+  textSize(10.2 * 1.15);
   text(
     `${Math.round(day.feelslike)}°F`,
     x + w / 2,
@@ -2326,17 +2326,17 @@ function drawWeeklyDayDetail() {
 
   fill("#2f276f");
   noStroke();
-  textSize(14);
+  textSize(14 * 1.15);
   textStyle(BOLD);
   text("Selected day", x + 24, y + 27);
 
   fill("#222");
-  textSize(17);
+  textSize(17 * 1.15);
   textStyle(BOLD);
   text(`${getShortWeekday(day.dateObj)}, ${day.monthName} ${day.day}`, x + 24, y + 55);
 
   fill("#555");
-  textSize(11.2);
+  textSize(11.2 * 1.15);
   textStyle(NORMAL);
   text(
     "The details show which selected layers were present on this day.",
@@ -2377,13 +2377,13 @@ function drawWeeklyDayDetail() {
 
     noStroke();
     fill(present ? "#222" : "#666");
-    textSize(10.3);
+    textSize(10.3 * 1.15);
     textStyle(present ? BOLD : NORMAL);
     text(`${info.icon} ${info.shortLabel}`, cx + 12, cy + 19);
 
     fill(present ? "#2f276f" : "#777");
     textAlign(RIGHT, BASELINE);
-    textSize(9.8);
+    textSize(9.8 * 1.15);
     text(present ? "present" : "not present", cx + chipW - 10, cy + 19);
     textAlign(LEFT, BASELINE);
   }
@@ -2401,12 +2401,12 @@ function drawWeeklyLensGuide() {
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
   text("How to read this view", x + 24, y + 27);
 
   fill("#333");
-  textSize(11.3);
+  textSize(11.3 * 1.15);
   textStyle(NORMAL);
   textLeading(15);
   text(
@@ -2439,7 +2439,7 @@ function drawWeeklyDotLegend(x, y) {
 
     noStroke();
     fill("#555");
-    textSize(10.5);
+    textSize(10.5 * 1.15);
     text(label, currentX + 10, y + 4);
 
     currentX += 145;
@@ -2456,12 +2456,12 @@ function drawWeeklyLensTakeaway() {
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
   text("Why this matters", x + 24, y + 23);
 
   fill("#333");
-  textSize(11.7);
+  textSize(11.7 * 1.15);
   textStyle(NORMAL);
   text(
     "The same week can look different depending on whether a reader cares most about wet walking, low daylight, gray skies, wind, or temperature comfort.",
@@ -2522,33 +2522,27 @@ function handleDayContextInteraction() {
 
 function handleContextDaySelector() {
   const days = getContextDayOptions();
-  if (!days.length) return;
 
-  const layout = getContextArrowSelectorLayout();
+  const x = 54;
+  const y = 118;
+  const w = width - 108;
 
-  const firstIndex = days[0].index;
-  const lastIndex = days[days.length - 1].index;
+  // Use the exact same button layout as drawContextDaySelector()
+  const buttonLayout = getContextDayButtonLayout(x, y, w, days.length);
 
-  // Previous day button
-  if (
-    mouseX >= layout.prevX &&
-    mouseX <= layout.prevX + layout.arrowW &&
-    mouseY >= layout.buttonY &&
-    mouseY <= layout.buttonY + layout.buttonH
-  ) {
-    selectedContextDayIndex = max(firstIndex, selectedContextDayIndex - 1);
-    return;
-  }
+  for (let i = 0; i < days.length; i++) {
+    const dayIndex = days[i].index;
+    const bx = buttonLayout.startX + i * (buttonLayout.buttonW + buttonLayout.gap);
 
-  // Next day button
-  if (
-    mouseX >= layout.nextX &&
-    mouseX <= layout.nextX + layout.arrowW &&
-    mouseY >= layout.buttonY &&
-    mouseY <= layout.buttonY + layout.buttonH
-  ) {
-    selectedContextDayIndex = min(lastIndex, selectedContextDayIndex + 1);
-    return;
+    if (
+      mouseX >= bx &&
+      mouseX <= bx + buttonLayout.buttonW &&
+      mouseY >= buttonLayout.y &&
+      mouseY <= buttonLayout.y + buttonLayout.buttonH
+    ) {
+      selectedContextDayIndex = dayIndex;
+      return;
+    }
   }
 }
 
@@ -2597,12 +2591,12 @@ function drawContextDaySelector() {
   // Left text block
   fill("#2f276f");
   noStroke();
-  textSize(14);
+  textSize(14 * 1.15);
   textStyle(BOLD);
   text("Choose a day to inspect", x + 24, y + 30);
 
   fill("#555");
-  textSize(11.2);
+  textSize(11.2 * 1.15);
   textStyle(NORMAL);
   textLeading(15);
   text(
@@ -2632,11 +2626,11 @@ function drawContextDaySelector() {
   fill("#FFFFFF");
   textAlign(CENTER, CENTER);
 
-  textSize(13);
+  textSize(13 * 1.15);
   textStyle(BOLD);
   text(getShortWeekday(day.dateObj), layout.dayCardX + layout.dayCardW / 2, layout.buttonY + 20);
 
-  textSize(11);
+  textSize(11 * 1.15);
   textStyle(NORMAL);
   text(`${day.monthName} ${day.day}`, layout.dayCardX + layout.dayCardW / 2, layout.buttonY + 42);
 
@@ -2698,11 +2692,11 @@ function drawContextArrowButton(x, y, w, h, arrow, label) {
   fill("#333");
   textAlign(CENTER, CENTER);
 
-  textSize(16);
+  textSize(16 * 1.15);
   textStyle(BOLD);
   text(arrow, x + w / 2, y + 20);
 
-  textSize(9.5);
+  textSize(9.5 * 1.15);
   textStyle(NORMAL);
   text(label, x + w / 2, y + 39);
 
@@ -2741,32 +2735,32 @@ function drawContextOverviewCard() {
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
   text("Selected day", x + 24, y + 30);
 
   fill("#222");
-  textSize(22);
+  textSize(22 * 1.15);
   textStyle(BOLD);
   text(`${getShortWeekday(day.dateObj)}, ${day.monthName} ${day.day}`, x + 24, y + 70);
 
   fill("#555");
-  textSize(11.5);
+  textSize(11.5 * 1.15);
   textStyle(NORMAL);
   text(day.date, x + 24, y + 95);
 
-  textSize(42);
+  textSize(42 * 1.15);
   textStyle(BOLD);
   fill("#222");
   text(`${Math.round(day.feelslike)}°F`, x + 24, y + 152);
 
-  textSize(34);
+  textSize(34 * 1.15);
   textAlign(CENTER, CENTER);
   text(getForecastIcon(day), x + w - 58, y + 135);
   textAlign(LEFT, BASELINE);
 
   fill("#555");
-  textSize(12.2);
+  textSize(12.2 * 1.15);
   textStyle(NORMAL);
   text(day.conditions || "No condition label", x + 24, y + 184, w - 48);
 
@@ -2775,7 +2769,7 @@ function drawContextOverviewCard() {
   rect(x + 24, y + h - 44, w - 48, 30, 9);
 
   fill("#444");
-  textSize(10.8);
+  textSize(10.8 * 1.15);
   textAlign(CENTER, CENTER);
   text(
     `${getAllActiveLayerCount(day)} of 6 layers present`,
@@ -2798,12 +2792,12 @@ function drawContextRawValues() {
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
   text("Raw weather values", x + 24, y + 30);
 
   fill("#555");
-  textSize(11.2);
+  textSize(11.2 * 1.15);
   textStyle(NORMAL);
   text(
     "These values come directly from the cleaned daily weather dataset.",
@@ -2844,21 +2838,21 @@ function drawContextRawValues() {
     noStroke();
 
     fill("#333");
-    textSize(14);
+    textSize(14 * 1.15);
     text(icon, cx + 12, cy + 24);
 
     fill("#333");
-    textSize(10.6);
+    textSize(10.6 * 1.15);
     textStyle(BOLD);
     text(label, cx + 34, cy + 21);
 
     fill("#222");
-    textSize(12.2);
+    textSize(12.2 * 1.15);
     textStyle(BOLD);
     text(value, cx + 34, cy + 43);
 
     fill("#777");
-    textSize(9.6);
+    textSize(9.6 * 1.15);
     textStyle(NORMAL);
     textAlign(RIGHT, BASELINE);
     text(layer, cx + cardW - 10, cy + 43);
@@ -2880,12 +2874,12 @@ function drawContextLayerExplanation() {
 
   fill("#2f276f");
   noStroke();
-  textSize(14);
+  textSize(14 * 1.15);
   textStyle(BOLD);
   text("Which layers are present on this day?", x + 24, y + 30);
 
   fill("#555");
-  textSize(11.2);
+  textSize(11.2 * 1.15);
   textStyle(NORMAL);
   text(
     "A layer is present when the raw value crosses our prototype threshold.",
@@ -2929,17 +2923,17 @@ function drawContextLayerExplanation() {
     noStroke();
 
     fill(present ? "#222" : "#666");
-    textSize(11.6);
+    textSize(11.6 * 1.15);
     textStyle(BOLD);
     text(`${info.icon} ${info.label}`, cx + 14, cy + 20);
 
     fill(present ? "#2f276f" : "#777");
-    textSize(10.2);
+    textSize(10.2 * 1.15);
     textStyle(NORMAL);
     text(getContextThresholdText(key), cx + 14, cy + 39);
 
     textAlign(RIGHT, BASELINE);
-    textSize(10.4);
+    textSize(10.4 * 1.15);
     textStyle(present ? BOLD : NORMAL);
     text(present ? "present" : "not present", cx + cardW - 14, cy + 39);
     textAlign(LEFT, BASELINE);
@@ -2971,12 +2965,12 @@ function drawContextTrustNote() {
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
   text("Why this view builds trust", x + 24, y + 29);
 
   fill("#333");
-  textSize(11.3);
+  textSize(11.3 * 1.15);
   textStyle(NORMAL);
   textLeading(15);
   text(
@@ -3002,12 +2996,12 @@ function drawContextTakeaway() {
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
   text("Takeaway", x + 24, y + 24);
 
   fill("#333");
-  textSize(11.8);
+  textSize(11.8 * 1.15);
   textStyle(NORMAL);
   text(
     `This day is not explained by one number alone. It has ${activeCount} active layers, showing how multiple ordinary weather conditions can shape a campus day together.`,
@@ -3053,12 +3047,12 @@ function drawPlaceholderPanel() {
   drawCard(70, 150, width - 140, 320, 18);
 
   fill("#2f276f");
-  textSize(24);
+  textSize(24 * 1.15);
   textStyle(BOLD);
   text("Coming in the next commit", 105, 220);
 
   fill("#444");
-  textSize(16);
+  textSize(16 * 1.15);
   textStyle(NORMAL);
   text(
     "The first three visualizations are now implemented: weather layers, yearly factor patterns, and monthly factor comparison.",
@@ -3072,7 +3066,7 @@ function drawPlaceholderPanel() {
   rect(105, 350, width - 210, 52, 12);
 
   fill("#333");
-  textSize(14);
+  textSize(14 * 1.15);
   text(
     "Next: weekly weather lens + day-in-context detail view.",
     130,
