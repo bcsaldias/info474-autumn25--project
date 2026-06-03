@@ -353,6 +353,317 @@ function setupSectionObserver() {
 /* -------------------------
    Drawing helpers
 -------------------------- */
+function measureWrappedTextHeight(str, boxWidth, fontSize = 12, leading = 16) {
+  push();
+  textSize(fontSize);
+  textStyle(NORMAL);
+  textLeading(leading);
+
+  const words = str.split(" ");
+  let line = "";
+  let lines = 1;
+
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + " ";
+    const testWidth = textWidth(testLine);
+
+    if (testWidth > boxWidth && i > 0) {
+      lines++;
+      line = words[i] + " ";
+    } else {
+      line = testLine;
+    }
+  }
+
+  pop();
+  return lines * leading;
+}
+
+function measureTextBlockHeight(blocks, innerWidth) {
+  // blocks = [{text, size, leading, gapAfter}]
+  let total = 0;
+
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i];
+    total += measureWrappedTextHeight(
+      b.text,
+      innerWidth,
+      b.size || 12,
+      b.leading || 16
+    );
+    total += b.gapAfter || 0;
+  }
+
+  return total;
+}
+function drawAutoTextCard({
+  x,
+  y,
+  w,
+  title = "",
+  icon = "",
+  body = "",
+  footerTitle = "",
+  footerBody = "",
+  minH = 120,
+  padding = 18,
+  titleSize = 15,
+  bodySize = 12.5,
+  bodyLeading = 16,
+  footerTitleSize = 12,
+  footerBodySize = 12,
+  footerLeading = 15
+}) {
+  const innerW = w - padding * 2;
+
+  let contentH = 0;
+
+  if (title) {
+    contentH += 26;
+  }
+
+  if (icon) {
+    contentH += 28;
+  }
+
+  if (body) {
+    contentH += measureWrappedTextHeight(body, innerW, bodySize, bodyLeading);
+    contentH += 14;
+  }
+
+  if (footerTitle || footerBody) {
+    contentH += 12;
+    contentH += 1; // divider visual spacing
+    contentH += 14;
+  }
+
+  if (footerTitle) {
+    contentH += 18;
+  }
+
+  if (footerBody) {
+    contentH += measureWrappedTextHeight(
+      footerBody,
+      innerW,
+      footerBodySize,
+      footerLeading
+    );
+  }
+
+  const h = max(minH, contentH + padding * 2);
+
+  drawCard(x, y, w, h, 16);
+
+  let cy = y + padding + 8;
+
+  if (title) {
+    fill("#2f276f");
+    noStroke();
+    textSize(titleSize * 1.15);
+    textStyle(BOLD);
+    text(title, x + padding, cy);
+    cy += 28;
+  }
+
+  if (icon) {
+    fill("#222");
+    textSize(24 * 1.15);
+    textAlign(CENTER, CENTER);
+    text(icon, x + w / 2, cy + 4);
+    textAlign(LEFT, BASELINE);
+    cy += 28;
+  }
+
+  if (body) {
+    fill("#555");
+    textSize(bodySize * 1.15);
+    textStyle(NORMAL);
+    textLeading(bodyLeading);
+    text(body, x + padding, cy, innerW);
+    cy += measureWrappedTextHeight(body, innerW, bodySize * 1.15, bodyLeading) + 14;
+  }
+
+  if (footerTitle || footerBody) {
+    drawMiniDivider(x + padding, cy, x + w - padding, cy);
+    cy += 16;
+
+    if (footerTitle) {
+      fill("#2f276f");
+      textSize(footerTitleSize * 1.15);
+      textStyle(BOLD);
+      text(footerTitle, x + padding, cy);
+      cy += 18;
+    }
+
+    if (footerBody) {
+      fill("#555");
+      textSize(footerBodySize * 1.15);
+      textStyle(NORMAL);
+      textLeading(footerLeading);
+      text(footerBody, x + padding, cy, innerW);
+    }
+  }
+
+  textLeading(13);
+  textStyle(NORMAL);
+
+  return h;
+}
+
+function measureWrappedTextHeight(str, boxWidth, fontSize = 12, leading = 16) {
+  if (!str) return 0;
+
+  push();
+  textSize(fontSize);
+  textStyle(NORMAL);
+  textLeading(leading);
+
+  const words = String(str).split(" ");
+  let line = "";
+  let lines = 1;
+
+  for (let i = 0; i < words.length; i++) {
+    const testLine = line + words[i] + " ";
+    if (textWidth(testLine) > boxWidth && i > 0) {
+      lines++;
+      line = words[i] + " ";
+    } else {
+      line = testLine;
+    }
+  }
+
+  pop();
+  return lines * leading;
+}
+
+function drawAdaptiveNote(x, y, w, textContent, options = {}) {
+  const padding = options.padding || 14;
+  const fontSize = options.fontSize || 12.5;
+  const leading = options.leading || 17;
+  const minH = options.minH || 42;
+  const bg = options.bg || "#F3EFE8";
+  const textColor = options.textColor || "#444";
+
+  const textW = w - padding * 2;
+  const textH = measureWrappedTextHeight(textContent, textW, fontSize, leading);
+  const h = Math.max(minH, textH + padding * 2);
+
+  fill(bg);
+  noStroke();
+  rect(x, y, w, h, 10);
+
+  fill(textColor);
+  textSize(fontSize);
+  textStyle(NORMAL);
+  textLeading(leading);
+  text(textContent, x + padding, y + padding, textW);
+
+  textLeading(13);
+  return h;
+}
+
+function drawAutoTextCard({
+  x,
+  y,
+  w,
+  title = "",
+  icon = "",
+  body = "",
+  footerTitle = "",
+  footerBody = "",
+  minH = 120,
+  padding = 18,
+  titleSize = 15.5,
+  bodySize = 12.5,
+  bodyLeading = 16,
+  footerTitleSize = 12.5,
+  footerBodySize = 12,
+  footerLeading = 15
+}) {
+  const innerW = w - padding * 2;
+
+  let contentH = 0;
+
+  if (title) contentH += 28;
+  if (icon) contentH += 34;
+
+  if (body) {
+    contentH += measureWrappedTextHeight(body, innerW, bodySize, bodyLeading);
+    contentH += 14;
+  }
+
+  if (footerTitle || footerBody) {
+    contentH += 18;
+  }
+
+  if (footerTitle) contentH += 18;
+
+  if (footerBody) {
+    contentH += measureWrappedTextHeight(
+      footerBody,
+      innerW,
+      footerBodySize,
+      footerLeading
+    );
+  }
+
+  const h = Math.max(minH, contentH + padding * 2);
+
+  drawCard(x, y, w, h, 16);
+
+  let cy = y + padding + 6;
+
+  if (title) {
+    fill("#2f276f");
+    noStroke();
+    textSize(titleSize);
+    textStyle(BOLD);
+    text(title, x + padding, cy);
+    cy += 30;
+  }
+
+  if (icon) {
+    textAlign(CENTER, CENTER);
+    textSize(26);
+    text(icon, x + w / 2, cy + 4);
+    textAlign(LEFT, BASELINE);
+    cy += 34;
+  }
+
+  if (body) {
+    fill("#555");
+    textSize(bodySize);
+    textStyle(NORMAL);
+    textLeading(bodyLeading);
+    text(body, x + padding, cy, innerW);
+    cy += measureWrappedTextHeight(body, innerW, bodySize, bodyLeading) + 14;
+  }
+
+  if (footerTitle || footerBody) {
+    drawMiniDivider(x + padding, cy, x + w - padding, cy);
+    cy += 16;
+  }
+
+  if (footerTitle) {
+    fill("#2f276f");
+    textSize(footerTitleSize);
+    textStyle(BOLD);
+    text(footerTitle, x + padding, cy);
+    cy += 18;
+  }
+
+  if (footerBody) {
+    fill("#555");
+    textSize(footerBodySize);
+    textStyle(NORMAL);
+    textLeading(footerLeading);
+    text(footerBody, x + padding, cy, innerW);
+  }
+
+  textLeading(13);
+  textStyle(NORMAL);
+  return h;
+}
 
 function drawLoading() {
   fill("#222");
@@ -1274,7 +1585,7 @@ function drawYearlyLineChart() {
 
   const chartX = 62;
   const chartY = 225;
-  const chartW = width - 315;
+  const chartW = width - 360;
   const chartH = Math.min(315, height - 395);
 
   const cardX = chartX - 22;
@@ -1473,56 +1784,36 @@ function drawYearlyAnnotationCard() {
   const info = FACTORS[selectedFactor];
   const metric = getYearlyMetricInfo(selectedFactor);
 
-  const x = width - 225;
+  const w = 220;
+  const x = width - w - 42;
   const y = 235;
-  const w = 180;
-  const h = 345;
 
-  drawCard(x, y, w, h, 16);
+  const bodyText =
+    metric.explanation ||
+    getYearlyAnnotationText(selectedFactor) ||
+    "This view shows the seasonal pattern of the selected weather layer.";
 
-  fill("#2f276f");
-  noStroke();
-  textSize(15.5 * 1.15);
-  textStyle(BOLD);
-  text("WHAT TO NOTICE", x + 18, y + 30);
+  const footerBody =
+    selectedFactor === "temp"
+      ? "Flagged days, measured in days. Higher means more days outside the comfort range."
+      : `${metric.yLabel}, measured in ${metric.unit}.`;
 
-  fill("#222");
-  textSize(28 * 1.15);
-  textAlign(CENTER);
-  text(info.icon, x + w / 2, y + 75);
-  textAlign(LEFT);
-
-  fill("#333");
-  textSize(15 * 1.15);
-  textStyle(BOLD);
-  text(info.label, x + 18, y + 112);
-
-  fill("#555");
-  textSize(12.5 * 1.15);
-  textStyle(NORMAL);
-  textLeading(16);
-  text(metric.explanation, x + 18, y + 138, w - 36);
-
-  drawMiniDivider(x + 18, y + h - 100, x + w - 18, y + h - 100);
-
-  fill("#2f276f");
-  textSize(12.5 * 1.15);
-  textStyle(BOLD);
-  text("Data shown", x + 18, y + h - 70);
-
-  fill("#555");
-  textSize(12.3 * 1.15);
-  textStyle(NORMAL);
-  text(
-    `${metric.yLabel}, measured in ${metric.unit}.`,
-    x + 18,
-    y + h - 48,
-    w - 36
-  );
-
-  textLeading(13);
-  textAlign(LEFT, BASELINE);
-  textStyle(NORMAL);
+  drawAutoTextCard({
+    x,
+    y,
+    w,
+    title: "WHAT TO NOTICE",
+    icon: info.icon,
+    body: bodyText,
+    footerTitle: "Data shown",
+    footerBody: footerBody,
+    minH: 190,
+    padding: 18,
+    bodySize: 12.2,
+    bodyLeading: 16,
+    footerBodySize: 12,
+    footerLeading: 15
+  });
 }
 
 function getYearlyAnnotationText(factorKey) {
