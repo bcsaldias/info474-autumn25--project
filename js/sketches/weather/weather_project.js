@@ -210,6 +210,10 @@ function resizeCanvasForActiveSection() {
 /* -------------------------
    Data helpers
 -------------------------- */
+function getDaysInMonth(monthObj) {
+  // monthObj.month is assumed to be 1–12
+  return new Date(2025, monthObj.month, 0).getDate();
+}
 
 function getCell(row, columnName, fallback = "") {
   try {
@@ -1961,11 +1965,7 @@ function drawMonthlyFlaggedDaysProfile() {
     textStyle(BOLD);
     text(info.shortLabel, centerX, plotY - 28);
 
-    // background bar
-    fill("#EFEAE2");
-    stroke("#D9D2C7");
-    strokeWeight(1);
-    rect(barX, plotY, barW, plotH, 8);
+
 
     // filled bar
     fill(red(c), green(c), blue(c), 88);
