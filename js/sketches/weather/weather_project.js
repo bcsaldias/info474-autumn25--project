@@ -374,16 +374,7 @@ function drawMainTitle(title, subtitle) {
 }
 
 function drawSectionNumber(num, x, y) {
-  fill("#4D3F8F");
-  noStroke();
-  circle(x, y, 26);
-
-  fill("#FFFFFF");
-  textSize(14 * 1.15);
-  textStyle(BOLD);
-  textAlign(CENTER, CENTER);
-  text(num, x, y + 1);
-  textAlign(LEFT, BASELINE);
+  return;
 }
 
 function drawCard(x, y, w, h, radius = 16) {
@@ -1286,7 +1277,6 @@ function drawYearlyLineChart() {
   const chartW = width - 315;
   const chartH = Math.min(315, height - 395);
 
-  // Make the main chart card taller so the bottom note stays inside the box
   const cardX = chartX - 22;
   const cardY = chartY - 42;
   const cardW = chartW + 44;
@@ -1306,24 +1296,20 @@ function drawYearlyLineChart() {
   text(metric.subtitle, chartX, chartY + 5);
 
   const values = monthlyData.map(d => getYearlyValue(d, selectedFactor));
-  let minVal = Math.min(...values);
-  let maxVal = Math.max(...values);
 
-  if (selectedFactor === "temp") {
-    minVal = 0;
-    maxVal = Math.max(1, maxVal);
-  }
+  const actualMin = Math.min(...values);
+  const actualMax = Math.max(...values);
 
-  const range = maxVal - minVal || 1;
-  const paddedMin = selectedFactor === "temp" ? 0 : minVal - range * 0.08;
-  const paddedMax = maxVal + range * 0.08;
+  // All factors now start from 0
+  const axisMin = 0;
+  const axisMax = getYearlyAxisMax(selectedFactor, actualMax);
 
   const plotX = chartX + 54;
   const plotY = chartY + 56;
   const plotW = chartW - 78;
   const plotH = chartH - 28;
 
-  // Grid and y-axis labels
+  // Grid + y-axis
   stroke("#E7E0D6");
   strokeWeight(1);
 
@@ -1331,7 +1317,7 @@ function drawYearlyLineChart() {
     const gy = plotY + map(i, 0, 4, 0, plotH);
     line(plotX, gy, plotX + plotW, gy);
 
-    const labelValue = map(i, 0, 4, paddedMax, paddedMin);
+    const labelValue = map(i, 0, 4, axisMax, axisMin);
     noStroke();
     fill("#666");
     textSize(10.5 * 1.15);
@@ -1365,18 +1351,18 @@ function drawYearlyLineChart() {
   for (let i = 0; i < monthlyData.length; i++) {
     const value = getYearlyValue(monthlyData[i], selectedFactor);
     const px = map(i, 0, monthlyData.length - 1, plotX, plotX + plotW);
-    const py = map(value, paddedMin, paddedMax, plotY + plotH, plotY);
+    const py = map(value, axisMin, axisMax, plotY + plotH, plotY);
     vertex(px, py);
   }
 
   endShape();
   strokeWeight(1);
 
-  // Points and month labels
+  // Points + month labels
   for (let i = 0; i < monthlyData.length; i++) {
     const value = getYearlyValue(monthlyData[i], selectedFactor);
     const px = map(i, 0, monthlyData.length - 1, plotX, plotX + plotW);
-    const py = map(value, paddedMin, paddedMax, plotY + plotH, plotY);
+    const py = map(value, axisMin, axisMax, plotY + plotH, plotY);
 
     fill("#FFFFFF");
     stroke(info.color);
@@ -1390,19 +1376,19 @@ function drawYearlyLineChart() {
     text(monthlyData[i].monthName[0], px, plotY + plotH + 24);
   }
 
-  // Observed range inside the chart card
+  // Observed range
   textAlign(LEFT, BASELINE);
   fill("#555");
   noStroke();
   textSize(11.5 * 1.15);
   textStyle(NORMAL);
   text(
-    `Observed range: ${formatYearlyValue(minVal, selectedFactor)} – ${formatYearlyValue(maxVal, selectedFactor)}`,
+    `Observed range: ${formatYearlyValue(actualMin, selectedFactor)} – ${formatYearlyValue(actualMax, selectedFactor)}`,
     plotX,
     plotY + plotH + 55
   );
 
-  // Bottom note inside the chart card
+  // Bottom note
   const noteX = plotX;
   const noteY = plotY + plotH + 72;
   const noteW = plotW;
@@ -1453,6 +1439,34 @@ function formatAxisValue(value, factorKey) {
   }
 
   return nf(value, 1, 1);
+}
+
+function getYearlyAxisMax(factorKey, actualMax) {
+  if (factorKey === "temp") {
+    return 31;
+  }
+
+  if (factorKey === "rain") {
+    return Math.max(0.1, Math.ceil(actualMax * 10) / 10);
+  }
+
+  if (factorKey === "cloud") {
+    return Math.min(100, Math.max(10, Math.ceil(actualMax / 10) * 10));
+  }
+
+  if (factorKey === "daylight") {
+    return Math.max(2, Math.ceil(actualMax / 2) * 2);
+  }
+
+  if (factorKey === "solar") {
+    return Math.max(2, Math.ceil(actualMax / 2) * 2);
+  }
+
+  if (factorKey === "wind") {
+    return Math.max(5, Math.ceil(actualMax / 5) * 5);
+  }
+
+  return Math.max(1, Math.ceil(actualMax));
 }
 
 function drawYearlyAnnotationCard() {
