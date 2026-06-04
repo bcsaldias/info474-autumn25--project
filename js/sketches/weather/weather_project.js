@@ -778,9 +778,7 @@ function drawArticleNote({
   const footerH = footerBody ? measureWrappedTextHeight(footerBody, innerW, 11.5, 15) : 0;
   const h = Math.max(minH, 64 + bodyH + (footerTitle || footerBody ? 42 + footerH : 0));
 
-  noStroke();
-  fill("#F7F2EA");
-  rect(x, y, w, h, 14);
+  //no background: keep it as article annotation, not a card
 
   stroke("#4D3F8F");
   strokeWeight(4);
@@ -831,40 +829,43 @@ function drawArticleNote({
 }
 
 function drawInlineInsight(x, y, w, label, body, h = 64) {
-  // Non-clickable inline insight style for article-like notes.
-  noStroke();
-  fill("#F7F2EA");
-  rect(x, y, w, h, 12);
+  // Article-style insight strip:
+  // no background, no border, not clickable.
+  // Only label + divider + explanation text.
 
-  stroke("#D8D0C8");
+  stroke("#D4DAE3");
   strokeWeight(1);
-  line(x + 150, y + 14, x + 150, y + h - 14);
+  line(x, y, x + w, y);
 
   noStroke();
-  fill("#2f276f");
-  textSize(13 * 1.15);
-  textStyle(BOLD);
-  text(label, x + 20, y + 25);
 
+  fill("#2f276f");
+  textSize(12.5 * 1.15);
+  textStyle(BOLD);
+  text(label, x + 4, y + 26);
+
+  stroke("#D4DAE3");
+  strokeWeight(1);
+  line(x + 145, y + 13, x + 145, y + h - 12);
+
+  noStroke();
   fill("#333");
-  textSize(11.8 * 1.15);
+  textSize(11.6 * 1.15);
   textStyle(NORMAL);
   textLeading(15);
-  text(body, x + 170, y + 19, w - 200);
+  text(body, x + 168, y + 20, w - 185);
 
   textLeading(13);
   textStyle(NORMAL);
 }
 
 function drawStaticPanel(x, y, w, h, radius = 14) {
-  // Static data-display panel: lighter than a button/card and never hoverable.
-  noStroke();
-  fill("#FBF8F2");
-  rect(x, y, w, h, radius);
+  // Static data-display area:
+  // subtle background only, no border.
+  // Borders are reserved for clickable controls.
 
-  stroke("#E1D8CD");
-  strokeWeight(1);
-  noFill();
+  noStroke();
+  fill("#FAFAFA");
   rect(x, y, w, h, radius);
 }
 
