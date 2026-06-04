@@ -161,12 +161,14 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: center;
+  background: #f4f1eb;
 }
 
 canvas {
   display: block;
   width: 100%;
   height: auto;
+  background: #f4f1eb;
 }
 
 .step {

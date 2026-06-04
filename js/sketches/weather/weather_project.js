@@ -125,7 +125,7 @@ function setup() {
 function draw() {
   resizeCanvasForActiveSection();
 
-  background("#FAF7F0");
+  background("#f4f1eb");
 
   if (!weatherData.length) {
     drawLoading();
@@ -797,7 +797,7 @@ function getShortFactorExplanation(factorKey) {
 -------------------------- */
 
 function drawOpeningPanel() {
-  background("#FAF7F0");
+  background("#f4f1eb");
 
   const cardX = 64;
   const cardY = 46;
