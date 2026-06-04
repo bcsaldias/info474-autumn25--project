@@ -125,7 +125,7 @@ function setup() {
 function draw() {
   resizeCanvasForActiveSection();
 
-  background("#f4f1eb");
+  background("#fbf9f6");
 
   if (!weatherData.length) {
     drawLoading();
@@ -360,9 +360,20 @@ function setupSectionObserver() {
    Drawing helpers
 -------------------------- */
 function drawVizBodyShell(x, y, w, h, radius = 18) {
+  // Remove shared body cards.
+  return;
+}
+
+function drawMonthlyBodyShell(x, y, w, h, radius = 18) {
+  return;
+}
+
+
+function drawSectionDivider(x1, x2, y) {
+  stroke("#D9D3C8");
+  strokeWeight(1);
+  line(x1, y, x2, y);
   noStroke();
-  fill("#F7F5F1");
-  rect(x, y, w, h, radius);
 }
 
 function measureWrappedTextHeight(str, boxWidth, fontSize = 12, leading = 16) {
@@ -393,30 +404,24 @@ function measureWrappedTextHeight(str, boxWidth, fontSize = 12, leading = 16) {
 }
 
 function drawAdaptiveNote(x, y, w, textContent, options = {}) {
-  const padding = options.padding || 14;
+  const padding = options.padding || 0;
   const fontSize = options.fontSize || 12.5;
   const leading = options.leading || 17;
-  const minH = options.minH || 42;
-  const bg = options.bg || "#F3EFE8";
   const textColor = options.textColor || "#444";
-
   const textW = w - padding * 2;
   const textH = measureWrappedTextHeight(textContent, textW, fontSize, leading);
-  const h = Math.max(minH, textH + padding * 2);
-
-  fill(bg);
-  noStroke();
-  rect(x, y, w, h, 10);
 
   fill(textColor);
+  noStroke();
   textSize(fontSize);
   textStyle(NORMAL);
   textLeading(leading);
   text(textContent, x + padding, y + padding, textW);
 
   textLeading(13);
-  return h;
+  return textH + padding * 2;
 }
+
 
 function colorWithAlpha(hexColor, alphaValue) {
   const c = color(hexColor);
@@ -440,119 +445,7 @@ function measureTextBlockHeight(blocks, innerWidth) {
 
   return total;
 }
-function drawAutoTextCard({
-  x,
-  y,
-  w,
-  title = "",
-  icon = "",
-  body = "",
-  footerTitle = "",
-  footerBody = "",
-  minH = 120,
-  padding = 18,
-  titleSize = 15,
-  bodySize = 12.5,
-  bodyLeading = 16,
-  footerTitleSize = 12,
-  footerBodySize = 12,
-  footerLeading = 15
-}) {
-  const innerW = w - padding * 2;
 
-  let contentH = 0;
-
-  if (title) {
-    contentH += 26;
-  }
-
-  if (icon) {
-    contentH += 28;
-  }
-
-  if (body) {
-    contentH += measureWrappedTextHeight(body, innerW, bodySize, bodyLeading);
-    contentH += 14;
-  }
-
-  if (footerTitle || footerBody) {
-    contentH += 12;
-    contentH += 1; // divider visual spacing
-    contentH += 14;
-  }
-
-  if (footerTitle) {
-    contentH += 18;
-  }
-
-  if (footerBody) {
-    contentH += measureWrappedTextHeight(
-      footerBody,
-      innerW,
-      footerBodySize,
-      footerLeading
-    );
-  }
-
-  const h = max(minH, contentH + padding * 2);
-
-  drawCard(x, y, w, h, 16);
-
-  let cy = y + padding + 8;
-
-  if (title) {
-    fill("#2f276f");
-    noStroke();
-    textSize(titleSize * 1.15);
-    textStyle(BOLD);
-    text(title, x + padding, cy);
-    cy += 28;
-  }
-
-  if (icon) {
-    fill("#222");
-    textSize(24 * 1.15);
-    textAlign(CENTER, CENTER);
-    text(icon, x + w / 2, cy + 4);
-    textAlign(LEFT, BASELINE);
-    cy += 28;
-  }
-
-  if (body) {
-    fill("#555");
-    textSize(bodySize * 1.15);
-    textStyle(NORMAL);
-    textLeading(bodyLeading);
-    text(body, x + padding, cy, innerW);
-    cy += measureWrappedTextHeight(body, innerW, bodySize * 1.15, bodyLeading) + 14;
-  }
-
-  if (footerTitle || footerBody) {
-    drawMiniDivider(x + padding, cy, x + w - padding, cy);
-    cy += 16;
-
-    if (footerTitle) {
-      fill("#2f276f");
-      textSize(footerTitleSize * 1.15);
-      textStyle(BOLD);
-      text(footerTitle, x + padding, cy);
-      cy += 18;
-    }
-
-    if (footerBody) {
-      fill("#555");
-      textSize(footerBodySize * 1.15);
-      textStyle(NORMAL);
-      textLeading(footerLeading);
-      text(footerBody, x + padding, cy, innerW);
-    }
-  }
-
-  textLeading(13);
-  textStyle(NORMAL);
-
-  return h;
-}
 
 function drawAutoTextCard({
   x,
@@ -572,90 +465,22 @@ function drawAutoTextCard({
   footerBodySize = 12,
   footerLeading = 15
 }) {
-  const innerW = w - padding * 2;
-
-  let contentH = 0;
-
-  if (title) contentH += 28;
-  if (icon) contentH += 34;
-
-  if (body) {
-    contentH += measureWrappedTextHeight(body, innerW, bodySize, bodyLeading);
-    contentH += 14;
-  }
-
-  if (footerTitle || footerBody) {
-    contentH += 18;
-  }
-
-  if (footerTitle) contentH += 18;
-
-  if (footerBody) {
-    contentH += measureWrappedTextHeight(
-      footerBody,
-      innerW,
-      footerBodySize,
-      footerLeading
-    );
-  }
-
-  const h = Math.max(minH, contentH + padding * 2);
-
-  drawCard(x, y, w, h, 16);
-
-  let cy = y + padding + 6;
-
-  if (title) {
-    fill("#2f276f");
-    noStroke();
-    textSize(titleSize);
-    textStyle(BOLD);
-    text(title, x + padding, cy);
-    cy += 30;
-  }
-
-  if (icon) {
-    textAlign(CENTER, CENTER);
-    textSize(26);
-    text(icon, x + w / 2, cy + 4);
-    textAlign(LEFT, BASELINE);
-    cy += 34;
-  }
-
-  if (body) {
-    fill("#555");
-    textSize(bodySize);
-    textStyle(NORMAL);
-    textLeading(bodyLeading);
-    text(body, x + padding, cy, innerW);
-    cy += measureWrappedTextHeight(body, innerW, bodySize, bodyLeading) + 14;
-  }
-
-  if (footerTitle || footerBody) {
-    drawMiniDivider(x + padding, cy, x + w - padding, cy);
-    cy += 16;
-  }
-
-  if (footerTitle) {
-    fill("#2f276f");
-    textSize(footerTitleSize);
-    textStyle(BOLD);
-    text(footerTitle, x + padding, cy);
-    cy += 18;
-  }
-
-  if (footerBody) {
-    fill("#555");
-    textSize(footerBodySize);
-    textStyle(NORMAL);
-    textLeading(footerLeading);
-    text(footerBody, x + padding, cy, innerW);
-  }
-
-  textLeading(13);
-  textStyle(NORMAL);
-  return h;
+  // Kept for compatibility, but rendered as an article note instead of a card.
+  drawArticleNote({
+    x,
+    y,
+    w,
+    title,
+    icon,
+    body,
+    footerTitle,
+    footerBody,
+    padding,
+    minH
+  });
+  return minH;
 }
+
 
 function drawLoading() {
   fill("#222");
@@ -681,23 +506,17 @@ function drawSectionNumber(num, x, y) {
 }
 
 function drawCard(x, y, w, h, radius = 16) {
-  noStroke();
-  fill("#FFFFFF");
-  rect(x, y, w, h, radius);
-
-  stroke("#D9D2C7");
-  strokeWeight(1.4);
-  noFill();
-  rect(x, y, w, h, radius);
-  strokeWeight(1);
+  // Static card backgrounds were removed to make the article feel continuous.
+  // Clickable controls still draw their own bordered button states.
+  return;
 }
+
 
 function drawSoftCard(x, y, w, h, colorValue, radius = 14) {
-  const c = color(colorValue);
-  fill(red(c), green(c), blue(c), 30);
-  stroke(red(c), green(c), blue(c), 120);
-  rect(x, y, w, h, radius);
+  // Legacy helper kept for compatibility. Static soft cards are no longer used.
+  return;
 }
+
 
 function drawMiniDivider(x1, y1, x2, y2) {
   stroke("#D8D0C8");
@@ -765,6 +584,37 @@ function drawRoundedButton(x, y, w, h, label, icon, active, colorValue, hover = 
   strokeWeight(1);
 }
 
+
+
+function drawInlineInsight(x, y, w, label, body, h = 60) {
+  // Article-style insight strip. No background box.
+  stroke("#D9D3C8");
+  strokeWeight(1);
+  line(x, y, x + w, y);
+
+  noStroke();
+
+  fill("#2f276f");
+  textSize(12.3 * 1.15);
+  textStyle(BOLD);
+  text(label, x + 4, y + 25);
+
+  stroke("#D9D3C8");
+  strokeWeight(1);
+  line(x + 145, y + 13, x + 145, y + h - 12);
+
+  noStroke();
+  fill("#333");
+  textSize(11.2 * 1.15);
+  textStyle(NORMAL);
+  textLeading(15);
+  text(body, x + 168, y + 19, w - 185);
+
+  textLeading(13);
+  textStyle(NORMAL);
+}
+
+
 function drawArticleNote({
   x,
   y,
@@ -777,13 +627,11 @@ function drawArticleNote({
   padding = 18,
   minH = 160
 }) {
-  // Non-clickable article note style: soft background + left accent line, no button border.
+  // Article annotation: vertical line only, no card background.
   const innerW = w - padding * 2 - 18;
   const bodyH = body ? measureWrappedTextHeight(body, innerW, 12.2, 16) : 0;
   const footerH = footerBody ? measureWrappedTextHeight(footerBody, innerW, 11.5, 15) : 0;
   const h = Math.max(minH, 64 + bodyH + (footerTitle || footerBody ? 42 + footerH : 0));
-
-  //no background: keep it as article annotation, not a card
 
   stroke("#4D3F8F");
   strokeWeight(4);
@@ -792,19 +640,19 @@ function drawArticleNote({
 
   noStroke();
   fill("#2f276f");
-  textSize(13.5 * 1.15);
+  textSize(13.2 * 1.15);
   textStyle(BOLD);
   text(title, x + padding + 16, y + 28, innerW - 28);
 
   if (icon) {
-    textSize(21);
+    textSize(20);
     textAlign(RIGHT, BASELINE);
     text(icon, x + w - padding, y + 30);
     textAlign(LEFT, BASELINE);
   }
 
   fill("#444");
-  textSize(12.2 * 1.15);
+  textSize(12 * 1.15);
   textStyle(NORMAL);
   textLeading(16);
   text(body, x + padding + 16, y + 60, innerW);
@@ -812,18 +660,18 @@ function drawArticleNote({
   if (footerTitle || footerBody) {
     const footerY = y + 72 + bodyH;
 
-    stroke("#D8D0C8");
+    stroke("#D9D3C8");
     strokeWeight(1);
     line(x + padding + 16, footerY, x + w - padding, footerY);
 
     noStroke();
     fill("#2f276f");
-    textSize(11.5 * 1.15);
+    textSize(11.3 * 1.15);
     textStyle(BOLD);
     text(footerTitle, x + padding + 16, footerY + 22);
 
-    fill("#555");
-    textSize(11.2 * 1.15);
+    fill("#666");
+    textSize(11 * 1.15);
     textStyle(NORMAL);
     textLeading(15);
     text(footerBody, x + padding + 16, footerY + 42, innerW);
@@ -833,45 +681,11 @@ function drawArticleNote({
   textStyle(NORMAL);
 }
 
-function drawInlineInsight(x, y, w, label, body, h = 64) {
-  // Article-style insight strip:
-  // no background, no border, not clickable.
-  // Only label + divider + explanation text.
-
-  stroke("#D4DAE3");
-  strokeWeight(1);
-  line(x, y, x + w, y);
-
-  noStroke();
-
-  fill("#2f276f");
-  textSize(12.5 * 1.15);
-  textStyle(BOLD);
-  text(label, x + 4, y + 26);
-
-  stroke("#D4DAE3");
-  strokeWeight(1);
-  line(x + 145, y + 13, x + 145, y + h - 12);
-
-  noStroke();
-  fill("#333");
-  textSize(11.6 * 1.15);
-  textStyle(NORMAL);
-  textLeading(15);
-  text(body, x + 168, y + 20, w - 185);
-
-  textLeading(13);
-  textStyle(NORMAL);
-}
 
 function drawStaticPanel(x, y, w, h, radius = 14) {
-  // Static data-display area:
-  // subtle background only, no border.
-  // Borders are reserved for clickable controls.
-
-  noStroke();
-  fill("#FAFAFA");
-  rect(x, y, w, h, radius);
+  // Remove non-interactive panel backgrounds.
+  // Section structure should come from spacing, text, and dividers.
+  return;
 }
 
 function isOverFactorButton() {
@@ -893,9 +707,11 @@ function isOverFactorButton() {
 function isOverMonthButton() {
   const startX = 54;
   const y = 118;
-  const w = 58;
   const h = 32;
-  const gap = 7;
+  const gap = 6;
+
+  const availableW = width - 108;
+  const w = (availableW - gap * 11) / 12;
 
   for (let i = 0; i < monthlyData.length; i++) {
     const x = startX + i * (w + gap);
@@ -1012,7 +828,7 @@ function getShortFactorExplanation(factorKey) {
 -------------------------- */
 
 function drawOpeningPanel() {
-  background("#f4f1eb");
+  background("#fbf9f6");
 
   const startX = 86;
   const startY = 54;
@@ -1440,19 +1256,15 @@ function drawForecastCard(day, x, y, w, h) {
   textStyle(BOLD);
   text("WHAT THE FORECAST SHOWS", x, y - 12);
 
-  // removed outer white card holder
-
   const innerX = x + 8;
   const innerY = y + 18;
   const innerW = w - 16;
   const innerH = h - 36;
 
-  fill("#F8FBFF");
-  stroke("#B6CDE5");
-  strokeWeight(1.2);
-  rect(innerX, innerY, innerW, innerH, 14);
-  strokeWeight(1);
+  // Light data module, no heavy card border.
   noStroke();
+  fill("#F8F6F1");
+  rect(innerX, innerY, innerW, innerH, 14);
 
   fill("#333");
   textSize(14 * 1.15);
@@ -1512,53 +1324,40 @@ function drawForecastCard(day, x, y, w, h) {
     rowY += 30;
   }
 
-  // remove note background box, keep text only
   fill("#555");
-  textSize(14 * 1.15);
+  textSize(13 * 1.15);
   textStyle(NORMAL);
-  textLeading(18);
+  textLeading(17);
   text(
     "Useful numbers, but still shown as separate pieces.",
     innerX + 18,
-    innerY + innerH - 56,
+    innerY + innerH - 52,
     innerW - 36
   );
-  textLeading(14);
+  textLeading(13);
 }
 
+
 function drawConnectionArrow(x, y) {
-  // Main arrow
-  stroke("#555");
-  strokeWeight(2);
+  stroke("#9CA3AF");
+  strokeWeight(1.6);
   line(x - 34, y, x + 34, y);
-  line(x + 34, y, x + 22, y - 9);
-  line(x + 34, y, x + 22, y + 9);
+  line(x + 34, y, x + 22, y - 8);
+  line(x + 34, y, x + 22, y + 8);
   strokeWeight(1);
 
-  // Small label above arrow
   noStroke();
-  fill("#F3EFE8");
-  rect(x - 42, y - 48, 84, 28, 9);
-
-  fill("#555");
-  textSize(10.5 * 1.15);
+  fill("#666");
+  textSize(10 * 1.15);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
-  text("connect", x, y - 34);
-
-  // Small label below arrow
-  fill("#F3EFE8");
-  noStroke();
-  rect(x - 42, y + 22, 84, 28, 9);
-
-  fill("#555");
-  textSize(10.5 * 1.15);
-  textStyle(BOLD);
-  text("as layers", x, y + 36);
+  text("connect", x, y - 32);
+  text("as layers", x, y + 30);
 
   textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
 }
+
 
 function drawLayerStack(day, x, y, w, h) {
   fill("#2f276f");
@@ -1566,8 +1365,6 @@ function drawLayerStack(day, x, y, w, h) {
   textSize(15 * 1.15);
   textStyle(BOLD);
   text("WHAT THE FORECAST DOESN'T CONNECT", x, y - 12);
-
-  // removed outer white card holder
 
   const layerKeys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
   const innerX = x + 8;
@@ -1588,7 +1385,7 @@ function drawLayerStack(day, x, y, w, h) {
   const noteH = 70;
   const listY = innerY + 64;
   const noteY = y + h - noteH - 8;
-  const listBottom = noteY - 16;
+  const listBottom = noteY - 18;
 
   const availableH = listBottom - listY;
   const gap = 10;
@@ -1602,32 +1399,29 @@ function drawLayerStack(day, x, y, w, h) {
     const c = color(info.color);
 
     if (active) {
-      fill(red(c), green(c), blue(c), 68);
+      fill(red(c), green(c), blue(c), 42);
       stroke(info.color);
-      strokeWeight(1.5);
+      strokeWeight(1.4);
     } else {
-      fill("#FBFAF6");
-      stroke("#DED6CA");
-      strokeWeight(1.1);
+      noFill();
+      stroke("#D9D3C8");
+      strokeWeight(1);
     }
 
     rect(innerX, yy, innerW, layerH, 11);
     strokeWeight(1);
 
-    // icon
     noStroke();
-    fill(active ? "#222" : "#888");
+    fill(active ? "#222" : "#777");
     textSize(18 * 1.15);
     textAlign(CENTER, CENTER);
     text(info.icon, innerX + 30, yy + layerH / 2);
 
-    // badge
-    const badgeW = 108;
-    const badgeH = 26;
+    const badgeW = 98;
+    const badgeH = 24;
     const badgeX = innerX + innerW - badgeW - 14;
     const badgeY = yy + layerH / 2 - badgeH / 2;
 
-    // label area width so it doesn't overlap the badge
     const labelX = innerX + 58;
     const labelW = badgeX - labelX - 18;
 
@@ -1637,51 +1431,31 @@ function drawLayerStack(day, x, y, w, h) {
     textStyle(BOLD);
     text(info.label, labelX, yy + layerH / 2, labelW);
 
-    if (active) {
-      fill(red(c), green(c), blue(c), 120);
-      stroke(info.color);
-      rect(badgeX, badgeY, badgeW, badgeH, 999);
-
-      noStroke();
-      fill("#222");
-      textSize(10.5 * 1.15);
-      textStyle(BOLD);
-      textAlign(CENTER, CENTER);
-      text("layer present", badgeX + badgeW / 2, badgeY + badgeH / 2);
-    } else {
-      fill("#FFFFFF");
-      stroke("#D9D2C7");
-      rect(badgeX, badgeY, badgeW, badgeH, 999);
-
-      noStroke();
-      fill("#777");
-      textSize(10.5 * 1.15);
-      textStyle(NORMAL);
-      textAlign(CENTER, CENTER);
-      text("not present", badgeX + badgeW / 2, badgeY + badgeH / 2);
-    }
+    fill(active ? info.color : "#777");
+    textSize(10 * 1.15);
+    textStyle(BOLD);
+    textAlign(RIGHT, CENTER);
+    text(active ? "present" : "absent", innerX + innerW - 18, yy + layerH / 2);
 
     textAlign(LEFT, BASELINE);
     textStyle(NORMAL);
   }
 
-  // bottom note
-  fill("#F3EFE8");
-  noStroke();
-  rect(innerX, noteY, innerW, noteH, 12);
+  drawSectionDivider(innerX, innerX + innerW, noteY - 8);
 
   fill("#444");
-  textSize(12.5 * 1.15);
+  textSize(12 * 1.15);
   textStyle(NORMAL);
-  textLeading(18);
+  textLeading(16);
   text(
     "Temperature is treated as comfort. It is only flagged when it is too cold or too hot, not simply when the number is higher.",
-    innerX + 16,
-    noteY + 18,
-    innerW - 32
+    innerX,
+    noteY + 10,
+    innerW
   );
-  textLeading(14);
+  textLeading(13);
 }
+
 
 function getLayerActualValue(day, key) {
   const values = {
@@ -1997,9 +1771,7 @@ function drawYearlyLineChart() {
   const noteW = plotW;
   const noteH = 42;
 
-  fill("#F3EFE8");
-  noStroke();
-  rect(noteX, noteY, noteW, noteH, 10);
+  drawSectionDivider(noteX, noteX + noteW, noteY);
 
   fill("#444");
   textSize(11.5 * 1.15);
@@ -2008,13 +1780,14 @@ function drawYearlyLineChart() {
   text(
     metric.readingNote,
     noteX + 16,
-    noteY + 12,
+    noteY + 18,
     noteW - 32
   );
 
   textLeading(13);
   textAlign(LEFT, BASELINE);
 }
+
 
 function formatAxisValue(value, factorKey) {
   if (factorKey === "rain") {
@@ -2145,7 +1918,6 @@ function drawMonthButtons() {
   const h = 32;
   const gap = 6;
 
-  // available width inside canvas with a little right margin
   const availableW = width - 108;
   const w = (availableW - gap * 11) / 12;
 
@@ -2160,11 +1932,11 @@ function drawMonthButtons() {
       stroke("#4D3F8F");
       strokeWeight(1.6);
     } else if (hover) {
-      fill("#FFFDF8");
+      fill("#F8F6F1");
       stroke("#4D3F8F");
-      strokeWeight(1.5);
+      strokeWeight(1.4);
     } else {
-      fill("#FFFFFF");
+      fill("#fbf9f6");
       stroke("#CFC6BA");
       strokeWeight(1);
     }
@@ -2173,7 +1945,7 @@ function drawMonthButtons() {
 
     noStroke();
     fill(active ? "#FFFFFF" : hover ? "#2f276f" : "#333");
-    textSize(11 * 1.15);
+    textSize(10.8 * 1.15);
     textStyle(active || hover ? BOLD : NORMAL);
     textAlign(CENTER, CENTER);
     text(month.monthName, x + w / 2, y + h / 2);
@@ -2187,15 +1959,18 @@ function drawMonthButtons() {
 function handleMonthSelection() {
   const startX = 54;
   const y = 118;
-  const w = 58;
   const h = 32;
-  const gap = 7;
+  const gap = 6;
+
+  const availableW = width - 108;
+  const w = (availableW - gap * 11) / 12;
 
   for (let i = 0; i < monthlyData.length; i++) {
     const x = startX + i * (w + gap);
 
     if (mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h) {
       selectedMonth = i;
+      return;
     }
   }
 }
@@ -2331,23 +2106,22 @@ function drawMonthlyAverageSummary() {
   const x = 54;
   const y = 545;
   const w = width - 108;
-  const h = 78;
 
-  drawStaticPanel(x, y, w, h, 14);
+  drawSectionDivider(x, x + w, y);
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5 * 1.15);
+  textSize(13 * 1.15);
   textStyle(BOLD);
-  text("Monthly averages", x + 24, y + 29);
+  text("Monthly averages", x + 4, y + 28);
 
-  fill("#555");
-  textSize(10.8 * 1.15);
+  fill("#666");
+  textSize(10.4 * 1.15);
   textStyle(NORMAL);
-  text("Raw values behind the flagged-day view", x + 24, y + 50);
+  text("Raw values behind the flagged-day view", x + 4, y + 50);
 
   const startX = x + 230;
-  const usableW = w - 260;
+  const usableW = w - 245;
   const gap = usableW / keys.length;
 
   for (let i = 0; i < keys.length; i++) {
@@ -2358,16 +2132,16 @@ function drawMonthlyAverageSummary() {
     textAlign(CENTER, BASELINE);
 
     fill("#333");
-    textSize(15 * 1.15);
-    text(info.icon, centerX, y + 22);
+    textSize(13.5 * 1.15);
+    text(info.icon, centerX, y + 24);
 
     fill("#333");
-    textSize(10.5 * 1.15);
+    textSize(9.8 * 1.15);
     textStyle(BOLD);
-    text(info.shortLabel, centerX, y + 42);
+    text(info.shortLabel, centerX, y + 43);
 
-    fill("#555");
-    textSize(10.2 * 1.15);
+    fill("#666");
+    textSize(9.5 * 1.15);
     textStyle(NORMAL);
     text(getMonthlyAverageLabel(month, key), centerX, y + 60);
   }
@@ -2402,7 +2176,7 @@ function drawMonthlySelectedInsight() {
     w,
     "What stands out",
     `${info.label} appears most often in ${month.monthName}, with ${highestValue} flagged days. This suggests which layer showed up most frequently in this month.`,
-    64
+    60
   );
 }
 
@@ -3151,29 +2925,18 @@ function drawDayInContextPanel() {
     "Inspect one day’s raw weather values and see which layers were present."
   );
 
-  // top control row
   drawContextDaySelector();
-
-  // shared body
-  const shellX = 54;
-  const shellY = 215;
-  const shellW = width - 108;
-  const shellH = 465;
-
-  drawVizBodyShell(shellX, shellY, shellW, shellH, 18);
 
   drawContextOverviewCard();
   drawContextRawValues();
 
-  // move divider lower so it no longer cuts through the top content
-  stroke("#E3E7EE");
-  strokeWeight(1);
-  line(shellX + 24, 470, shellX + shellW - 24, 470);
-  noStroke();
+  drawSectionDivider(54, width - 54, 420);
 
   drawContextLayerExplanationIntegrated();
+
   drawContextTakeawaySingle();
 }
+
 
 function ensureDayContextInitialized() {
   if (!weatherData.length) return;
@@ -3259,29 +3022,22 @@ function drawContextDaySelector() {
 
   const x = layout.x;
   const y = layout.y;
-  const w = layout.w;
-  const h = layout.h;
-
-  // Control row: subtle background, no border.
-  noStroke();
-  fill("#F6F4EF");
-  rect(x, y, w, h, 18);
 
   fill("#2f276f");
   noStroke();
-  textSize(12.5 * 1.15);
+  textSize(12.3 * 1.15);
   textStyle(BOLD);
-  text("Choose a day", x + 24, y + 26);
+  text("Choose a day", x, y + 20);
 
   fill("#555");
-  textSize(9.8 * 1.15);
+  textSize(9.6 * 1.15);
   textStyle(NORMAL);
   textLeading(13);
   text(
     "Move through the same week from the weekly lens.",
-    x + 24,
-    y + 47,
-    290
+    x,
+    y + 43,
+    300
   );
 
   drawContextArrowButton(
@@ -3332,13 +3088,14 @@ function drawContextDaySelector() {
   textStyle(NORMAL);
 }
 
-function getContextArrowSelectorLayout() {
-  const x = 54;
-  const y = 108;
-  const w = width - 108;
-  const h = 76;
 
-  const controlY = y + 18;
+function getContextArrowSelectorLayout() {
+  const x = 68;
+  const y = 112;
+  const w = width - 136;
+  const h = 70;
+
+  const controlY = y + 8;
 
   const arrowW = 76;
   const dayCardW = 150;
@@ -3346,7 +3103,7 @@ function getContextArrowSelectorLayout() {
   const gap = 12;
 
   const totalControlW = arrowW + gap + dayCardW + gap + arrowW;
-  const centeredStartX = x + w - totalControlW - 34;
+  const centeredStartX = x + w - totalControlW;
 
   return {
     x: x,
@@ -3366,7 +3123,7 @@ function getContextArrowSelectorLayout() {
 function drawContextArrowButton(x, y, w, h, arrow, label) {
   const hover = isMouseInside(x, y, w, h);
 
-  fill(hover ? "#FFFDF8" : "#FFFFFF");
+  fill(hover ? "#F8F6F1" : "#fbf9f6");
   stroke(hover ? "#4D3F8F" : "#CFC6BA");
   strokeWeight(hover ? 1.7 : 1.1);
   rect(x, y, w, h, 12);
@@ -3387,6 +3144,7 @@ function drawContextArrowButton(x, y, w, h, arrow, label) {
   textStyle(NORMAL);
   strokeWeight(1);
 }
+
 
 function getContextDayButtonLayout(cardX, cardY, cardW, dayCount) {
   const textBlockW = 230;
@@ -3411,8 +3169,8 @@ function getContextDayButtonLayout(cardX, cardY, cardW, dayCount) {
 function drawContextOverviewCard() {
   const day = getSelectedContextDay();
 
-  const x = 82;
-  const y = 245;
+  const x = 78;
+  const y = 220;
   const w = 255;
 
   fill("#2f276f");
@@ -3458,7 +3216,7 @@ function drawContextRawValues() {
   const day = getSelectedContextDay();
 
   const x = 385;
-  const y = 245;
+  const y = 220;
   const w = width - 465;
 
   fill("#2f276f");
@@ -3468,7 +3226,7 @@ function drawContextRawValues() {
   text("Raw weather values", x, y + 18);
 
   fill("#555");
-  textSize(9.8 * 1.15);
+  textSize(9.6 * 1.15);
   textStyle(NORMAL);
   text(
     "Values from the cleaned daily weather dataset.",
@@ -3487,43 +3245,39 @@ function drawContextRawValues() {
   ];
 
   const gridX = x;
-  const gridY = y + 58;
-  const gapX = 12;
-  const gapY = 12;
-  const cardW = (w - gapX * 2) / 3;
-  const cardH = 52;
+  const gridY = y + 62;
+  const gapX = 18;
+  const gapY = 18;
+  const cellW = (w - gapX * 2) / 3;
+  const cellH = 48;
 
   for (let i = 0; i < values.length; i++) {
     const [icon, label, value] = values[i];
     const col = i % 3;
     const row = Math.floor(i / 3);
 
-    const cx = gridX + col * (cardW + gapX);
-    const cy = gridY + row * (cardH + gapY);
-
-    fill("#FFFFFF");
-    stroke("#E5E7EB");
-    strokeWeight(1);
-    rect(cx, cy, cardW, cardH, 12);
+    const cx = gridX + col * (cellW + gapX);
+    const cy = gridY + row * (cellH + gapY);
 
     noStroke();
 
-    textSize(10.8 * 1.15);
-    text(icon, cx + 12, cy + 20);
+    textSize(11 * 1.15);
+    text(icon, cx, cy + 17);
 
     fill("#444");
     textSize(8.8 * 1.15);
     textStyle(BOLD);
-    text(label, cx + 32, cy + 18, cardW - 42);
+    text(label, cx + 28, cy + 16, cellW - 28);
 
     fill("#222");
-    textSize(10.4 * 1.15);
+    textSize(10.6 * 1.15);
     textStyle(BOLD);
-    text(value, cx + 32, cy + 39, cardW - 42);
+    text(value, cx + 28, cy + 38, cellW - 28);
 
     textStyle(NORMAL);
   }
 }
+
 
 function getContextLayerLabel(key) {
   const labels = {
@@ -3627,9 +3381,9 @@ function drawContextLayerExplanation() {
 function drawContextLayerExplanationIntegrated() {
   const day = getSelectedContextDay();
 
-  const x = 82;
-  const y = 500;
-  const w = width - 164;
+  const x = 78;
+  const y = 455;
+  const w = width - 156;
 
   fill("#2f276f");
   noStroke();
@@ -3638,7 +3392,7 @@ function drawContextLayerExplanationIntegrated() {
   text("Which layers are present on this day?", x, y);
 
   fill("#555");
-  textSize(9.8 * 1.15);
+  textSize(9.6 * 1.15);
   textStyle(NORMAL);
   text(
     "A layer is marked present when the daily value crosses the prototype threshold.",
@@ -3650,11 +3404,11 @@ function drawContextLayerExplanationIntegrated() {
   const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
 
   const startX = x;
-  const startY = y + 42;
-  const gapX = 12;
-  const gapY = 12;
-  const cardW = (w - gapX * 2) / 3;
-  const cardH = 42;
+  const startY = y + 48;
+  const gapX = 18;
+  const gapY = 18;
+  const cellW = (w - gapX * 2) / 3;
+  const cellH = 38;
 
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
@@ -3665,31 +3419,30 @@ function drawContextLayerExplanationIntegrated() {
     const col = i % 3;
     const row = Math.floor(i / 3);
 
-    const cx = startX + col * (cardW + gapX);
-    const cy = startY + row * (cardH + gapY);
+    const cx = startX + col * (cellW + gapX);
+    const cy = startY + row * (cellH + gapY);
 
-    fill("#FFFFFF");
-    stroke(present ? info.color : "#D9DDE5");
-    strokeWeight(present ? 1.4 : 1.0);
-    rect(cx, cy, cardW, cardH, 11);
-
+    stroke(present ? info.color : "#D6D0C8");
+    strokeWeight(present ? 2 : 1);
+    line(cx, cy + cellH, cx + cellW - 10, cy + cellH);
     noStroke();
 
     fill(present ? "#222" : "#666");
-    textSize(9.5 * 1.15);
+    textSize(9.6 * 1.15);
     textStyle(BOLD);
-    text(`${info.icon} ${label}`, cx + 14, cy + 25, cardW - 92);
+    text(`${info.icon} ${label}`, cx, cy + 22, cellW - 90);
 
     fill(present ? info.color : "#888");
     textSize(8 * 1.15);
     textStyle(BOLD);
-    textAlign(RIGHT, CENTER);
-    text(present ? "present" : "absent", cx + cardW - 14, cy + cardH / 2);
+    textAlign(RIGHT, BASELINE);
+    text(present ? "present" : "absent", cx + cellW - 10, cy + 22);
 
     textAlign(LEFT, BASELINE);
     textStyle(NORMAL);
   }
 }
+
 
 function getContextThresholdText(key) {
   const rules = {
@@ -3710,7 +3463,7 @@ function drawContextTakeawaySingle() {
   const layerWord = activeCount === 1 ? "layer" : "layers";
 
   const x = 54;
-  const y = 685;
+  const y = 650;
   const w = width - 108;
 
   drawInlineInsight(
