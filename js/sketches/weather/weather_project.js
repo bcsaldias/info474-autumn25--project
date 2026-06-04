@@ -1671,7 +1671,7 @@ function drawYearlyLineChart() {
   const cardW = chartW + 44;
   const cardH = chartH + 190;
 
-  drawCard(cardX, cardY, cardW, cardH, 18);
+  //drawCard(cardX, cardY, cardW, cardH, 18);
 
   fill("#222");
   noStroke();
@@ -1983,7 +1983,7 @@ function drawMonthlyFlaggedDaysProfile() {
   const chartW = width - 108;
   const chartH = 350;
 
-  drawCard(chartX, chartY, chartW, chartH, 18);
+  //drawCard(chartX, chartY, chartW, chartH, 18);
 
   fill("#222");
   noStroke();
