@@ -1009,34 +1009,27 @@ function getShortFactorExplanation(factorKey) {
 function drawOpeningPanel() {
   background("#f4f1eb");
 
-  const cardX = 64;
-  const cardY = 36;
-  const cardW = width - 128;
-  const cardH = 650;
+  const startX = 86;
+  const startY = 54;
+  const contentW = width - 172;
 
-  // Match the soft blue forecast-card background.
-  // No border, so it feels like an article section instead of a dashboard card.
-  noStroke();
-  fill("#F6F7F9");
-  rect(cardX, cardY, cardW, cardH, 24);
-
+  // No outer card/background. Make this feel like an article section.
   fill("#222");
   noStroke();
   textStyle(BOLD);
   textSize(30 * 1.15);
-  text("BEYOND THE FORECAST", cardX + 38, cardY + 62);
+  text("BEYOND THE FORECAST", startX, startY);
 
   fill("#555");
   textStyle(NORMAL);
   textSize(14 * 1.15);
   text(
     "A roadmap for reading Seattle weather as layers, not as one score.",
-    cardX + 38,
-    cardY + 90
+    startX,
+    startY + 30
   );
 
-  // Roadmap now includes the final takeaway as the fourth callout.
-  drawOpeningRoadmap(cardX + 38, cardY + 135, cardW - 76, 450);
+  drawOpeningRoadmap(startX, startY + 78, contentW, 470);
 
   textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
@@ -1117,8 +1110,8 @@ function drawRoadmapStep(stepNum, title, body, x, y, w, h, pillLabels) {
 }
 
 function drawOpeningRoadmap(x, y, w, h) {
-  const sectionH = 74;
-  const gap = 38;
+  const sectionH = 72;
+  const gap = 36;
 
   drawRoadmapSection(
     x,
@@ -1131,11 +1124,11 @@ function drawOpeningRoadmap(x, y, w, h) {
     ["55°F", "0.01 in rain", "99% cloud", "15.6 mph wind", "sunrise / sunset"]
   );
 
-  drawDownArrow(x + w / 2, y + sectionH + 10);
+  drawDownArrow(x + 18, y + sectionH + 10);
 
   drawRoadmapSection(
     x,
-    y + (sectionH + gap),
+    y + sectionH + gap,
     w,
     sectionH,
     "",
@@ -1144,7 +1137,7 @@ function drawOpeningRoadmap(x, y, w, h) {
     ["Rain", "Cloud", "Daylight", "Solar", "Wind", "Temp comfort"]
   );
 
-  drawDownArrow(x + w / 2, y + sectionH * 2 + gap + 10);
+  drawDownArrow(x + 18, y + sectionH * 2 + gap + 10);
 
   drawRoadmapSection(
     x,
@@ -1157,7 +1150,7 @@ function drawOpeningRoadmap(x, y, w, h) {
     ["Year", "Month", "Week", "Day"]
   );
 
-  drawDownArrow(x + w / 2, y + sectionH * 3 + gap * 2 + 10);
+  drawDownArrow(x + 18, y + sectionH * 3 + gap * 2 + 10);
 
   drawRoadmapSection(
     x,
@@ -1198,16 +1191,13 @@ function drawRoadmapTakeaway(x, y, w, body) {
   textStyle(NORMAL);
 }
 function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
-  // Campus-scenario style:
-  // no card, no background, no number badge.
-  // Only vertical line + article text + light inline tags.
+  const lineX = x;
+  const textX = x + 22;
+  const tagX = x + 360;
+  const tagY = y + 17;
+  const tagMaxW = w - 380;
 
-  const lineX = x + 8;
-  const textX = x + 30;
-  const tagAreaX = x + 360;
-  const tagAreaY = y + 14;
-  const tagAreaW = w - 390;
-
+  // Vertical article line only
   stroke("#4D3F8F");
   strokeWeight(4);
   line(lineX, y + 4, lineX, y + h - 4);
@@ -1215,43 +1205,45 @@ function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
 
   noStroke();
 
+  // Main text
   fill("#2f276f");
   textSize(15 * 1.15);
   textStyle(BOLD);
   text(title, textX, y + 18);
 
-  fill("#333");
+  fill("#444");
   textSize(11.8 * 1.15);
   textStyle(NORMAL);
   text(subtitle, textX, y + 42, 280);
 
-  let currentX = tagAreaX;
-  let currentY = tagAreaY;
+  // Inline tags, not pills/buttons
+  let currentX = tagX;
+  let currentY = tagY;
 
-  const tagH = 26;
-  const tagGap = 8;
-  const rowGap = 8;
+  textSize(10.8 * 1.15);
+  textStyle(BOLD);
 
   for (let i = 0; i < items.length; i++) {
     const label = items[i];
-    const tagW = getRoadmapPillWidth(label);
+    const labelW = textWidth(label);
+    const separatorW = i === items.length - 1 ? 0 : 18;
 
-    if (currentX + tagW > tagAreaX + tagAreaW) {
-      currentX = tagAreaX;
-      currentY += tagH + rowGap;
+    if (currentX + labelW + separatorW > tagX + tagMaxW) {
+      currentX = tagX;
+      currentY += 22;
     }
 
+    fill("#334155");
     noStroke();
-    fill("#E9EEF5");
-    rect(currentX, currentY, tagW, tagH, 999);
+    text(label, currentX, currentY);
 
-    fill("#2F3B4F");
-    textSize(10 * 1.15);
-    textStyle(BOLD);
-    textAlign(CENTER, CENTER);
-    text(label, currentX + tagW / 2, currentY + tagH / 2);
+    currentX += labelW;
 
-    currentX += tagW + tagGap;
+    if (i !== items.length - 1) {
+      fill("#A0A8B5");
+      text("·", currentX + 7, currentY);
+      currentX += 18;
+    }
   }
 
   textAlign(LEFT, BASELINE);
@@ -1267,11 +1259,11 @@ function getRoadmapPillWidth(label) {
 }
 
 function drawDownArrow(x, y) {
-  stroke("#B5BECF");
-  strokeWeight(1.5);
-  line(x, y, x, y + 12);
-  line(x, y + 12, x - 5, y + 7);
-  line(x, y + 12, x + 5, y + 7);
+  stroke("#C4CBD6");
+  strokeWeight(1.4);
+  line(x, y, x, y + 13);
+  line(x, y + 13, x - 5, y + 8);
+  line(x, y + 13, x + 5, y + 8);
   noStroke();
 }
 
