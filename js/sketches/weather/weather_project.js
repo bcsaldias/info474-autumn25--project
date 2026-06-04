@@ -16,7 +16,7 @@ const VIZ_HEIGHTS = {
   2: 980,
   3: 760,
   4: 900,
-  5: 900
+  5: 960
 };
 
 let selectedWeekStart = 0;
@@ -846,6 +846,80 @@ function drawOpeningPanel() {
 
   textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
+}
+
+function drawRoadmapPill(x, y, w, h, label) {
+  fill("#f7f3ed");
+  stroke("#d8cfc2");
+  strokeWeight(1.5);
+  rect(x, y, w, h, 12);
+
+  noStroke();
+  fill("#333");
+  textAlign(CENTER, CENTER);
+  textSize(15);
+  textStyle(BOLD);
+  text(label, x + w / 2, y + h / 2 + 1);
+}
+
+function drawWrappedPills(startX, startY, maxWidth, labels, pillH = 42, gapX = 12, gapY = 12) {
+  let x = startX;
+  let y = startY;
+
+  textSize(15);
+  textStyle(BOLD);
+
+  for (let label of labels) {
+    let w = max(90, textWidth(label) + 34);
+
+    if (x + w > startX + maxWidth) {
+      x = startX;
+      y += pillH + gapY;
+    }
+
+    drawRoadmapPill(x, y, w, pillH, label);
+    x += w + gapX;
+  }
+
+  return y + pillH; // returns bottom y of the final row
+}
+
+function drawRoadmapStep(stepNum, title, body, x, y, w, h, pillLabels) {
+  // card
+  fill("#fbfaf7");
+  stroke("#d8cfc2");
+  strokeWeight(2);
+  rect(x, y, w, h, 22);
+
+  // number circle
+  fill("#5143a5");
+  noStroke();
+  circle(x + 48, y + 50, 46);
+
+  fill("white");
+  textAlign(CENTER, CENTER);
+  textSize(22);
+  textStyle(BOLD);
+  text(stepNum, x + 48, y + 50);
+
+  // left text
+  fill("#352d7f");
+  textAlign(LEFT, TOP);
+  textSize(24);
+  textStyle(BOLD);
+  text(title, x + 85, y + 28);
+
+  fill("#555");
+  textSize(16);
+  textStyle(NORMAL);
+  text(body, x + 85, y + 76, 430, h - 100);
+
+  // right pills
+  let pillAreaX = x + w - 470;
+  let pillAreaY = y + 24;
+  let pillAreaW = 390;
+
+  drawWrappedPills(pillAreaX, pillAreaY, pillAreaW, pillLabels, 40, 12, 12);
 }
 
 function drawOpeningRoadmap(x, y, w, h) {
@@ -3262,26 +3336,24 @@ function getContextThresholdText(key) {
 
 function drawContextTrustNote() {
   const x = 54;
-  const y = 755;
+  const y = 765;
   const w = width - 108;
-  const h = 76;
 
-  drawCard(x, y, w, h, 14);
-
+  // No card holder — text only
   fill("#2f276f");
   noStroke();
   textSize(13.5 * 1.15);
   textStyle(BOLD);
-  text("Why this view builds trust", x + 24, y + 29);
+  text("Why this view builds trust", x, y + 18);
 
   fill("#333");
-  textSize(11.3 * 1.15);
+  textSize(11.7 * 1.15);
   textStyle(NORMAL);
-  textLeading(15);
+  textLeading(17);
   text(
     "This detail view shows the actual daily values behind the earlier summaries, so readers can check what each layer is based on.",
     x + 220,
-    y + 22,
+    y + 14,
     w - 250
   );
 
@@ -3291,29 +3363,31 @@ function drawContextTrustNote() {
 function drawContextTakeaway() {
   const day = getSelectedContextDay();
   const activeCount = getAllActiveLayerCount(day);
+  const layerWord = activeCount === 1 ? "layer" : "layers";
 
   const x = 54;
-  const y = 850;
+  const y = 835;
   const w = width - 108;
-  const h = 54;
 
-  drawCard(x, y, w, h, 14);
-
+  // No card holder — text only
   fill("#2f276f");
   noStroke();
   textSize(13.5 * 1.15);
   textStyle(BOLD);
-  text("Takeaway", x + 24, y + 24);
+  text("Takeaway", x, y + 18);
 
   fill("#333");
-  textSize(11.8 * 1.15);
+  textSize(12.1 * 1.15);
   textStyle(NORMAL);
+  textLeading(18);
   text(
-    `This day is not explained by one number alone. It has ${activeCount} active layers, showing how multiple ordinary weather conditions can shape a campus day together.`,
-    x + 135,
-    y + 19,
-    w - 170
+    `This day is not explained by one number alone. It has ${activeCount} active ${layerWord}, showing how ordinary weather conditions can shape a campus day together.`,
+    x + 220,
+    y + 12,
+    w - 250
   );
+
+  textLeading(13);
 }
 
 function getAllActiveLayerCount(day) {
