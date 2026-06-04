@@ -3468,13 +3468,13 @@ function drawContextRawValues() {
   );
 
   const values = [
-    ["💧", "Precipitation", `${nf(day.precip, 1, 2)} in`, "Rain"],
-    ["☁️", "Cloud cover", `${Math.round(day.cloudcover)}%`, "Cloud"],
-    ["☀️", "Daylight", `${nf(day.daylightHours, 1, 1)} hrs`, "Daylight"],
-    ["🌤️", "Solar energy", `${nf(day.solarenergy, 1, 1)} MJ/m²`, "Solar"],
-    ["〰️", "Wind speed", `${nf(day.windspeed, 1, 1)} mph`, "Wind"],
-    ["🌡️", "Feels like", `${nf(day.feelslike, 1, 1)}°F`, "Temp"]
-  ];
+  ["💧", "Precipitation", `${nf(day.precip, 1, 2)} in`],
+  ["☁️", "Cloud cover", `${Math.round(day.cloudcover)}%`],
+  ["☀️", "Daylight", `${nf(day.daylightHours, 1, 1)} hrs`],
+  ["🌤️", "Solar energy", `${nf(day.solarenergy, 1, 1)} MJ/m²`],
+  ["〰️", "Wind speed", `${nf(day.windspeed, 1, 1)} mph`],
+  ["🌡️", "Feels like", `${nf(day.feelslike, 1, 1)}°F`]
+];
 
   const gridX = x + 24;
   const gridY = y + 82;
@@ -3484,7 +3484,7 @@ function drawContextRawValues() {
   const cardH = 58;
 
   for (let i = 0; i < values.length; i++) {
-    const [icon, label, value, layer] = values[i];
+    const [icon, label, value] = values[i];
 
     const col = i % 3;
     const row = Math.floor(i / 3);
@@ -3512,13 +3512,6 @@ function drawContextRawValues() {
     textSize(12.2 * 1.15);
     textStyle(BOLD);
     text(value, cx + 34, cy + 43);
-
-    fill("#777");
-    textSize(9.6 * 1.15);
-    textStyle(NORMAL);
-    textAlign(RIGHT, BASELINE);
-    text(layer, cx + cardW - 10, cy + 43);
-    textAlign(LEFT, BASELINE);
   }
 
   textStyle(NORMAL);
@@ -3593,12 +3586,6 @@ function drawContextLayerExplanation() {
     textSize(10.2 * 1.15);
     textStyle(NORMAL);
     text(getContextThresholdText(key), cx + 14, cy + 39);
-
-    textAlign(RIGHT, BASELINE);
-    textSize(10.4 * 1.15);
-    textStyle(present ? BOLD : NORMAL);
-    text(present ? "present" : "not present", cx + cardW - 14, cy + 39);
-    textAlign(LEFT, BASELINE);
   }
 
   textStyle(NORMAL);
