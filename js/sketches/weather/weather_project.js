@@ -13,9 +13,9 @@ let selectedContextDayIndex = -1;
 
 const VIZ_HEIGHTS = {
   1: 860,
-  2: 980,
-  3: 760,
-  4: 900,
+  2: 900,
+  3: 850,
+  4: 860,
   5: 760
 };
 
@@ -357,21 +357,23 @@ function setupSectionObserver() {
 /* -------------------------
    Drawing helpers
 -------------------------- */
+
 function measureWrappedTextHeight(str, boxWidth, fontSize = 12, leading = 16) {
+  if (!str) return 0;
+
   push();
   textSize(fontSize);
   textStyle(NORMAL);
   textLeading(leading);
 
-  const words = str.split(" ");
+  const words = String(str).split(" ");
   let line = "";
   let lines = 1;
 
   for (let i = 0; i < words.length; i++) {
     const testLine = line + words[i] + " ";
-    const testWidth = textWidth(testLine);
 
-    if (testWidth > boxWidth && i > 0) {
+    if (textWidth(testLine) > boxWidth && i > 0) {
       lines++;
       line = words[i] + " ";
     } else {
@@ -381,6 +383,37 @@ function measureWrappedTextHeight(str, boxWidth, fontSize = 12, leading = 16) {
 
   pop();
   return lines * leading;
+}
+
+function drawAdaptiveNote(x, y, w, textContent, options = {}) {
+  const padding = options.padding || 14;
+  const fontSize = options.fontSize || 12.5;
+  const leading = options.leading || 17;
+  const minH = options.minH || 42;
+  const bg = options.bg || "#F3EFE8";
+  const textColor = options.textColor || "#444";
+
+  const textW = w - padding * 2;
+  const textH = measureWrappedTextHeight(textContent, textW, fontSize, leading);
+  const h = Math.max(minH, textH + padding * 2);
+
+  fill(bg);
+  noStroke();
+  rect(x, y, w, h, 10);
+
+  fill(textColor);
+  textSize(fontSize);
+  textStyle(NORMAL);
+  textLeading(leading);
+  text(textContent, x + padding, y + padding, textW);
+
+  textLeading(13);
+  return h;
+}
+
+function colorWithAlpha(hexColor, alphaValue) {
+  const c = color(hexColor);
+  return color(red(c), green(c), blue(c), 255 * alphaValue);
 }
 
 function measureTextBlockHeight(blocks, innerWidth) {
@@ -511,58 +544,6 @@ function drawAutoTextCard({
   textLeading(13);
   textStyle(NORMAL);
 
-  return h;
-}
-
-function measureWrappedTextHeight(str, boxWidth, fontSize = 12, leading = 16) {
-  if (!str) return 0;
-
-  push();
-  textSize(fontSize);
-  textStyle(NORMAL);
-  textLeading(leading);
-
-  const words = String(str).split(" ");
-  let line = "";
-  let lines = 1;
-
-  for (let i = 0; i < words.length; i++) {
-    const testLine = line + words[i] + " ";
-    if (textWidth(testLine) > boxWidth && i > 0) {
-      lines++;
-      line = words[i] + " ";
-    } else {
-      line = testLine;
-    }
-  }
-
-  pop();
-  return lines * leading;
-}
-
-function drawAdaptiveNote(x, y, w, textContent, options = {}) {
-  const padding = options.padding || 14;
-  const fontSize = options.fontSize || 12.5;
-  const leading = options.leading || 17;
-  const minH = options.minH || 42;
-  const bg = options.bg || "#F3EFE8";
-  const textColor = options.textColor || "#444";
-
-  const textW = w - padding * 2;
-  const textH = measureWrappedTextHeight(textContent, textW, fontSize, leading);
-  const h = Math.max(minH, textH + padding * 2);
-
-  fill(bg);
-  noStroke();
-  rect(x, y, w, h, 10);
-
-  fill(textColor);
-  textSize(fontSize);
-  textStyle(NORMAL);
-  textLeading(leading);
-  text(textContent, x + padding, y + padding, textW);
-
-  textLeading(13);
   return h;
 }
 
