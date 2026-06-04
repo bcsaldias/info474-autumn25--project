@@ -16,7 +16,7 @@ const VIZ_HEIGHTS = {
   2: 980,
   3: 760,
   4: 820,
-  5: 820
+  5: 760
 };
 
 let selectedWeekStart = 0;
@@ -3251,25 +3251,23 @@ function drawContextDaySelector() {
 
   drawStaticPanel(x, y, w, h, 16);
 
-  // Left text block
   fill("#2f276f");
   noStroke();
-  textSize(14 * 1.15);
+  textSize(13 * 1.15);
   textStyle(BOLD);
-  text("Choose a day to inspect", x + 24, y + 30);
+  text("Choose a day to inspect", x + 24, y + 28);
 
   fill("#555");
-  textSize(11.2 * 1.15);
+  textSize(10.5 * 1.15);
   textStyle(NORMAL);
-  textLeading(15);
+  textLeading(14);
   text(
     "Use the arrows to move through the same week from the weekly lens.",
     x + 24,
-    y + 52,
-    250
+    y + 48,
+    270
   );
 
-  // Previous day button
   drawContextArrowButton(
     layout.prevX,
     layout.buttonY,
@@ -3279,7 +3277,6 @@ function drawContextDaySelector() {
     "Previous"
   );
 
-  // Selected day card
   fill("#4D3F8F");
   stroke("#4D3F8F");
   strokeWeight(1.2);
@@ -3289,15 +3286,14 @@ function drawContextDaySelector() {
   fill("#FFFFFF");
   textAlign(CENTER, CENTER);
 
-  textSize(13 * 1.15);
+  textSize(12.5 * 1.15);
   textStyle(BOLD);
-  text(getShortWeekday(day.dateObj), layout.dayCardX + layout.dayCardW / 2, layout.buttonY + 20);
+  text(getShortWeekday(day.dateObj), layout.dayCardX + layout.dayCardW / 2, layout.buttonY + 17);
 
-  textSize(11 * 1.15);
+  textSize(10.5 * 1.15);
   textStyle(NORMAL);
-  text(`${day.monthName} ${day.day}`, layout.dayCardX + layout.dayCardW / 2, layout.buttonY + 42);
+  text(`${day.monthName} ${day.day}`, layout.dayCardX + layout.dayCardW / 2, layout.buttonY + 35);
 
-  // Next day button
   drawContextArrowButton(
     layout.nextX,
     layout.buttonY,
@@ -3314,18 +3310,16 @@ function drawContextDaySelector() {
 
 function getContextArrowSelectorLayout() {
   const x = 54;
-  const y = 96;
+  const y = 105;
   const w = width - 108;
-  const h = 112;
+  const h = 88;
 
-  // Keep the left text block separate from the controls
-  const controlStartX = x + 330;
-  const controlY = y + 30;
+  const controlY = y + 22;
 
-  const arrowW = 88;
-  const dayCardW = 170;
-  const buttonH = 54;
-  const gap = 14;
+  const arrowW = 76;
+  const dayCardW = 160;
+  const buttonH = 46;
+  const gap = 12;
 
   const totalControlW = arrowW + gap + dayCardW + gap + arrowW;
   const centeredStartX = x + w - totalControlW - 34;
@@ -3357,13 +3351,13 @@ function drawContextArrowButton(x, y, w, h, arrow, label) {
   fill(hover ? "#2f276f" : "#333");
   textAlign(CENTER, CENTER);
 
-  textSize(16 * 1.15);
+  textSize(14 * 1.15);
   textStyle(BOLD);
-  text(arrow, x + w / 2, y + 20);
+  text(arrow, x + w / 2, y + 16);
 
-  textSize(9.5 * 1.15);
+  textSize(8.7 * 1.15);
   textStyle(hover ? BOLD : NORMAL);
-  text(label, x + w / 2, y + 39);
+  text(label, x + w / 2, y + 33);
 
   textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
@@ -3394,102 +3388,93 @@ function drawContextOverviewCard() {
   const day = getSelectedContextDay();
 
   const x = 54;
-  const y = 215;
+  const y = 210;
   const w = 270;
-  const h = 240;
-
-  //drawCard(x, y, w, h, 18);
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5 * 1.15);
+  textSize(12.5 * 1.15);
   textStyle(BOLD);
-  text("Selected day", x + 24, y + 30);
+  text("Selected day", x + 20, y + 20);
 
   fill("#222");
-  textSize(22 * 1.15);
+  textSize(18 * 1.15);
   textStyle(BOLD);
-  text(`${getShortWeekday(day.dateObj)}, ${day.monthName} ${day.day}`, x + 24, y + 70);
+  text(`${getShortWeekday(day.dateObj)}, ${day.monthName} ${day.day}`, x + 20, y + 52);
 
   fill("#555");
-  textSize(11.5 * 1.15);
+  textSize(10.5 * 1.15);
   textStyle(NORMAL);
-  text(day.date, x + 24, y + 95);
+  text(day.date, x + 20, y + 74);
 
-  textSize(42 * 1.15);
-  textStyle(BOLD);
   fill("#222");
-  text(`${Math.round(day.feelslike)}°F`, x + 24, y + 152);
-
   textSize(34 * 1.15);
+  textStyle(BOLD);
+  text(`${Math.round(day.feelslike)}°F`, x + 20, y + 124);
+
+  textSize(27 * 1.15);
   textAlign(CENTER, CENTER);
-  text(getForecastIcon(day), x + w - 58, y + 135);
+  text(getForecastIcon(day), x + w - 54, y + 106);
   textAlign(LEFT, BASELINE);
 
   fill("#555");
-  textSize(12.2 * 1.15);
+  textSize(10.5 * 1.15);
   textStyle(NORMAL);
-  text(day.conditions || "No condition label", x + 24, y + 184, w - 48);
+  text(day.conditions || "No condition label", x + 20, y + 154, w - 40);
 
-  fill("#F3EFE8");
-  noStroke();
-  rect(x + 24, y + h - 44, w - 48, 30, 9);
-
-  fill("#444");
-  textSize(10.8 * 1.15);
-  textAlign(CENTER, CENTER);
+  fill("#333");
+  textSize(10.5 * 1.15);
+  textStyle(BOLD);
   text(
     `${getAllActiveLayerCount(day)} of 6 layers present`,
-    x + w / 2,
-    y + h - 29
+    x + 20,
+    y + 176
   );
 
-  textAlign(LEFT, BASELINE);
+  textStyle(NORMAL);
 }
 
 function drawContextRawValues() {
   const day = getSelectedContextDay();
 
   const x = 350;
-  const y = 215;
+  const y = 210;
   const w = width - 404;
-  const h = 240;
-
-  //drawCard(x, y, w, h, 18);
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5 * 1.15);
+  textSize(12.5 * 1.15);
   textStyle(BOLD);
-  text("Raw weather values", x + 24, y + 30);
+  text("Raw weather values", x + 20, y + 20);
 
   fill("#555");
-  textSize(11.2 * 1.15);
+  textSize(10.2 * 1.15);
   textStyle(NORMAL);
   text(
-    "These values come directly from the cleaned daily weather dataset.",
-    x + 24,
-    y + 52
+    "Values from the cleaned daily weather dataset.",
+    x + 20,
+    y + 42,
+    w - 40
   );
 
   const values = [
-    ["💧", "Precipitation", `${nf(day.precip, 1, 2)} in`, "Rain"],
-    ["☁️", "Cloud cover", `${Math.round(day.cloudcover)}%`, "Cloud"],
-    ["☀️", "Daylight", `${nf(day.daylightHours, 1, 1)} hrs`, "Daylight"],
-    ["🌤️", "Solar energy", `${nf(day.solarenergy, 1, 1)} MJ/m²`, "Solar"],
-    ["〰️", "Wind speed", `${nf(day.windspeed, 1, 1)} mph`, "Wind"],
-    ["🌡️", "Feels like", `${nf(day.feelslike, 1, 1)}°F`, "Temp"]
+    ["💧", "Precipitation", `${nf(day.precip, 1, 2)} in`],
+    ["☁️", "Cloud cover", `${Math.round(day.cloudcover)}%`],
+    ["☀️", "Daylight", `${nf(day.daylightHours, 1, 1)} hrs`],
+    ["🌤️", "Solar energy", `${nf(day.solarenergy, 1, 1)} MJ/m²`],
+    ["〰️", "Wind speed", `${nf(day.windspeed, 1, 1)} mph`],
+    ["🌡️", "Feels like", `${nf(day.feelslike, 1, 1)}°F`]
   ];
 
-  const gridX = x + 24;
-  const gridY = y + 82;
+  const gridX = x + 20;
+  const gridY = y + 62;
   const gapX = 10;
-  const gapY = 14;
-  const cardW = (w - 48 - gapX * 2) / 3;
-  const cardH = 58;
+  const gapY = 10;
+  const cardW = (w - 40 - gapX * 2) / 3;
+  const cardH = 54;
 
   for (let i = 0; i < values.length; i++) {
-    const [icon, label, value, layer] = values[i];
+    const [icon, label, value] = values[i];
 
     const col = i % 3;
     const row = Math.floor(i / 3);
@@ -3504,69 +3489,76 @@ function drawContextRawValues() {
 
     noStroke();
 
-    fill("#333");
-    textSize(14 * 1.15);
-    text(icon, cx + 12, cy + 24);
+    textSize(12 * 1.15);
+    text(icon, cx + 12, cy + 22);
 
     fill("#333");
-    textSize(10.6 * 1.15);
+    textSize(9.5 * 1.15);
     textStyle(BOLD);
-    text(label, cx + 34, cy + 21);
+    text(label, cx + 34, cy + 20, cardW - 44);
 
     fill("#222");
-    textSize(12.2 * 1.15);
+    textSize(11.5 * 1.15);
     textStyle(BOLD);
-    text(value, cx + 34, cy + 43);
+    text(value, cx + 34, cy + 41, cardW - 44);
 
-    fill("#777");
-    textSize(9.6 * 1.15);
     textStyle(NORMAL);
-    textAlign(RIGHT, BASELINE);
-    text(layer, cx + cardW - 10, cy + 43);
-    textAlign(LEFT, BASELINE);
   }
+}
 
-  textStyle(NORMAL);
+function getContextLayerLabel(key) {
+  const labels = {
+    rain: "Rain",
+    cloud: "Cloud",
+    daylight: "Daylight",
+    solar: "Solar",
+    wind: "Wind",
+    temp: "Temp comfort"
+  };
+
+  return labels[key] || FACTORS[key].shortLabel || FACTORS[key].label;
 }
 
 function drawContextLayerExplanation() {
   const day = getSelectedContextDay();
 
   const x = 54;
-  const y = 445;
+  const y = 405;
   const w = width - 108;
-  const h = 215;
+  const h = 170;
 
   drawStaticPanel(x, y, w, h, 18);
 
   fill("#2f276f");
   noStroke();
-  textSize(14 * 1.15);
+  textSize(13 * 1.15);
   textStyle(BOLD);
-  text("Which layers are present on this day?", x + 24, y + 30);
+  text("Which layers are present on this day?", x + 20, y + 25);
 
   fill("#555");
-  textSize(11.2 * 1.15);
+  textSize(10.2 * 1.15);
   textStyle(NORMAL);
   text(
-    "A layer is present when the raw value crosses our prototype threshold.",
-    x + 24,
-    y + 54
+    "A layer is marked present when the daily value crosses the prototype threshold.",
+    x + 20,
+    y + 46,
+    w - 40
   );
 
   const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
 
-  const startX = x + 24;
-  const startY = y + 86;
-  const gapX = 12;
-  const gapY = 18;
-  const cardW = (w - 72) / 3;
-  const cardH = 50;
+  const startX = x + 20;
+  const startY = y + 68;
+  const gapX = 10;
+  const gapY = 10;
+  const cardW = (w - 60) / 3;
+  const cardH = 42;
 
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     const info = FACTORS[key];
     const present = day.layers[key];
+    const label = getContextLayerLabel(key);
 
     const col = i % 3;
     const row = Math.floor(i / 3);
@@ -3577,7 +3569,7 @@ function drawContextLayerExplanation() {
     const c = color(info.color);
 
     if (present) {
-      fill(red(c), green(c), blue(c), 72);
+      fill(red(c), green(c), blue(c), 58);
       stroke(info.color);
     } else {
       fill("#FFFFFF");
@@ -3585,28 +3577,33 @@ function drawContextLayerExplanation() {
     }
 
     strokeWeight(1.2);
-    rect(cx, cy, cardW, cardH, 12);
+    rect(cx, cy, cardW, cardH, 11);
 
     noStroke();
 
+    // left: icon + shorter layer name
     fill(present ? "#222" : "#666");
-    textSize(11.6 * 1.15);
+    textSize(9.8 * 1.15);
     textStyle(BOLD);
-    text(`${info.icon} ${info.label}`, cx + 14, cy + 20);
+    text(`${info.icon} ${label}`, cx + 12, cy + 25, cardW - 100);
 
+    // right: status
     fill(present ? "#2f276f" : "#777");
-    textSize(10.2 * 1.15);
-    textStyle(NORMAL);
-    text(getContextThresholdText(key), cx + 14, cy + 39);
+    textSize(8.4 * 1.15);
+    textStyle(BOLD);
+    textAlign(RIGHT, CENTER);
+    text(
+      present ? "present" : "not present",
+      cx + cardW - 12,
+      cy + cardH / 2
+    );
 
-    textAlign(RIGHT, BASELINE);
-    textSize(10.4 * 1.15);
-    textStyle(present ? BOLD : NORMAL);
-    text(present ? "present" : "not present", cx + cardW - 14, cy + 39);
     textAlign(LEFT, BASELINE);
+    textStyle(NORMAL);
   }
 
   textStyle(NORMAL);
+  textAlign(LEFT, BASELINE);
 }
 
 function getContextThresholdText(key) {
@@ -3624,7 +3621,7 @@ function getContextThresholdText(key) {
 
 function drawContextTrustNote() {
   const x = 54;
-  const y = 678;
+  const y = 620;
   const w = width - 108;
 
   drawInlineInsight(
@@ -3633,7 +3630,7 @@ function drawContextTrustNote() {
     w,
     "Why trust",
     "This detail view brings the earlier summary back to the actual daily values, so readers can see what each layer is based on.",
-    56
+    48
   );
 }
 
@@ -3643,7 +3640,7 @@ function drawContextTakeaway() {
   const layerWord = activeCount === 1 ? "layer" : "layers";
 
   const x = 54;
-  const y = 742;
+  const y = 676;
   const w = width - 108;
 
   drawInlineInsight(
@@ -3651,8 +3648,8 @@ function drawContextTakeaway() {
     y,
     w,
     "Takeaway",
-    `This day is not explained by one number alone. It has ${activeCount} active ${layerWord}, showing how ordinary weather conditions can shape a campus day together.`,
-    56
+    `This day is not explained by one number alone. It has ${activeCount} active ${layerWord}, showing how ordinary conditions can shape a campus day together.`,
+    48
   );
 }
 
