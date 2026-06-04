@@ -493,3 +493,42 @@ canvas {
     gap: 24px;
   }
 }
+
+#article-footer {
+  margin: 20px auto 0 auto;
+  padding: 44px 28px 58px 28px;
+  border-top: 1px solid #d8d0c8;
+  background: transparent;
+}
+
+.footer-inner {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+#article-footer p {
+  max-width: 760px;
+  margin: 0 0 12px 0;
+  color: #6b7280;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.back-to-top {
+  display: inline-block;
+  margin-top: 18px;
+  color: #4d3f8f;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 2px;
+}
+
+.back-to-top:hover {
+  color: #2f276f;
+}
+
+html {
+  scroll-behavior: smooth;
+}
