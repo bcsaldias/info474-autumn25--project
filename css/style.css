@@ -3,6 +3,7 @@ body {
   background: #f4f1eb;
   color: #222;
   font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.5;
 }
 
 #site-header {
@@ -97,11 +98,11 @@ body {
   gap: 6px;
   max-width: 760px;
   margin: 24px 0 24px 0;
-  padding: 18px 22px;
-  border: 1px solid #ded6ca;
-  border-radius: 18px;
-  background: #fffefa;
-  box-shadow: 0 8px 24px rgba(40, 32, 20, 0.04);
+  padding: 4px 0 4px 18px;
+  border-left: 4px solid #4d3f8f;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .intro-question span {
@@ -121,7 +122,7 @@ body {
 .intro-pills {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 0;
   margin-top: 18px;
 }
 
@@ -129,16 +130,26 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 9px 14px;
-  border: 1px solid #ded6ca;
-  border-radius: 999px;
-  background: #fffefa;
-  color: #444444;
+  padding: 6px 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #555555;
   font-size: 14px;
   font-weight: 650;
-  box-shadow: 0 2px 8px rgba(40, 32, 20, 0.04);
+  box-shadow: none;
 }
 
+.intro-pills span::after {
+  content: "·";
+  margin: 0 12px;
+  color: #b8afa3;
+}
+
+.intro-pills span:last-child::after {
+  content: "";
+  margin: 0;
+}
 
 .tag-row {
   display: flex;
@@ -254,7 +265,6 @@ canvas {
   color: #444;
 }
 
- 
 @media (max-width: 1050px) {
   #graphic {
     display: block;
@@ -282,4 +292,25 @@ canvas {
   #intro h1 {
     font-size: 34px;
   }
+}
+
+/* Interaction language
+   - Clickable elements are drawn in p5 with hover + hand cursor.
+   - Article notes and static data panels stay visually quiet and never use hover styling.
+*/
+#vis canvas {
+  user-select: none;
+}
+
+.step {
+  cursor: default;
+}
+
+.step .title {
+  cursor: default;
+}
+
+#closing,
+#intro {
+  cursor: default;
 }

@@ -13,15 +13,9 @@ let selectedContextDayIndex = -1;
 
 const VIZ_HEIGHTS = {
   1: 860,
-<<<<<<< HEAD
-  2: 900,
-  3: 850,
-  4: 860,
-=======
   2: 980,
   3: 760,
   4: 820,
->>>>>>> origin/gh-pages
   5: 760
 };
 
@@ -155,6 +149,8 @@ function draw() {
   } else {
     drawPlaceholderPanel();
   }
+
+  updateCanvasCursor();
 }
 
 function windowResized() {
@@ -724,14 +720,29 @@ function formatTime(timeText) {
   return `${hour}:${minute} ${suffix}`;
 }
 
-function drawRoundedButton(x, y, w, h, label, icon, active, colorValue) {
+function isMouseInside(x, y, w, h) {
+  return mouseX >= x && mouseX <= x + w && mouseY >= y && mouseY <= y + h;
+}
+
+function drawRoundedButton(x, y, w, h, label, icon, active, colorValue, hover = false) {
+  // Clickable control style: clear button shape + hover + active state.
+  const c = color(colorValue || "#4D3F8F");
+
   if (active) {
-    drawSoftCard(x, y, w, h, colorValue, 12);
+    fill(red(c), green(c), blue(c), 38);
+    stroke(colorValue || "#4D3F8F");
+    strokeWeight(2);
+  } else if (hover) {
+    fill("#FFFDF8");
+    stroke(colorValue || "#4D3F8F");
+    strokeWeight(1.8);
   } else {
     fill("#FFFFFF");
-    stroke("#D9D2C7");
-    rect(x, y, w, h, 12);
+    stroke("#CFC6BA");
+    strokeWeight(1.1);
   }
+
+  rect(x, y, w, h, 12);
 
   noStroke();
   textAlign(CENTER, CENTER);
@@ -739,13 +750,224 @@ function drawRoundedButton(x, y, w, h, label, icon, active, colorValue) {
   textSize(19 * 1.15);
   text(icon, x + w / 2, y + 21);
 
-  fill(active ? "#2f276f" : "#333");
+  fill(active ? "#2f276f" : hover ? "#2f276f" : "#333");
   textSize(10.5 * 1.15);
-  textStyle(active ? BOLD : NORMAL);
+  textStyle(active || hover ? BOLD : NORMAL);
   text(label, x + w / 2, y + h - 14);
 
   textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
+  strokeWeight(1);
+}
+
+function drawArticleNote({
+  x,
+  y,
+  w,
+  title = "",
+  icon = "",
+  body = "",
+  footerTitle = "",
+  footerBody = "",
+  padding = 18,
+  minH = 160
+}) {
+  // Non-clickable article note style: soft background + left accent line, no button border.
+  const innerW = w - padding * 2 - 18;
+  const bodyH = body ? measureWrappedTextHeight(body, innerW, 12.2, 16) : 0;
+  const footerH = footerBody ? measureWrappedTextHeight(footerBody, innerW, 11.5, 15) : 0;
+  const h = Math.max(minH, 64 + bodyH + (footerTitle || footerBody ? 42 + footerH : 0));
+
+  noStroke();
+  fill("#F7F2EA");
+  rect(x, y, w, h, 14);
+
+  stroke("#4D3F8F");
+  strokeWeight(4);
+  line(x + 14, y + 18, x + 14, y + h - 18);
+  strokeWeight(1);
+
+  noStroke();
+  fill("#2f276f");
+  textSize(13.5 * 1.15);
+  textStyle(BOLD);
+  text(title, x + padding + 16, y + 28, innerW - 28);
+
+  if (icon) {
+    textSize(21);
+    textAlign(RIGHT, BASELINE);
+    text(icon, x + w - padding, y + 30);
+    textAlign(LEFT, BASELINE);
+  }
+
+  fill("#444");
+  textSize(12.2 * 1.15);
+  textStyle(NORMAL);
+  textLeading(16);
+  text(body, x + padding + 16, y + 60, innerW);
+
+  if (footerTitle || footerBody) {
+    const footerY = y + 72 + bodyH;
+
+    stroke("#D8D0C8");
+    strokeWeight(1);
+    line(x + padding + 16, footerY, x + w - padding, footerY);
+
+    noStroke();
+    fill("#2f276f");
+    textSize(11.5 * 1.15);
+    textStyle(BOLD);
+    text(footerTitle, x + padding + 16, footerY + 22);
+
+    fill("#555");
+    textSize(11.2 * 1.15);
+    textStyle(NORMAL);
+    textLeading(15);
+    text(footerBody, x + padding + 16, footerY + 42, innerW);
+  }
+
+  textLeading(13);
+  textStyle(NORMAL);
+}
+
+function drawInlineInsight(x, y, w, label, body, h = 64) {
+  // Non-clickable inline insight style for article-like notes.
+  noStroke();
+  fill("#F7F2EA");
+  rect(x, y, w, h, 12);
+
+  stroke("#D8D0C8");
+  strokeWeight(1);
+  line(x + 150, y + 14, x + 150, y + h - 14);
+
+  noStroke();
+  fill("#2f276f");
+  textSize(13 * 1.15);
+  textStyle(BOLD);
+  text(label, x + 20, y + 25);
+
+  fill("#333");
+  textSize(11.8 * 1.15);
+  textStyle(NORMAL);
+  textLeading(15);
+  text(body, x + 170, y + 19, w - 200);
+
+  textLeading(13);
+  textStyle(NORMAL);
+}
+
+function drawStaticPanel(x, y, w, h, radius = 14) {
+  // Static data-display panel: lighter than a button/card and never hoverable.
+  noStroke();
+  fill("#FBF8F2");
+  rect(x, y, w, h, radius);
+
+  stroke("#E1D8CD");
+  strokeWeight(1);
+  noFill();
+  rect(x, y, w, h, radius);
+}
+
+function isOverFactorButton() {
+  const keys = Object.keys(FACTORS);
+  const startX = 52;
+  const y = 118;
+  const w = 82;
+  const h = 62;
+  const gap = 10;
+
+  for (let i = 0; i < keys.length; i++) {
+    const x = startX + i * (w + gap);
+    if (isMouseInside(x, y, w, h)) return true;
+  }
+
+  return false;
+}
+
+function isOverMonthButton() {
+  const startX = 54;
+  const y = 118;
+  const w = 58;
+  const h = 32;
+  const gap = 7;
+
+  for (let i = 0; i < monthlyData.length; i++) {
+    const x = startX + i * (w + gap);
+    if (isMouseInside(x, y, w, h)) return true;
+  }
+
+  return false;
+}
+
+function isOverWeeklyFactorButton() {
+  const x = 54;
+  const y = 100;
+  const w = width - 108;
+  const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
+  const buttonY = y + 42;
+  const gap = 10;
+  const buttonW = (w - gap * (keys.length - 1)) / keys.length;
+  const buttonH = 38;
+
+  for (let i = 0; i < keys.length; i++) {
+    const bx = x + i * (buttonW + gap);
+    if (isMouseInside(bx, buttonY, buttonW, buttonH)) return true;
+  }
+
+  return false;
+}
+
+function isOverWeekNavButton() {
+  const y = 205;
+  const buttonW = 80;
+  const buttonH = 34;
+  return isMouseInside(54, y, buttonW, buttonH) || isMouseInside(width - 134, y, buttonW, buttonH);
+}
+
+function isOverWeeklyDayBar() {
+  const week = getCurrentWeekDays();
+  if (!week.length) return false;
+
+  const chartX = 76;
+  const chartY = 300;
+  const chartW = width - 152;
+  const chartH = 225;
+  const barAreaX = chartX + 66;
+  const barAreaW = chartW - 96;
+  const dayGap = barAreaW / week.length;
+  const barW = Math.min(68, dayGap * 0.62);
+
+  for (let i = 0; i < week.length; i++) {
+    const centerX = barAreaX + dayGap * i + dayGap / 2;
+    const barX = centerX - barW / 2;
+    if (isMouseInside(barX - 14, chartY - 28, barW + 28, chartH + 84)) return true;
+  }
+
+  return false;
+}
+
+function isOverContextArrowButton() {
+  const layout = getContextArrowSelectorLayout();
+  return (
+    isMouseInside(layout.prevX, layout.buttonY, layout.arrowW, layout.buttonH) ||
+    isMouseInside(layout.nextX, layout.buttonY, layout.arrowW, layout.buttonH)
+  );
+}
+
+function isOverClickableControl() {
+  if (activeSection === 2) return isOverFactorButton();
+  if (activeSection === 3) return isOverMonthButton();
+  if (activeSection === 4) return isOverWeeklyFactorButton() || isOverWeekNavButton() || isOverWeeklyDayBar();
+  if (activeSection === 5) return isOverContextArrowButton();
+  return false;
+}
+
+function updateCanvasCursor() {
+  if (isOverClickableControl()) {
+    cursor(HAND);
+  } else {
+    cursor(ARROW);
+  }
 }
 
 function normalizeValue(value, minValue, maxValue) {
@@ -1514,15 +1736,19 @@ function drawFactorButtons() {
     const key = keys[i];
     const info = FACTORS[key];
 
+    const x = startX + i * (w + gap);
+    const hover = isMouseInside(x, y, w, h);
+
     drawRoundedButton(
-      startX + i * (w + gap),
+      x,
       y,
       w,
       h,
       info.shortLabel,
       info.icon,
       selectedFactor === key,
-      info.color
+      info.color,
+      hover
     );
   }
 }
@@ -1861,7 +2087,7 @@ function drawYearlyAnnotationCard() {
       ? "Flagged days, measured in days. Higher means more days outside the comfort range."
       : `${metric.yLabel}, measured in ${metric.unit}.`;
 
-  drawAutoTextCard({
+  drawArticleNote({
     x,
     y,
     w,
@@ -1871,11 +2097,7 @@ function drawYearlyAnnotationCard() {
     footerTitle: "Data shown",
     footerBody: footerBody,
     minH: 190,
-    padding: 18,
-    bodySize: 12.2,
-    bodyLeading: 16,
-    footerBodySize: 12,
-    footerLeading: 15
+    padding: 18
   });
 }
 
@@ -1925,22 +2147,35 @@ function drawMonthButtons() {
     const month = monthlyData[i];
     const x = startX + i * (w + gap);
     const active = selectedMonth === i;
+    const hover = isMouseInside(x, y, w, h);
 
-    fill(active ? "#4D3F8F" : "#FFFFFF");
-    stroke(active ? "#4D3F8F" : "#D9D2C7");
-    strokeWeight(1);
+    if (active) {
+      fill("#4D3F8F");
+      stroke("#4D3F8F");
+      strokeWeight(1.6);
+    } else if (hover) {
+      fill("#FFFDF8");
+      stroke("#4D3F8F");
+      strokeWeight(1.5);
+    } else {
+      fill("#FFFFFF");
+      stroke("#CFC6BA");
+      strokeWeight(1);
+    }
+
     rect(x, y, w, h, 10);
 
     noStroke();
-    fill(active ? "#FFFFFF" : "#333");
+    fill(active ? "#FFFFFF" : hover ? "#2f276f" : "#333");
     textSize(11.5 * 1.15);
-    textStyle(active ? BOLD : NORMAL);
+    textStyle(active || hover ? BOLD : NORMAL);
     textAlign(CENTER, CENTER);
     text(month.monthName, x + w / 2, y + h / 2);
   }
 
   textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
+  strokeWeight(1);
 }
 
 function handleMonthSelection() {
@@ -2092,7 +2327,7 @@ function drawMonthlyAverageSummary() {
   const w = width - 108;
   const h = 78;
 
-  drawCard(x, y, w, h, 14);
+  drawStaticPanel(x, y, w, h, 14);
 
   fill("#2f276f");
   noStroke();
@@ -2151,29 +2386,17 @@ function drawMonthlySelectedInsight() {
   }
 
   const info = FACTORS[highestKey];
-
-  // moved upward
   const x = 54;
   const y = 655;
   const w = width - 108;
-  const h = 64;
 
-  drawCard(x, y, w, h, 14);
-
-  fill("#2f276f");
-  noStroke();
-  textSize(13.5 * 1.15);
-  textStyle(BOLD);
-  text("What stands out", x + 24, y + 26);
-
-  fill("#333");
-  textSize(12.1 * 1.15);
-  textStyle(NORMAL);
-  text(
+  drawInlineInsight(
+    x,
+    y,
+    w,
+    "What stands out",
     `${info.label} appears most often in ${month.monthName}, with ${highestValue} flagged days. This suggests which layer showed up most frequently in this month.`,
-    x + 160,
-    y + 22,
-    w - 190
+    64
   );
 }
 
@@ -2183,7 +2406,7 @@ function drawMonthlyMethodNote() {
   const w = width - 108;
   const h = 118;
 
-  drawCard(x, y, w, h, 16);
+  drawStaticPanel(x, y, w, h, 16);
 
   fill("#2f276f");
   noStroke();
@@ -2245,24 +2468,14 @@ function drawMonthlyTakeaway() {
   const x = 54;
   const y = 870;
   const w = width - 108;
-  const h = 60;
 
-  drawCard(x, y, w, h, 14);
-
-  fill("#2f276f");
-  noStroke();
-  textSize(13.5 * 1.15);
-  textStyle(BOLD);
-  text("Why this matters", x + 28, y + 24);
-
-  fill("#333");
-  textSize(12.2 * 1.15);
-  textStyle(NORMAL);
-  text(
+  drawInlineInsight(
+    x,
+    y,
+    w,
+    "Why this matters",
     "This profile separates frequency from raw intensity. A month can stand out because one layer appears often, even if no single weather number looks extreme.",
-    x + 190,
-    y + 23,
-    w - 225
+    60
   );
 }
 
@@ -2367,37 +2580,43 @@ function drawWeeklyFactorControls() {
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     const info = FACTORS[key];
-
     const bx = startX + i * (buttonW + gap);
     const active = weeklySelectedFactors.includes(key);
+    const hover = isMouseInside(bx, buttonY, buttonW, buttonH);
     const c = color(info.color);
 
     if (active) {
-      fill(red(c), green(c), blue(c), 82);
+      fill(red(c), green(c), blue(c), 68);
       stroke(info.color);
       strokeWeight(2);
+    } else if (hover) {
+      fill("#FFFDF8");
+      stroke(info.color);
+      strokeWeight(1.8);
     } else {
-      fill("#f4f1eb");
-      stroke("#BFB6AA");
-      strokeWeight(1.4);
+      fill("#FFFFFF");
+      stroke("#CFC6BA");
+      strokeWeight(1.1);
     }
 
     rect(bx, buttonY, buttonW, buttonH, 12);
 
     noStroke();
-    fill(active ? "#222" : "#777");
+    fill(active || hover ? "#222" : "#666");
     textAlign(CENTER, CENTER);
 
     textSize(14 * 1.15);
     text(info.icon, bx + buttonW * 0.25, buttonY + buttonH / 2);
 
     textSize(10.5 * 1.15);
-    textStyle(active ? BOLD : NORMAL);
+    textStyle(active || hover ? BOLD : NORMAL);
     text(info.shortLabel, bx + buttonW * 0.62, buttonY + buttonH / 2);
 
     textAlign(LEFT, BASELINE);
     textStyle(NORMAL);
   }
+
+  strokeWeight(1);
 }
 
 function handleWeeklyLensInteraction() {
@@ -2553,6 +2772,8 @@ function drawWeeklyTimeline() {
     const barX = centerX - barW / 2;
     const selected = i === selectedWeeklyDayIndex;
 
+    const hover = isMouseInside(barX - 14, chartY - 28, barW + 28, chartH + 84);
+
     drawWeeklyStackedBar(
       day,
       barX,
@@ -2560,7 +2781,8 @@ function drawWeeklyTimeline() {
       barW,
       chartH,
       segmentH,
-      selected
+      selected,
+      hover
     );
 
     noStroke();
@@ -2619,14 +2841,14 @@ function drawWeeklyStackedAxis(x, y, w, h) {
   textAlign(LEFT, BASELINE);
 }
 
-function drawWeeklyStackedBar(day, x, y, w, h, segmentH, selected) {
+function drawWeeklyStackedBar(day, x, y, w, h, segmentH, selected, hover = false) {
   const presentKeys = weeklySelectedFactors.filter(key => day.layers[key]);
 
-  // Clickable hit area style: selected day has stronger outline.
-  if (selected) {
+  // Clickable hit area style: selected day has stronger outline; hover previews clickability.
+  if (selected || hover) {
     noFill();
-    stroke("#2f276f");
-    strokeWeight(2.4);
+    stroke(selected ? "#2f276f" : "#8B7FC9");
+    strokeWeight(selected ? 2.4 : 1.6);
     rect(x - 8, y - 8, w + 16, h + 16, 14);
   }
 
@@ -2678,19 +2900,22 @@ function drawWeeklyStackedBar(day, x, y, w, h, segmentH, selected) {
 }
 
 function drawWeekNavButton(x, y, label) {
-  fill("#FFFFFF");
-  stroke("#D9D2C7");
-  strokeWeight(1);
+  const hover = isMouseInside(x, y, 80, 34);
+
+  fill(hover ? "#FFFDF8" : "#FFFFFF");
+  stroke(hover ? "#4D3F8F" : "#CFC6BA");
+  strokeWeight(hover ? 1.6 : 1.1);
   rect(x, y, 80, 34, 12);
 
   noStroke();
-  fill("#333");
+  fill(hover ? "#2f276f" : "#333");
   textSize(11.5 * 1.15);
   textStyle(BOLD);
   textAlign(CENTER, CENTER);
   text(label, x + 40, y + 17);
   textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
+  strokeWeight(1);
 }
 
 function drawWeeklyDayCard(day, x, y, w, h, count, selected) {
@@ -2961,27 +3186,21 @@ function handleDayContextInteraction() {
 
 function handleContextDaySelector() {
   const days = getContextDayOptions();
+  if (!days.length) return;
 
-  const x = 54;
-  const y = 118;
-  const w = width - 108;
+  const layout = getContextArrowSelectorLayout();
+  const currentPosition = days.findIndex(item => item.index === selectedContextDayIndex);
+  const safePosition = currentPosition >= 0 ? currentPosition : 0;
 
-  // Use the exact same button layout as drawContextDaySelector()
-  const buttonLayout = getContextDayButtonLayout(x, y, w, days.length);
+  if (isMouseInside(layout.prevX, layout.buttonY, layout.arrowW, layout.buttonH)) {
+    const prevPosition = max(0, safePosition - 1);
+    selectedContextDayIndex = days[prevPosition].index;
+    return;
+  }
 
-  for (let i = 0; i < days.length; i++) {
-    const dayIndex = days[i].index;
-    const bx = buttonLayout.startX + i * (buttonLayout.buttonW + buttonLayout.gap);
-
-    if (
-      mouseX >= bx &&
-      mouseX <= bx + buttonLayout.buttonW &&
-      mouseY >= buttonLayout.y &&
-      mouseY <= buttonLayout.y + buttonLayout.buttonH
-    ) {
-      selectedContextDayIndex = dayIndex;
-      return;
-    }
+  if (isMouseInside(layout.nextX, layout.buttonY, layout.arrowW, layout.buttonH)) {
+    const nextPosition = min(days.length - 1, safePosition + 1);
+    selectedContextDayIndex = days[nextPosition].index;
   }
 }
 
@@ -3025,7 +3244,7 @@ function drawContextDaySelector() {
   const w = layout.w;
   const h = layout.h;
 
-  drawCard(x, y, w, h, 16);
+  drawStaticPanel(x, y, w, h, 16);
 
   // Left text block
   fill("#2f276f");
@@ -3122,13 +3341,15 @@ function getContextArrowSelectorLayout() {
 }
 
 function drawContextArrowButton(x, y, w, h, arrow, label) {
-  fill("#FFFFFF");
-  stroke("#D9D2C7");
-  strokeWeight(1.2);
+  const hover = isMouseInside(x, y, w, h);
+
+  fill(hover ? "#FFFDF8" : "#FFFFFF");
+  stroke(hover ? "#4D3F8F" : "#CFC6BA");
+  strokeWeight(hover ? 1.7 : 1.1);
   rect(x, y, w, h, 12);
 
   noStroke();
-  fill("#333");
+  fill(hover ? "#2f276f" : "#333");
   textAlign(CENTER, CENTER);
 
   textSize(16 * 1.15);
@@ -3136,10 +3357,12 @@ function drawContextArrowButton(x, y, w, h, arrow, label) {
   text(arrow, x + w / 2, y + 20);
 
   textSize(9.5 * 1.15);
-  textStyle(NORMAL);
+  textStyle(hover ? BOLD : NORMAL);
   text(label, x + w / 2, y + 39);
 
   textAlign(LEFT, BASELINE);
+  textStyle(NORMAL);
+  strokeWeight(1);
 }
 
 function getContextDayButtonLayout(cardX, cardY, cardW, dayCount) {
@@ -3309,7 +3532,7 @@ function drawContextLayerExplanation() {
   const w = width - 108;
   const h = 215;
 
-  drawCard(x, y, w, h, 18);
+  drawStaticPanel(x, y, w, h, 18);
 
   fill("#2f276f");
   noStroke();
