@@ -15,7 +15,7 @@ const VIZ_HEIGHTS = {
   1: 860,
   2: 980,
   3: 760,
-  4: 900,
+  4: 820,
   5: 760
 };
 
@@ -2322,7 +2322,7 @@ function drawWeeklyWeatherLensPanel() {
 
   drawMainTitle(
     "BUILD YOUR WEEKLY WEATHER LENS",
-    "Choose the layers that matter to your campus routine and see which days match your selected concerns."
+    "Choose weather layers, then read the week as a stacked bar chart of overlapping conditions."
   );
 
   drawSectionNumber("4", 38, 43);
@@ -2330,8 +2330,8 @@ function drawWeeklyWeatherLensPanel() {
   drawWeeklyFactorControls();
   drawWeeklyTimeline();
   drawWeeklyDayDetail();
-  drawWeeklyLensGuide();
-  drawWeeklyLensTakeaway();
+  //drawWeeklyLensGuide();
+  //drawWeeklyLensTakeaway();
 }
 
 function ensureWeeklyLensInitialized() {
@@ -2361,34 +2361,20 @@ function getCurrentWeekDays() {
 
 function drawWeeklyFactorControls() {
   const x = 54;
-  const y = 118;
+  const y = 100;
   const w = width - 108;
-  const h = 138;
-
-  drawCard(x, y, w, h, 18);
 
   fill("#2f276f");
   noStroke();
   textSize(15 * 1.15);
   textStyle(BOLD);
-  text("Choose your weather layers", x + 26, y + 32);
-
-  fill("#555");
-  textSize(11.5 * 1.15);
-  textStyle(NORMAL);
-  text(
-    "Select the factors that matter most to your routine. The weekly view updates based on your choices.",
-    x + 26,
-    y + 55,
-    w - 52
-  );
+  text("Choose your weather layers", x, y + 18);
 
   const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
-  const buttonY = y + 78;
+  const buttonY = y + 42;
 
-  // Make the six buttons fit inside the card
-  const startX = x + 26;
-  const endX = x + w - 26;
+  const startX = x;
+  const endX = x + w;
   const gap = 10;
   const buttonW = (endX - startX - gap * (keys.length - 1)) / keys.length;
   const buttonH = 38;
@@ -2402,19 +2388,19 @@ function drawWeeklyFactorControls() {
     const c = color(info.color);
 
     if (active) {
-      fill(red(c), green(c), blue(c), 78);
+      fill(red(c), green(c), blue(c), 82);
       stroke(info.color);
-      strokeWeight(1.5);
+      strokeWeight(2);
     } else {
-      fill("#FFFFFF");
-      stroke("#D9D2C7");
-      strokeWeight(1);
+      fill("#f4f1eb");
+      stroke("#BFB6AA");
+      strokeWeight(1.4);
     }
 
     rect(bx, buttonY, buttonW, buttonH, 12);
 
     noStroke();
-    fill(active ? "#222" : "#666");
+    fill(active ? "#222" : "#777");
     textAlign(CENTER, CENTER);
 
     textSize(14 * 1.15);
@@ -2437,15 +2423,14 @@ function handleWeeklyLensInteraction() {
 
 function handleWeeklyFactorToggle() {
   const x = 54;
-  const y = 118;
+  const y = 100;
   const w = width - 108;
   const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
 
-  const buttonY = y + 78;
+  const buttonY = y + 42;
 
-  // Must match drawWeeklyFactorControls()
-  const startX = x + 26;
-  const endX = x + w - 26;
+  const startX = x;
+  const endX = x + w;
   const gap = 10;
   const buttonW = (endX - startX - gap * (keys.length - 1)) / keys.length;
   const buttonH = 38;
@@ -2461,7 +2446,6 @@ function handleWeeklyFactorToggle() {
       mouseY <= buttonY + buttonH
     ) {
       if (weeklySelectedFactors.includes(key)) {
-        // Keep at least one selected layer so the chart always has meaning.
         if (weeklySelectedFactors.length > 1) {
           weeklySelectedFactors = weeklySelectedFactors.filter(k => k !== key);
         }
@@ -2473,7 +2457,7 @@ function handleWeeklyFactorToggle() {
 }
 
 function handleWeekNavigation() {
-  const y = 284;
+  const y = 205;
   const leftX = 54;
   const rightX = width - 134;
   const buttonW = 80;
@@ -2507,22 +2491,25 @@ function handleWeeklyDaySelection() {
   const week = getCurrentWeekDays();
   if (!week.length) return;
 
-  const chartX = 54;
-  const chartY = 320;
-  const chartW = width - 108;
-  const cardGap = 12;
-  const cardW = (chartW - cardGap * 6) / 7;
-  const cardH = 190;
+  const chartX = 76;
+  const chartY = 300;
+  const chartW = width - 152;
+  const chartH = 225;
+
+  const barAreaX = chartX + 66;
+  const barAreaW = chartW - 96;
+  const dayGap = barAreaW / week.length;
+  const barW = Math.min(68, dayGap * 0.62);
 
   for (let i = 0; i < week.length; i++) {
-    const x = chartX + i * (cardW + cardGap);
-    const y = chartY;
+    const centerX = barAreaX + dayGap * i + dayGap / 2;
+    const barX = centerX - barW / 2;
 
     if (
-      mouseX >= x &&
-      mouseX <= x + cardW &&
-      mouseY >= y &&
-      mouseY <= y + cardH
+      mouseX >= barX - 14 &&
+      mouseX <= barX + barW + 14 &&
+      mouseY >= chartY - 28 &&
+      mouseY <= chartY + chartH + 56
     ) {
       selectedWeeklyDayIndex = i;
     }
@@ -2533,7 +2520,7 @@ function drawWeeklyTimeline() {
   const week = getCurrentWeekDays();
   if (!week.length) return;
 
-  const navY = 276;
+  const navY = 205;
 
   drawWeekNavButton(54, navY, "← Prev");
   drawWeekNavButton(width - 134, navY, "Next →");
@@ -2550,28 +2537,159 @@ function drawWeeklyTimeline() {
   text(
     `${firstDay.monthName} ${firstDay.day} – ${lastDay.monthName} ${lastDay.day}, 2025`,
     width / 2,
-    navY + 18
+    navY + 17
   );
 
   textAlign(LEFT, BASELINE);
 
-  // Move the day cards upward and make them slightly shorter
-  const chartX = 54;
-  const chartY = 320;
-  const chartW = width - 108;
-  const cardGap = 12;
-  const cardW = (chartW - cardGap * 6) / 7;
-  const cardH = 190;
+  const chartX = 76;
+  const chartY = 300;
+  const chartW = width - 152;
+  const chartH = 225;
+
+  fill("#2f276f");
+  noStroke();
+  textSize(15 * 1.15);
+  textStyle(BOLD);
+  text("Weekly stacked overlap", chartX, chartY - 34);
+
+  drawWeeklyStackedAxis(chartX, chartY, chartW, chartH);
+
+  const barAreaX = chartX + 66;
+  const barAreaW = chartW - 96;
+  const dayGap = barAreaW / week.length;
+  const barW = Math.min(68, dayGap * 0.62);
+  const maxLayers = Math.max(1, weeklySelectedFactors.length);
+  const segmentH = chartH / maxLayers;
 
   for (let i = 0; i < week.length; i++) {
     const day = week[i];
-    const x = chartX + i * (cardW + cardGap);
-    const y = chartY;
-    const count = getSelectedLayerCount(day);
+    const centerX = barAreaX + dayGap * i + dayGap / 2;
+    const barX = centerX - barW / 2;
     const selected = i === selectedWeeklyDayIndex;
 
-    drawWeeklyDayCard(day, x, y, cardW, cardH, count, selected);
+    drawWeeklyStackedBar(
+      day,
+      barX,
+      chartY,
+      barW,
+      chartH,
+      segmentH,
+      selected
+    );
+
+    noStroke();
+    fill(selected ? "#2f276f" : "#444");
+    textAlign(CENTER, CENTER);
+    textSize(11 * 1.15);
+    textStyle(selected ? BOLD : NORMAL);
+    text(getShortWeekday(day.dateObj), centerX, chartY + chartH + 26);
+
+    fill("#666");
+    textSize(10 * 1.15);
+    textStyle(NORMAL);
+    text(`${day.monthName} ${day.day}`, centerX, chartY + chartH + 46);
   }
+
+  textAlign(LEFT, BASELINE);
+  textStyle(NORMAL);
+}
+
+function drawWeeklyStackedAxis(x, y, w, h) {
+  stroke("#D8D0C8");
+  strokeWeight(1.2);
+
+  // y-axis
+  line(x + 46, y, x + 46, y + h);
+
+  // baseline
+  line(x + 46, y + h, x + w, y + h);
+
+  const maxLayers = Math.max(1, weeklySelectedFactors.length);
+
+  for (let i = 0; i <= maxLayers; i++) {
+    const gy = map(i, 0, maxLayers, y + h, y);
+
+    stroke("#E3DCD2");
+    strokeWeight(1);
+    line(x + 46, gy, x + w, gy);
+
+    noStroke();
+    fill("#666");
+    textSize(10.5 * 1.15);
+    textAlign(RIGHT, CENTER);
+    text(i, x + 36, gy);
+  }
+
+  push();
+  translate(x + 2, y + h / 2);
+  rotate(-HALF_PI);
+  fill("#555");
+  noStroke();
+  textSize(10.8 * 1.15);
+  textAlign(CENTER, CENTER);
+  text("Present selected layers", 0, 0);
+  pop();
+
+  textAlign(LEFT, BASELINE);
+}
+
+function drawWeeklyStackedBar(day, x, y, w, h, segmentH, selected) {
+  const presentKeys = weeklySelectedFactors.filter(key => day.layers[key]);
+
+  // Clickable hit area style: selected day has stronger outline.
+  if (selected) {
+    noFill();
+    stroke("#2f276f");
+    strokeWeight(2.4);
+    rect(x - 8, y - 8, w + 16, h + 16, 14);
+  }
+
+  // faint full bar guide, non-data background
+  fill("#eee8df");
+  stroke("#D8D0C8");
+  strokeWeight(1);
+  rect(x, y, w, h, 10);
+
+  // colored stack
+  let currentBottom = y + h;
+
+  for (let i = 0; i < presentKeys.length; i++) {
+    const key = presentKeys[i];
+    const info = FACTORS[key];
+    const c = color(info.color);
+
+    const segY = currentBottom - segmentH;
+
+    fill(red(c), green(c), blue(c), 92);
+    stroke(info.color);
+    strokeWeight(1.4);
+    rect(x, segY, w, segmentH, 6);
+
+    noStroke();
+    fill("#222");
+    textAlign(CENTER, CENTER);
+    textSize(12 * 1.15);
+    text(info.icon, x + w / 2, segY + segmentH / 2);
+
+    currentBottom -= segmentH;
+  }
+
+  // count label
+  const count = presentKeys.length;
+  noStroke();
+  fill("#222");
+  textAlign(CENTER, CENTER);
+  textSize(15 * 1.15);
+  textStyle(BOLD);
+  text(count, x + w / 2, y - 18);
+
+  fill("#666");
+  textSize(9.5 * 1.15);
+  textStyle(NORMAL);
+  text("layers", x + w / 2, y - 4);
+
+  textAlign(LEFT, BASELINE);
 }
 
 function drawWeekNavButton(x, y, label) {
@@ -2697,105 +2815,62 @@ function drawWeeklyDayDetail() {
   const day = week[selectedWeeklyDayIndex] || week[0];
 
   const x = 54;
-  const y = 530;
+  const y = 600;
   const w = width - 108;
-  const h = 108;
 
-  drawCard(x, y, w, h, 16);
+  const selectedPresent = weeklySelectedFactors.filter(key => day.layers[key]);
 
   fill("#2f276f");
   noStroke();
-  textSize(14 * 1.15);
+  textSize(13.5 * 1.15);
   textStyle(BOLD);
-  text("Selected day", x + 24, y + 27);
+  text("Selected day detail", x, y + 18);
 
   fill("#222");
-  textSize(17 * 1.15);
+  textSize(15.5 * 1.15);
   textStyle(BOLD);
-  text(`${getShortWeekday(day.dateObj)}, ${day.monthName} ${day.day}`, x + 24, y + 55);
+  text(`${getShortWeekday(day.dateObj)}, ${day.monthName} ${day.day}`, x + 190, y + 18);
 
   fill("#555");
   textSize(11.2 * 1.15);
   textStyle(NORMAL);
+
+  const layerText =
+    selectedPresent.length > 0
+      ? selectedPresent.map(key => `${FACTORS[key].icon} ${FACTORS[key].shortLabel}`).join("   ")
+      : "No selected layers were present.";
+
   text(
-    "The details show which selected layers were present on this day.",
-    x + 24,
-    y + 78,
-    300
+    `${selectedPresent.length} of ${weeklySelectedFactors.length} selected layers present: ${layerText}`,
+    x + 190,
+    y + 44,
+    w - 220
   );
-
-  const selectedKeys = weeklySelectedFactors;
-  const gridX = x + 360;
-  const gridY = y + 22;
-  const chipW = 130;
-  const chipH = 30;
-  const gap = 12;
-
-  for (let i = 0; i < selectedKeys.length; i++) {
-    const key = selectedKeys[i];
-    const info = FACTORS[key];
-    const present = day.layers[key];
-
-    const col = i % 3;
-    const row = Math.floor(i / 3);
-
-    const cx = gridX + col * (chipW + gap);
-    const cy = gridY + row * (chipH + 10);
-
-    const c = color(info.color);
-
-    if (present) {
-      fill(red(c), green(c), blue(c), 78);
-      stroke(info.color);
-    } else {
-      fill("#FFFFFF");
-      stroke("#D9D2C7");
-    }
-
-    rect(cx, cy, chipW, chipH, 10);
-
-    noStroke();
-    fill(present ? "#222" : "#666");
-    textSize(10.3 * 1.15);
-    textStyle(present ? BOLD : NORMAL);
-    text(`${info.icon} ${info.shortLabel}`, cx + 12, cy + 19);
-
-    fill(present ? "#2f276f" : "#777");
-    textAlign(RIGHT, BASELINE);
-    textSize(9.8 * 1.15);
-    text(present ? "present" : "not present", cx + chipW - 10, cy + 19);
-    textAlign(LEFT, BASELINE);
-  }
 
   textStyle(NORMAL);
 }
 
 function drawWeeklyLensGuide() {
   const x = 54;
-  const y = 655;
+  const y = 680;
   const w = width - 108;
-  const h = 76;
-
-  drawCard(x, y, w, h, 14);
 
   fill("#2f276f");
   noStroke();
-  textSize(13.5 * 1.15);
+  textSize(13 * 1.15);
   textStyle(BOLD);
-  text("How to read this view", x + 24, y + 27);
+  text("How to read this view", x, y + 18);
 
   fill("#333");
-  textSize(11.3 * 1.15);
+  textSize(11.2 * 1.15);
   textStyle(NORMAL);
-  textLeading(15);
+  textLeading(16);
   text(
-    "Each day card counts only the layers you selected. A darker day means more selected layers were present, not that the day is universally worse.",
-    x + 185,
-    y + 19,
-    w - 215
+    "Clickable elements have stronger outlines or button shapes: layer controls, week arrows, and the stacked bars. Text notes are non-clickable and appear without button styling.",
+    x + 190,
+    y + 12,
+    w - 220
   );
-
-  drawWeeklyDotLegend(x + 185, y + 56);
 
   textLeading(13);
 }
@@ -2827,7 +2902,7 @@ function drawWeeklyDotLegend(x, y) {
 
 function drawWeeklyLensTakeaway() {
   const x = 54;
-  const y = 750;
+  const y = 710;
   const w = width - 108;
   const h = 52;
 
