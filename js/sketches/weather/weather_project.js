@@ -16,7 +16,7 @@ const VIZ_HEIGHTS = {
   2: 980,
   3: 760,
   4: 900,
-  5: 960
+  5: 760
 };
 
 let selectedWeekStart = 0;
@@ -680,12 +680,12 @@ function drawMainTitle(title, subtitle) {
   noStroke();
   textSize(25 * 1.15);
   textStyle(BOLD);
-  text(title, 68, 48, width - 110);
+  text(title, 68, 30, width - 110);
 
   textStyle(NORMAL);
   textSize(13 * 1.15);
   fill("#555");
-  text(subtitle, 68, 80, width - 110);
+  text(subtitle, 68, 60, width - 110);
 }
 
 function drawSectionNumber(num, x, y) {
@@ -3030,7 +3030,7 @@ function drawContextDaySelector() {
 
 function getContextArrowSelectorLayout() {
   const x = 54;
-  const y = 118;
+  const y = 96;
   const w = width - 108;
   const h = 112;
 
@@ -3106,11 +3106,11 @@ function drawContextOverviewCard() {
   const day = getSelectedContextDay();
 
   const x = 54;
-  const y = 248;
+  const y = 215;
   const w = 270;
   const h = 240;
 
-  drawCard(x, y, w, h, 18);
+  //drawCard(x, y, w, h, 18);
 
   fill("#2f276f");
   noStroke();
@@ -3163,11 +3163,11 @@ function drawContextRawValues() {
   const day = getSelectedContextDay();
 
   const x = 350;
-  const y = 248;
+  const y = 215;
   const w = width - 404;
   const h = 240;
 
-  drawCard(x, y, w, h, 18);
+  //drawCard(x, y, w, h, 18);
 
   fill("#2f276f");
   noStroke();
@@ -3245,9 +3245,9 @@ function drawContextLayerExplanation() {
   const day = getSelectedContextDay();
 
   const x = 54;
-  const y = 520;
+  const y = 445;
   const w = width - 108;
-  const h = 220;
+  const h = 215;
 
   drawCard(x, y, w, h, 18);
 
@@ -3336,25 +3336,24 @@ function getContextThresholdText(key) {
 
 function drawContextTrustNote() {
   const x = 54;
-  const y = 765;
+  const y = 680;
   const w = width - 108;
 
-  // No card holder — text only
   fill("#2f276f");
   noStroke();
-  textSize(13.5 * 1.15);
+  textSize(11.8 * 1.15);
   textStyle(BOLD);
-  text("Why this view builds trust", x, y + 18);
+  text("Why this view builds trust", x, y + 14);
 
   fill("#333");
-  textSize(11.7 * 1.15);
+  textSize(10.4 * 1.15);
   textStyle(NORMAL);
-  textLeading(17);
+  textLeading(14);
   text(
     "This detail view shows the actual daily values behind the earlier summaries, so readers can check what each layer is based on.",
-    x + 220,
-    y + 14,
-    w - 250
+    x + 210,
+    y + 10,
+    w - 240
   );
 
   textLeading(13);
@@ -3366,25 +3365,24 @@ function drawContextTakeaway() {
   const layerWord = activeCount === 1 ? "layer" : "layers";
 
   const x = 54;
-  const y = 835;
+  const y = 725;
   const w = width - 108;
 
-  // No card holder — text only
   fill("#2f276f");
   noStroke();
-  textSize(13.5 * 1.15);
+  textSize(11.8 * 1.15);
   textStyle(BOLD);
-  text("Takeaway", x, y + 18);
+  text("Takeaway", x, y + 14);
 
   fill("#333");
-  textSize(12.1 * 1.15);
+  textSize(10.4 * 1.15);
   textStyle(NORMAL);
-  textLeading(18);
+  textLeading(14);
   text(
     `This day is not explained by one number alone. It has ${activeCount} active ${layerWord}, showing how ordinary weather conditions can shape a campus day together.`,
-    x + 220,
-    y + 12,
-    w - 250
+    x + 210,
+    y + 10,
+    w - 240
   );
 
   textLeading(13);
