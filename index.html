@@ -17,7 +17,7 @@
   <header id="site-header">
     <h1 id="site-title">Beyond the Forecast</h1>
     <div id="site-subtitle">
-      What environmental factors make Seattle weather feel hard for campus life?
+      A visual article about the weather layers that shape everyday campus life in Seattle.
     </div>
   </header>
 
@@ -29,26 +29,28 @@
         <h1>Seattle weather is not just rain.</h1>
     
         <p class="intro-lede">
-          A forecast gives useful numbers, but those numbers do not always explain
-          how a day feels when students move through campus. Using 2025 Seattle daily
-          weather data, this article separates the forecast into six visible layers:
-          rain, cloud cover, daylight, solar energy, wind, and temperature comfort.
+          A forecast is useful, but it rarely captures how a day feels once someone is
+          walking across campus, waiting for a bus, or leaving an evening class. In
+          Seattle, a hard weather day often comes from several ordinary conditions
+          happening together: wet ground, low light, cloud cover, wind, and temperature
+          that feels colder or warmer than expected.
         </p>
 
         <div class="intro-scenario">
           <p class="scenario-label">Campus scenario</p>
 
           <p>
-            Imagine a student leaving class in Seattle. The forecast says 55°F, light rain,
-            and cloudy skies. But the day may feel harder than those numbers suggest:
-            the sidewalk is wet, the sky is gray, daylight is short, and the wind makes
-            waiting outside feel colder.
+            Imagine checking the forecast before class: 55°F, light rain, cloudy. On paper,
+            that sounds manageable. Outside, the same day can feel different. The sky stays
+            gray, the sidewalk is wet, the daylight fades early, and the wind makes a short
+            wait at the bus stop feel longer.
           </p>
 
           <p>
-            This project is designed for students, commuters, and campus walkers who need
-            to understand not just what the weather is, but how different weather layers
-            combine to shape the feeling of a school day.
+            This article uses 2025 Seattle daily weather data to pull those conditions apart.
+            Instead of treating “bad weather” as one score, it follows six layers that shape
+            the campus experience: rain, cloud cover, daylight, solar energy, wind, and
+            temperature comfort.
           </p>
         </div>
     
@@ -73,118 +75,101 @@
         <section class="step" data-active-index="0">
           <div class="title">Opening Roadmap</div>
         
-          This opening view explains how the article works. We are not trying to create
-          one universal score for “bad weather.” Instead, we translate regular forecast
-          variables into six visible weather layers.
+          This article does not rank Seattle days with a single “bad weather” score.
+          It starts with the basic forecast variables, then keeps them separate long
+          enough to see what each one contributes.
           <br /><br />
         
-          Readers will move from a simple forecast view to yearly patterns, monthly
-          comparison, weekly overlap, and finally one day’s raw weather values.
+          As you scroll, the view moves from a single forecast, to yearly patterns,
+          to monthly comparisons, to a selected week, and finally to one day’s raw
+          weather values.
         </section>
 
         <section class="step" data-active-index="1">
-          <div class="title"> Beyond the Forecast: Weather Layers</div>
+          <div class="title">Beyond the Forecast: Weather Layers</div>
         
-          A standard forecast gives us separate numbers: temperature,
-          precipitation, cloud cover, wind speed, sunrise time, and sunset time.
-          These numbers are useful, but they do not always explain how a day
-          feels when students move through campus.
+          Weather apps list numbers one by one: temperature, precipitation, cloud cover,
+          wind speed, sunrise, and sunset. On campus, those numbers are not experienced
+          one by one. They arrive together.
           <br /><br />
         
-          This first visualization separates the forecast into six environmental
-          layers: rain, cloud cover, daylight, solar energy, wind, and
-          <b>temperature comfort</b>. Temperature is treated differently because it
-          does not follow a simple “more is worse” rule. Both cold and hot days can
-          affect campus routines.
+          This first view separates the forecast into six layers: rain, cloud cover,
+          daylight, solar energy, wind, and <b>temperature comfort</b>. Temperature needs
+          its own treatment because higher is not automatically worse. A cold morning
+          and an unusually warm afternoon can both change how a day feels.
           <br /><br />
         
-          The goal is not to create a score. Instead, this view makes the layers
-          visible before we look at yearly patterns, monthly profiles, and weekly
-          interactions.
+          The point is to make the layers visible before comparing them across the year,
+          across a month, and across one lived week.
         </section>
 
         <section class="step" data-active-index="2">
           <div class="title">Factor Patterns Across the Year</div>
         
-          After introducing the six weather layers, this view lets readers look at
-          one layer at a time across 2025. Instead of combining everything into one
-          score, the line chart shows the seasonal pattern of the selected factor.
+          Once the layers are separated, seasonal patterns become easier to read. Choose
+          one factor at a time and follow how it changes through 2025.
           <br /><br />
         
-          Most factors are shown with their original units, such as precipitation in
-          inches, cloud cover in percent, daylight in hours, solar energy in MJ/m²,
-          and wind speed in mph. This makes the data easier to trust because readers
-          can see what is actually being measured.
+          Most layers stay in their original units: precipitation in inches, cloud cover
+          in percent, daylight in hours, solar energy in MJ/m², and wind speed in mph.
+          Keeping the units visible makes the chart less like a black-box score and more
+          like an article you can check against the data.
           <br /><br />
         
-          Temperature is handled differently. A higher temperature is not automatically
-          worse, and people experience temperature differently. For this reason, the
-          temperature view shows <b>temperature comfort days</b>: the number of days
-          in a month when the feels-like temperature falls outside our prototype
-          comfort range. This keeps the visualization from treating temperature as a
-          simple “more is worse” variable.
+          Temperature is handled as comfort days. A month rises in this view when more
+          days fall outside the prototype comfort range, not simply when the average
+          temperature is higher.
         </section>
         
         <section class="step" data-active-index="3">
           <div class="title">Monthly Weather Layer Profile</div>
         
-          After looking at one factor across the whole year, this view zooms into one
-          month and compares all six layers side by side. Instead of mixing different
-          units into one score, the main bars show <b>flagged days</b>: how many days
-          in that month crossed each layer’s prototype threshold.
+          The yearly view shows one layer at a time. This view zooms into one month and
+          puts all six layers next to each other.
           <br /><br />
         
-          This choice makes the comparison more honest. Rain is measured in inches,
-          cloud cover is measured in percent, daylight is measured in hours, and wind
-          is measured in mph. Temperature is even more different because it depends on
-          comfort range. Counting flagged days gives all six layers a shared scale:
-          how often each condition became noticeable in that month.
+          Because the variables use different units, the main bars count <b>flagged days</b>:
+          days when a layer crossed its prototype threshold. That shared scale makes the
+          comparison more readable without pretending rain, daylight, wind, and temperature
+          are the same kind of measurement.
           <br /><br />
         
-          The smaller labels still show the monthly average value, so readers can
-          connect the flagged-day pattern back to the original weather data.
+          The smaller labels still show the monthly averages, so the summary stays tied
+          to the original weather values.
         </section>
 
         <section class="step" data-active-index="4">
           <div class="title">Build Your Weekly Weather Lens</div>
         
-          The monthly profile shows which layers appear often, but students do not
-          experience weather as a whole month at once. They experience it through
-          specific weeks: walking to class, waiting for buses, attending evening
-          courses, or moving between buildings.
+          A month can reveal a pattern, but students usually feel weather through smaller
+          routines: a Monday commute, a walk between buildings, a late class, or a wait
+          outside after dark.
           <br /><br />
         
-          This view lets readers choose the layers that matter most to their own
-          campus routine. For example, a commuter may care more about rain and wind,
-          while a student with evening classes may pay more attention to daylight.
-          Someone sensitive to gray weather may focus on cloud cover and solar energy.
+          This view lets readers choose the layers that matter most to their own routine.
+          A commuter might turn on rain and wind. A student with evening classes might
+          focus on daylight. Someone affected by gray days might look more closely at
+          cloud cover and solar energy.
           <br /><br />
         
-          Darker days do not mean “worse” days. They mean more of the selected layers
-          are present on that day. This keeps the interaction personal and transparent
-          without creating one universal weather score.
+          Darker days are not labeled as universally worse. They simply show that more of
+          the selected layers were present on that day.
         </section>
 
         <section class="step" data-active-index="5">
           <div class="title">Day in Context: Check the Raw Weather</div>
         
-          After users build a weekly weather lens, this final detail view brings the
-          story back to one specific day. The goal is to show why a day was marked by
-          certain layers and connect the visual pattern back to the original weather
-          data.
+          The final view returns to one day. After seeing yearly, monthly, and weekly
+          summaries, this panel shows the actual weather values behind the visual labels.
           <br /><br />
         
-          This matters because the project should not ask readers to trust color or
-          labels alone. For each selected day, the view shows the raw values behind the
-          layers: precipitation, cloud cover, daylight hours, solar energy, wind speed,
-          and feels-like temperature.
+          This is important because the article should not ask readers to trust color alone.
+          For the selected day, the view shows precipitation, cloud cover, daylight hours,
+          solar energy, wind speed, and feels-like temperature.
           <br /><br />
         
-          Temperature is shown as <b>temperature comfort</b>, not as “higher is worse.”
-          A day is only flagged for temperature when the feels-like temperature falls
-          outside the prototype comfort range. This keeps the interpretation more honest
-          and reminds readers that the visualization is a lens for exploration, not a
-          universal judgment of the weather.
+          Temperature remains a comfort measure. A day is flagged only when the feels-like
+          temperature falls outside the prototype comfort range.
         </section>
       </div>
 
@@ -194,10 +179,10 @@
     <section id="closing">
       <h2>Final Takeaway</h2>
       <p>
-        The main goal of this project is to help users move beyond a simple
-        “Seattle is rainy” explanation. By separating and reconnecting different
-        weather layers, the article helps students understand why some days feel
-        harder than the forecast suggests.
+        Seattle’s weather is often described as rainy, but rain is only one part of the
+        experience. The harder days are usually layered: cloud cover, low daylight, wind,
+        wet ground, and temperature comfort can overlap in ways a standard forecast does
+        not immediately show.
       </p>
     </section>
   </main>

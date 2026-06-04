@@ -16,7 +16,7 @@ const VIZ_HEIGHTS = {
   2: 980,
   3: 760,
   4: 820,
-  5: 760
+  5: 820
 };
 
 let selectedWeekStart = 0;
@@ -385,30 +385,6 @@ function measureWrappedTextHeight(str, boxWidth, fontSize = 12, leading = 16) {
 
   pop();
   return lines * leading;
-}
-
-function drawChipGrid(items, startX, startY, cols, chipW, chipH, gapX, gapY) {
-  for (let i = 0; i < items.length; i++) {
-    const col = i % cols;
-    const row = Math.floor(i / cols);
-
-    const x = startX + col * (chipW + gapX);
-    const y = startY + row * (chipH + gapY);
-
-    fill("#FBFAF6");
-    stroke("#DED6CA");
-    strokeWeight(1);
-    rect(x, y, chipW, chipH, 12);
-
-    noStroke();
-    fill("#333");
-    textAlign(CENTER, CENTER);
-    textStyle(BOLD);
-    textSize(12);
-    text(items[i], x + chipW / 2, y + chipH / 2);
-  }
-
-  textAlign(LEFT, BASELINE);
 }
 
 function drawAdaptiveNote(x, y, w, textContent, options = {}) {
@@ -1037,9 +1013,12 @@ function drawOpeningPanel() {
   const cardW = width - 128;
   const cardH = 650;
 
-  //drawCard(cardX, cardY, cardW, cardH, 24);
+  // Match the soft blue forecast-card background.
+  // No border, so it feels like an article section instead of a dashboard card.
+  noStroke();
+  fill("#F6F7F9");
+  rect(cardX, cardY, cardW, cardH, 24);
 
-  // Header
   fill("#222");
   noStroke();
   textStyle(BOLD);
@@ -1055,27 +1034,8 @@ function drawOpeningPanel() {
     cardY + 90
   );
 
-  drawOpeningRoadmap(cardX + 38, cardY + 135, cardW - 76, 430);
-
-  // Bottom takeaway strip
-  const stripX = cardX + 38;
-  const stripY = cardY + cardH - 70;
-  const stripW = cardW - 76;
-  const stripH = 44;
-
-  fill("#F3EFE8");
-  noStroke();
-  rect(stripX, stripY, stripW, stripH, 12);
-
-  fill("#333");
-  textSize(13.5 * 1.15);
-  textStyle(BOLD);
-  textAlign(CENTER, CENTER);
-  text(
-    "Not a score. Not one cause. More layers, more context.",
-    stripX + stripW / 2,
-    stripY + stripH / 2
-  );
+  // Roadmap now includes the final takeaway as the fourth callout.
+  drawOpeningRoadmap(cardX + 38, cardY + 135, cardW - 76, 450);
 
   textAlign(LEFT, BASELINE);
   textStyle(NORMAL);
@@ -1156,112 +1116,141 @@ function drawRoadmapStep(stepNum, title, body, x, y, w, h, pillLabels) {
 }
 
 function drawOpeningRoadmap(x, y, w, h) {
-  const sectionH = 125;
-  const gap = 28;
+  const sectionH = 74;
+  const gap = 38;
 
   drawRoadmapSection(
     x,
     y,
     w,
     sectionH,
-    "1",
+    "",
     "Forecast numbers",
     "A normal forecast gives separate measurements.",
     ["55°F", "0.01 in rain", "99% cloud", "15.6 mph wind", "sunrise / sunset"]
   );
 
-  drawDownArrow(x + w / 2, y + sectionH + 6);
+  drawDownArrow(x + w / 2, y + sectionH + 10);
 
   drawRoadmapSection(
     x,
-    y + sectionH + gap,
+    y + (sectionH + gap),
     w,
     sectionH,
-    "2",
+    "",
     "Weather layers",
-    "We translate those measurements into visible conditions.",
+    "Those measurements are translated into visible conditions.",
     ["Rain", "Cloud", "Daylight", "Solar", "Wind", "Temp comfort"]
   );
 
-  drawDownArrow(x + w / 2, y + sectionH * 2 + gap + 6);
+  drawDownArrow(x + w / 2, y + sectionH * 2 + gap + 10);
 
   drawRoadmapSection(
     x,
-    y + sectionH * 2 + gap * 2,
+    y + (sectionH + gap) * 2,
     w,
     sectionH,
-    "3",
+    "",
     "Explore context",
-    "Readers move from broad patterns to one specific day.",
+    "The article moves from broad patterns to one specific day.",
     ["Year", "Month", "Week", "Day"]
+  );
+
+  drawDownArrow(x + w / 2, y + sectionH * 3 + gap * 2 + 10);
+
+  drawRoadmapSection(
+    x,
+    y + (sectionH + gap) * 3,
+    w,
+    sectionH,
+    "",
+    "Takeaway",
+    "Not a score. Not one cause. More layers, more context.",
+    []
   );
 }
 
-function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
-  fill("#FFFFFF");
-  stroke("#DED6CA");
-  strokeWeight(1.2);
-  rect(x, y, w, h, 16);
+function drawRoadmapTakeaway(x, y, w, body) {
+  // Same article-callout style as the roadmap sections:
+  // no box, no background, only a vertical line and text.
 
-  // Number circle
-  fill("#4D3F8F");
+  const lineX = x + 8;
+  const textX = x + 28;
+
+  stroke("#4D3F8F");
+  strokeWeight(4);
+  line(lineX, y + 6, lineX, y + 44);
+  strokeWeight(1);
+
   noStroke();
-  circle(x + 28, y + 30, 28);
 
-  fill("#FFFFFF");
-  textSize(13 * 1.15);
-  textStyle(BOLD);
-  textAlign(CENTER, CENTER);
-  text(num, x + 28, y + 30);
-
-  textAlign(LEFT, BASELINE);
-
-  // Left text area
   fill("#2f276f");
-  textSize(14.5 * 1.15);
+  textSize(12.8 * 1.15);
   textStyle(BOLD);
-  text(title, x + 52, y + 28);
+  text("Takeaway", textX, y + 18);
 
-  fill("#555");
-  textSize(11.2 * 1.15);
+  fill("#333");
+  textSize(12.2 * 1.15);
   textStyle(NORMAL);
-  text(subtitle, x + 52, y + 48, 260);
+  text(body, textX, y + 40, w - 40);
 
-  // Pill area
-  const pillAreaX = x + 360;
-  const pillAreaY = y + 18;
-  const pillAreaW = w - 390;
+  textStyle(NORMAL);
+}
+function drawRoadmapSection(x, y, w, h, num, title, subtitle, items) {
+  // Campus-scenario style:
+  // no card, no background, no number badge.
+  // Only vertical line + article text + light inline tags.
 
-  let currentX = pillAreaX;
-  let currentY = pillAreaY;
+  const lineX = x + 8;
+  const textX = x + 30;
+  const tagAreaX = x + 360;
+  const tagAreaY = y + 14;
+  const tagAreaW = w - 390;
 
-  const pillH = 28;
-  const pillGap = 8;
+  stroke("#4D3F8F");
+  strokeWeight(4);
+  line(lineX, y + 4, lineX, y + h - 4);
+  strokeWeight(1);
+
+  noStroke();
+
+  fill("#2f276f");
+  textSize(15 * 1.15);
+  textStyle(BOLD);
+  text(title, textX, y + 18);
+
+  fill("#333");
+  textSize(11.8 * 1.15);
+  textStyle(NORMAL);
+  text(subtitle, textX, y + 42, 280);
+
+  let currentX = tagAreaX;
+  let currentY = tagAreaY;
+
+  const tagH = 26;
+  const tagGap = 8;
   const rowGap = 8;
 
   for (let i = 0; i < items.length; i++) {
     const label = items[i];
-    const pillW = getRoadmapPillWidth(label);
+    const tagW = getRoadmapPillWidth(label);
 
-    // Wrap to second row if it would go outside the card
-    if (currentX + pillW > pillAreaX + pillAreaW) {
-      currentX = pillAreaX;
-      currentY += pillH + rowGap;
+    if (currentX + tagW > tagAreaX + tagAreaW) {
+      currentX = tagAreaX;
+      currentY += tagH + rowGap;
     }
 
-    fill("#FBFAF6");
-    stroke("#DED6CA");
-    strokeWeight(1);
-    rect(currentX, currentY, pillW, pillH, 9);
-
     noStroke();
-    fill("#333");
+    fill("#E9EEF5");
+    rect(currentX, currentY, tagW, tagH, 999);
+
+    fill("#2F3B4F");
     textSize(10 * 1.15);
     textStyle(BOLD);
     textAlign(CENTER, CENTER);
-    text(label, currentX + pillW / 2, currentY + pillH / 2);
+    text(label, currentX + tagW / 2, currentY + tagH / 2);
 
-    currentX += pillW + pillGap;
+    currentX += tagW + tagGap;
   }
 
   textAlign(LEFT, BASELINE);
@@ -1277,11 +1266,11 @@ function getRoadmapPillWidth(label) {
 }
 
 function drawDownArrow(x, y) {
-  stroke("#8B8175");
-  strokeWeight(2);
-  line(x, y, x, y + 16);
-  line(x, y + 16, x - 6, y + 10);
-  line(x, y + 16, x + 6, y + 10);
+  stroke("#B5BECF");
+  strokeWeight(1.5);
+  line(x, y, x, y + 12);
+  line(x, y + 12, x - 5, y + 7);
+  line(x, y + 12, x + 5, y + 7);
   noStroke();
 }
 
@@ -1710,24 +1699,16 @@ function getLayerActualValue(day, key) {
 }
 
 function drawVizOneTakeaway(y) {
-  const x = 42;
-  const w = width - 84;
+  const x = 54;
+  const w = width - 108;
 
-  drawCard(x, y, w, 64, 14);
-
-  fill("#2f276f");
-  textSize(14 * 1.15);
-  textStyle(BOLD);
-  text("Takeaway", x + 26, y + 28);
-
-  fill("#333");
-  textSize(12.3 * 1.15);
-  textStyle(NORMAL);
-  text(
+  drawInlineInsight(
+    x,
+    y,
+    w,
+    "Takeaway",
     "The forecast is useful, but the campus experience comes from how weather layers appear together. This view keeps those layers visible instead of turning them into one score.",
-    x + 120,
-    y + 21,
-    w - 150
+    64
   );
 }
 
@@ -3492,13 +3473,13 @@ function drawContextRawValues() {
   );
 
   const values = [
-  ["💧", "Precipitation", `${nf(day.precip, 1, 2)} in`],
-  ["☁️", "Cloud cover", `${Math.round(day.cloudcover)}%`],
-  ["☀️", "Daylight", `${nf(day.daylightHours, 1, 1)} hrs`],
-  ["🌤️", "Solar energy", `${nf(day.solarenergy, 1, 1)} MJ/m²`],
-  ["〰️", "Wind speed", `${nf(day.windspeed, 1, 1)} mph`],
-  ["🌡️", "Feels like", `${nf(day.feelslike, 1, 1)}°F`]
-];
+    ["💧", "Precipitation", `${nf(day.precip, 1, 2)} in`, "Rain"],
+    ["☁️", "Cloud cover", `${Math.round(day.cloudcover)}%`, "Cloud"],
+    ["☀️", "Daylight", `${nf(day.daylightHours, 1, 1)} hrs`, "Daylight"],
+    ["🌤️", "Solar energy", `${nf(day.solarenergy, 1, 1)} MJ/m²`, "Solar"],
+    ["〰️", "Wind speed", `${nf(day.windspeed, 1, 1)} mph`, "Wind"],
+    ["🌡️", "Feels like", `${nf(day.feelslike, 1, 1)}°F`, "Temp"]
+  ];
 
   const gridX = x + 24;
   const gridY = y + 82;
@@ -3508,7 +3489,7 @@ function drawContextRawValues() {
   const cardH = 58;
 
   for (let i = 0; i < values.length; i++) {
-    const [icon, label, value] = values[i];
+    const [icon, label, value, layer] = values[i];
 
     const col = i % 3;
     const row = Math.floor(i / 3);
@@ -3536,6 +3517,13 @@ function drawContextRawValues() {
     textSize(12.2 * 1.15);
     textStyle(BOLD);
     text(value, cx + 34, cy + 43);
+
+    fill("#777");
+    textSize(9.6 * 1.15);
+    textStyle(NORMAL);
+    textAlign(RIGHT, BASELINE);
+    text(layer, cx + cardW - 10, cy + 43);
+    textAlign(LEFT, BASELINE);
   }
 
   textStyle(NORMAL);
@@ -3610,6 +3598,12 @@ function drawContextLayerExplanation() {
     textSize(10.2 * 1.15);
     textStyle(NORMAL);
     text(getContextThresholdText(key), cx + 14, cy + 39);
+
+    textAlign(RIGHT, BASELINE);
+    textSize(10.4 * 1.15);
+    textStyle(present ? BOLD : NORMAL);
+    text(present ? "present" : "not present", cx + cardW - 14, cy + 39);
+    textAlign(LEFT, BASELINE);
   }
 
   textStyle(NORMAL);
@@ -3630,27 +3624,17 @@ function getContextThresholdText(key) {
 
 function drawContextTrustNote() {
   const x = 54;
-  const y = 680;
+  const y = 678;
   const w = width - 108;
 
-  fill("#2f276f");
-  noStroke();
-  textSize(11.8 * 1.15);
-  textStyle(BOLD);
-  text("Why this view builds trust", x, y + 14);
-
-  fill("#333");
-  textSize(10.4 * 1.15);
-  textStyle(NORMAL);
-  textLeading(14);
-  text(
-    "This detail view shows the actual daily values behind the earlier summaries, so readers can check what each layer is based on.",
-    x + 210,
-    y + 10,
-    w - 240
+  drawInlineInsight(
+    x,
+    y,
+    w,
+    "Why trust",
+    "This detail view brings the earlier summary back to the actual daily values, so readers can see what each layer is based on.",
+    56
   );
-
-  textLeading(13);
 }
 
 function drawContextTakeaway() {
@@ -3659,27 +3643,17 @@ function drawContextTakeaway() {
   const layerWord = activeCount === 1 ? "layer" : "layers";
 
   const x = 54;
-  const y = 725;
+  const y = 742;
   const w = width - 108;
 
-  fill("#2f276f");
-  noStroke();
-  textSize(11.8 * 1.15);
-  textStyle(BOLD);
-  text("Takeaway", x, y + 14);
-
-  fill("#333");
-  textSize(10.4 * 1.15);
-  textStyle(NORMAL);
-  textLeading(14);
-  text(
+  drawInlineInsight(
+    x,
+    y,
+    w,
+    "Takeaway",
     `This day is not explained by one number alone. It has ${activeCount} active ${layerWord}, showing how ordinary weather conditions can shape a campus day together.`,
-    x + 210,
-    y + 10,
-    w - 240
+    56
   );
-
-  textLeading(13);
 }
 
 function getAllActiveLayerCount(day) {

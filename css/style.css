@@ -151,6 +151,7 @@ body {
   margin: 0;
 }
 
+
 .tag-row {
   display: flex;
   flex-wrap: wrap;
@@ -265,6 +266,7 @@ canvas {
   color: #444;
 }
 
+ 
 @media (max-width: 1050px) {
   #graphic {
     display: block;
