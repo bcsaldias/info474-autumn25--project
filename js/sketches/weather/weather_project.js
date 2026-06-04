@@ -1216,46 +1216,50 @@ function getForecastIcon(day) {
 function drawForecastCard(day, x, y, w, h) {
   fill("#2f276f");
   noStroke();
-  textSize(13 * 1.15);
+  textSize(15 * 1.15);
   textStyle(BOLD);
   text("WHAT THE FORECAST SHOWS", x, y - 12);
 
-  drawCard(x, y, w, h, 16);
+  // removed outer white card holder
 
-  const innerX = x + 18;
-  const innerY = y + 24;
-  const innerW = w - 36;
-  const innerH = h - 48;
+  const innerX = x + 8;
+  const innerY = y + 18;
+  const innerW = w - 16;
+  const innerH = h - 36;
 
   fill("#F8FBFF");
   stroke("#B6CDE5");
   strokeWeight(1.2);
   rect(innerX, innerY, innerW, innerH, 14);
   strokeWeight(1);
-
   noStroke();
 
   fill("#333");
-  textSize(12 * 1.15);
+  textSize(14 * 1.15);
   textStyle(BOLD);
   text(day.date, innerX + 18, innerY + 38);
 
-  textSize(34 * 1.15);
+  textSize(38 * 1.15);
   textStyle(BOLD);
   fill("#222");
-  text(`${Math.round(day.feelslike)}°F`, innerX + 18, innerY + 90);
+  text(`${Math.round(day.feelslike)}°F`, innerX + 18, innerY + 94);
 
-  textSize(30 * 1.15);
+  textSize(32 * 1.15);
   textAlign(CENTER, CENTER);
-  text(getForecastIcon(day), innerX + innerW - 42, innerY + 72);
+  text(getForecastIcon(day), innerX + innerW - 46, innerY + 76);
   textAlign(LEFT, BASELINE);
 
   fill("#444");
-  textSize(13.5 * 1.15);
+  textSize(16 * 1.15);
   textStyle(NORMAL);
-  text(day.conditions, innerX + 18, innerY + 124, innerW - 36);
+  text(day.conditions, innerX + 18, innerY + 134, innerW - 36);
 
-  drawMiniDivider(innerX + 14, innerY + 142, innerX + innerW - 14, innerY + 142);
+  drawMiniDivider(
+    innerX + 14,
+    innerY + 150,
+    innerX + innerW - 14,
+    innerY + 150
+  );
 
   const rows = [
     ["💧", "Rain", `${nf(day.precip, 1, 2)} in`],
@@ -1266,44 +1270,40 @@ function drawForecastCard(day, x, y, w, h) {
     ["🌡️", "Feels like", `${nf(day.feelslike, 1, 1)}°F`]
   ];
 
-  let rowY = innerY + 178;
+  let rowY = innerY + 190;
 
   for (let i = 0; i < rows.length; i++) {
     const [icon, label, value] = rows[i];
 
     fill("#333");
-    textSize(12.5 * 1.15);
+    textSize(13.5 * 1.15);
     text(icon, innerX + 18, rowY);
 
     fill("#555");
-    textSize(11.5 * 1.15);
+    textSize(13 * 1.15);
     text(label, innerX + 48, rowY);
 
     fill("#222");
     textAlign(RIGHT, BASELINE);
-    textSize(11.5 * 1.15);
+    textSize(13 * 1.15);
     text(value, innerX + innerW - 18, rowY);
     textAlign(LEFT, BASELINE);
 
-    rowY += 28;
+    rowY += 30;
   }
 
-  const noteH = 44;
-  const noteY = innerY + innerH - noteH - 14;
-
-  fill("#F3EFE8");
-  noStroke();
-  rect(innerX + 14, noteY, innerW - 28, noteH, 10);
-
+  // remove note background box, keep text only
   fill("#555");
-  textSize(10.6 * 1.15);
+  textSize(14 * 1.15);
   textStyle(NORMAL);
+  textLeading(18);
   text(
     "Useful numbers, but still shown as separate pieces.",
-    innerX + 26,
-    noteY + 17,
-    innerW - 52
+    innerX + 18,
+    innerY + innerH - 56,
+    innerW - 36
   );
+  textLeading(14);
 }
 
 function drawConnectionArrow(x, y) {
@@ -1343,36 +1343,35 @@ function drawConnectionArrow(x, y) {
 function drawLayerStack(day, x, y, w, h) {
   fill("#2f276f");
   noStroke();
-  textSize(13 * 1.15);
+  textSize(15 * 1.15);
   textStyle(BOLD);
   text("WHAT THE FORECAST DOESN'T CONNECT", x, y - 12);
 
-  drawCard(x, y, w, h, 16);
+  // removed outer white card holder
 
   const layerKeys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
-  const innerX = x + 26;
-  const innerY = y + 30;
-  const innerW = w - 52;
+  const innerX = x + 8;
+  const innerY = y + 18;
+  const innerW = w - 16;
 
   fill("#444");
   noStroke();
-  textSize(11.4 * 1.15);
+  textSize(14 * 1.15);
   textStyle(NORMAL);
   text(
     "Each row is one weather layer. Present means the layer crossed our prototype campus-experience threshold.",
     innerX,
     innerY,
-    innerW
+    innerW - 10
   );
 
-  // Make the bottom note taller and give the layer list less vertical space.
-  const noteH = 62;
-  const listY = innerY + 48;
-  const noteY = y + h - noteH - 18;
-  const listBottom = noteY - 14;
+  const noteH = 70;
+  const listY = innerY + 64;
+  const noteY = y + h - noteH - 8;
+  const listBottom = noteY - 16;
 
   const availableH = listBottom - listY;
-  const gap = 7;
+  const gap = 10;
   const layerH = (availableH - gap * (layerKeys.length - 1)) / layerKeys.length;
 
   for (let i = 0; i < layerKeys.length; i++) {
@@ -1385,7 +1384,7 @@ function drawLayerStack(day, x, y, w, h) {
     if (active) {
       fill(red(c), green(c), blue(c), 68);
       stroke(info.color);
-      strokeWeight(1.4);
+      strokeWeight(1.5);
     } else {
       fill("#FBFAF6");
       stroke("#DED6CA");
@@ -1394,29 +1393,29 @@ function drawLayerStack(day, x, y, w, h) {
 
     rect(innerX, yy, innerW, layerH, 11);
     strokeWeight(1);
-    noStroke();
 
+    // icon
+    noStroke();
     fill(active ? "#222" : "#888");
-    textSize(16 * 1.15);
+    textSize(18 * 1.15);
     textAlign(CENTER, CENTER);
     text(info.icon, innerX + 30, yy + layerH / 2);
 
-    textAlign(LEFT, CENTER);
-
-    fill(active ? "#222" : "#666");
-    textSize(12.2 * 1.15);
-    textStyle(BOLD);
-    text(info.label, innerX + 58, yy + layerH / 2 - 10);
-
-    fill(active ? "#444" : "#777");
-    textSize(10.2 * 1.15);
-    textStyle(NORMAL);
-    text(getLayerActualValue(day, key), innerX + 58, yy + layerH / 2 + 8);
-
-    const badgeW = 92;
-    const badgeH = 24;
+    // badge
+    const badgeW = 108;
+    const badgeH = 26;
     const badgeX = innerX + innerW - badgeW - 14;
     const badgeY = yy + layerH / 2 - badgeH / 2;
+
+    // label area width so it doesn't overlap the badge
+    const labelX = innerX + 58;
+    const labelW = badgeX - labelX - 18;
+
+    fill(active ? "#222" : "#666");
+    textAlign(LEFT, CENTER);
+    textSize(14 * 1.15);
+    textStyle(BOLD);
+    text(info.label, labelX, yy + layerH / 2, labelW);
 
     if (active) {
       fill(red(c), green(c), blue(c), 120);
@@ -1425,7 +1424,7 @@ function drawLayerStack(day, x, y, w, h) {
 
       noStroke();
       fill("#222");
-      textSize(9.8 * 1.15);
+      textSize(10.5 * 1.15);
       textStyle(BOLD);
       textAlign(CENTER, CENTER);
       text("layer present", badgeX + badgeW / 2, badgeY + badgeH / 2);
@@ -1436,7 +1435,7 @@ function drawLayerStack(day, x, y, w, h) {
 
       noStroke();
       fill("#777");
-      textSize(9.8 * 1.15);
+      textSize(10.5 * 1.15);
       textStyle(NORMAL);
       textAlign(CENTER, CENTER);
       text("not present", badgeX + badgeW / 2, badgeY + badgeH / 2);
@@ -1446,23 +1445,22 @@ function drawLayerStack(day, x, y, w, h) {
     textStyle(NORMAL);
   }
 
-  // Bottom note box
+  // bottom note
   fill("#F3EFE8");
   noStroke();
   rect(innerX, noteY, innerW, noteH, 12);
 
   fill("#444");
-  textSize(10.8 * 1.15);
+  textSize(12.5 * 1.15);
   textStyle(NORMAL);
-  textLeading(15);
+  textLeading(18);
   text(
     "Temperature is treated as comfort. It is only flagged when it is too cold or too hot, not simply when the number is higher.",
     innerX + 16,
     noteY + 18,
     innerW - 32
   );
-
-  textLeading(13);
+  textLeading(14);
 }
 
 function getLayerActualValue(day, key) {
