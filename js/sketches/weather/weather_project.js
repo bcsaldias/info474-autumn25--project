@@ -1389,7 +1389,7 @@ function drawWeatherLayersPanel() {
   const day = pickExampleDay();
 
   drawMainTitle(
-    "BEYOND THE FORECAST: WEATHER LAYERS",
+    "WEATHER LAYERS",
     "A forecast shows useful numbers, but it does not show how those conditions layer together during a campus day."
   );
 
