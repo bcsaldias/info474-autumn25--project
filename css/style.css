@@ -448,3 +448,31 @@ canvas {
     gap: 28px;
   }
 }
+
+.reading-note {
+  margin-top: 26px;
+  padding-left: 16px;
+  border-left: 4px solid #4d3f8f;
+}
+
+.reading-note p {
+  margin: 0 0 14px 0;
+  color: #444;
+  font-size: 15.5px;
+  line-height: 1.55;
+}
+
+.reading-note strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #2f276f;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.reading-note .source-line {
+  color: #6b7280;
+  font-size: 14px;
+}
