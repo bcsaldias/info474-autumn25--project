@@ -438,3 +438,58 @@ canvas {
 .article-callout.muted p {
   color: #6b7280;
 }
+
+.threshold-info {
+  margin-top: 54px;
+  padding-top: 34px;
+  border-top: 1px solid #d8d0c8;
+}
+
+.threshold-info h3 {
+  margin: 0 0 14px 0;
+  color: #111;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.threshold-info > p {
+  max-width: 780px;
+  margin: 0 0 28px 0;
+  color: #444;
+  font-size: 16px;
+  line-height: 1.62;
+}
+
+.threshold-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 26px 34px;
+}
+
+.threshold-item {
+  padding-left: 18px;
+  border-left: 4px solid #4d3f8f;
+}
+
+.threshold-item span {
+  display: block;
+  margin-bottom: 8px;
+  color: #2f276f;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.threshold-item p {
+  margin: 0;
+  color: #444;
+  font-size: 15.5px;
+  line-height: 1.55;
+}
+
+@media (max-width: 760px) {
+  .threshold-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
