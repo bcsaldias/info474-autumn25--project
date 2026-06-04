@@ -387,6 +387,30 @@ function measureWrappedTextHeight(str, boxWidth, fontSize = 12, leading = 16) {
   return lines * leading;
 }
 
+function drawChipGrid(items, startX, startY, cols, chipW, chipH, gapX, gapY) {
+  for (let i = 0; i < items.length; i++) {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+
+    const x = startX + col * (chipW + gapX);
+    const y = startY + row * (chipH + gapY);
+
+    fill("#FBFAF6");
+    stroke("#DED6CA");
+    strokeWeight(1);
+    rect(x, y, chipW, chipH, 12);
+
+    noStroke();
+    fill("#333");
+    textAlign(CENTER, CENTER);
+    textStyle(BOLD);
+    textSize(12);
+    text(items[i], x + chipW / 2, y + chipH / 2);
+  }
+
+  textAlign(LEFT, BASELINE);
+}
+
 function drawAdaptiveNote(x, y, w, textContent, options = {}) {
   const padding = options.padding || 14;
   const fontSize = options.fontSize || 12.5;
@@ -1009,11 +1033,11 @@ function drawOpeningPanel() {
   background("#f4f1eb");
 
   const cardX = 64;
-  const cardY = 46;
+  const cardY = 36;
   const cardW = width - 128;
-  const cardH = 520;
+  const cardH = 650;
 
-  drawCard(cardX, cardY, cardW, cardH, 24);
+  //drawCard(cardX, cardY, cardW, cardH, 24);
 
   // Header
   fill("#222");
@@ -1031,7 +1055,7 @@ function drawOpeningPanel() {
     cardY + 90
   );
 
-  drawOpeningRoadmap(cardX + 38, cardY + 128, cardW - 76, 320);
+  drawOpeningRoadmap(cardX + 38, cardY + 135, cardW - 76, 430);
 
   // Bottom takeaway strip
   const stripX = cardX + 38;
@@ -1132,8 +1156,8 @@ function drawRoadmapStep(stepNum, title, body, x, y, w, h, pillLabels) {
 }
 
 function drawOpeningRoadmap(x, y, w, h) {
-  const sectionH = 86;
-  const gap = 24;
+  const sectionH = 125;
+  const gap = 28;
 
   drawRoadmapSection(
     x,
