@@ -1252,13 +1252,13 @@ function getForecastIcon(day) {
 function drawForecastCard(day, x, y, w, h) {
   fill("#2f276f");
   noStroke();
-  textSize(15 * 1.15);
+  textSize(13 * 1.15);
   textStyle(BOLD);
-  text("WHAT THE FORECAST SHOWS", x, y - 12);
+  text("WHAT THE FORECAST SHOWS", x + 24, y - 12);
 
-  const innerX = x + 8;
+  const innerX = x;
   const innerY = y + 18;
-  const innerW = w - 16;
+  const innerW = w;
   const innerH = h - 36;
 
   // Light data module, no heavy card border.
@@ -1362,25 +1362,27 @@ function drawConnectionArrow(x, y) {
 function drawLayerStack(day, x, y, w, h) {
   fill("#2f276f");
   noStroke();
-  textSize(15 * 1.15);
+  textSize(12.2 * 1.15);   // slightly smaller than the left title
   textStyle(BOLD);
   text("WHAT THE FORECAST DOESN'T CONNECT", x, y - 12);
 
   const layerKeys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
-  const innerX = x + 8;
+  const innerX = x;
   const innerY = y + 18;
-  const innerW = w - 16;
+  const innerW = w;
 
   fill("#444");
   noStroke();
   textSize(14 * 1.15);
   textStyle(NORMAL);
+  textLeading(18);
   text(
     "Each row is one weather layer. Present means the layer crossed our prototype campus-experience threshold.",
     innerX,
     innerY,
-    innerW - 10
+    innerW - 20
   );
+  textLeading(13);
 
   const noteH = 70;
   const listY = innerY + 64;
