@@ -2443,7 +2443,7 @@ function handleWeeklyFactorToggle() {
 }
 
 function handleWeekNavigation() {
-  const y = 205;
+  const y = 225;
   const leftX = 54;
   const rightX = width - 134;
   const buttonW = 80;
@@ -2478,9 +2478,9 @@ function handleWeeklyDaySelection() {
   if (!week.length) return;
 
   const chartX = 76;
-  const chartY = 300;
+  const chartY = 350;
   const chartW = width - 152;
-  const chartH = 225;
+  const chartH = 220;
 
   const barAreaX = chartX + 66;
   const barAreaW = chartW - 96;
@@ -2494,8 +2494,8 @@ function handleWeeklyDaySelection() {
     if (
       mouseX >= barX - 14 &&
       mouseX <= barX + barW + 14 &&
-      mouseY >= chartY - 28 &&
-      mouseY <= chartY + chartH + 56
+      mouseY >= chartY - 45 &&
+      mouseY <= chartY + chartH + 60
     ) {
       selectedWeeklyDayIndex = i;
     }
@@ -2506,7 +2506,7 @@ function drawWeeklyTimeline() {
   const week = getCurrentWeekDays();
   if (!week.length) return;
 
-  const navY = 205;
+  const navY = 225;
 
   drawWeekNavButton(54, navY, "← Prev");
   drawWeekNavButton(width - 134, navY, "Next →");
@@ -2529,15 +2529,15 @@ function drawWeeklyTimeline() {
   textAlign(LEFT, BASELINE);
 
   const chartX = 76;
-  const chartY = 300;
+  const chartY = 350;   // moved lower
   const chartW = width - 152;
-  const chartH = 225;
+  const chartH = 220;
 
   fill("#2f276f");
   noStroke();
   textSize(15 * 1.15);
   textStyle(BOLD);
-  text("Weekly stacked overlap", chartX, chartY - 34);
+  text("Weekly stacked overlap", chartX, chartY - 62);
 
   drawWeeklyStackedAxis(chartX, chartY, chartW, chartH);
 
@@ -2553,7 +2553,6 @@ function drawWeeklyTimeline() {
     const centerX = barAreaX + dayGap * i + dayGap / 2;
     const barX = centerX - barW / 2;
     const selected = i === selectedWeeklyDayIndex;
-
     const hover = isMouseInside(barX - 14, chartY - 28, barW + 28, chartH + 84);
 
     drawWeeklyStackedBar(
@@ -2572,12 +2571,12 @@ function drawWeeklyTimeline() {
     textAlign(CENTER, CENTER);
     textSize(11 * 1.15);
     textStyle(selected ? BOLD : NORMAL);
-    text(getShortWeekday(day.dateObj), centerX, chartY + chartH + 26);
+    text(getShortWeekday(day.dateObj), centerX, chartY + chartH + 28);
 
     fill("#666");
     textSize(10 * 1.15);
     textStyle(NORMAL);
-    text(`${day.monthName} ${day.day}`, centerX, chartY + chartH + 46);
+    text(`${day.monthName} ${day.day}`, centerX, chartY + chartH + 50);
   }
 
   textAlign(LEFT, BASELINE);
@@ -2626,7 +2625,22 @@ function drawWeeklyStackedAxis(x, y, w, h) {
 function drawWeeklyStackedBar(day, x, y, w, h, segmentH, selected, hover = false) {
   const presentKeys = weeklySelectedFactors.filter(key => day.layers[key]);
 
-  // Clickable hit area style: selected day has stronger outline; hover previews clickability.
+  // Count label above the bar, clearly separated from the chart
+  const count = presentKeys.length;
+
+  noStroke();
+  fill("#222");
+  textAlign(CENTER, CENTER);
+  textSize(15 * 1.15);
+  textStyle(BOLD);
+  text(count, x + w / 2, y - 36);
+
+  fill("#666");
+  textSize(9.5 * 1.15);
+  textStyle(NORMAL);
+  text("layers", x + w / 2, y - 18);
+
+  // selected / hover outline
   if (selected || hover) {
     noFill();
     stroke(selected ? "#2f276f" : "#8B7FC9");
@@ -2634,7 +2648,7 @@ function drawWeeklyStackedBar(day, x, y, w, h, segmentH, selected, hover = false
     rect(x - 8, y - 8, w + 16, h + 16, 14);
   }
 
-  // faint full bar guide, non-data background
+  // full bar guide
   fill("#eee8df");
   stroke("#D8D0C8");
   strokeWeight(1);
@@ -2664,21 +2678,8 @@ function drawWeeklyStackedBar(day, x, y, w, h, segmentH, selected, hover = false
     currentBottom -= segmentH;
   }
 
-  // count label
-  const count = presentKeys.length;
-  noStroke();
-  fill("#222");
-  textAlign(CENTER, CENTER);
-  textSize(15 * 1.15);
-  textStyle(BOLD);
-  text(count, x + w / 2, y - 18);
-
-  fill("#666");
-  textSize(9.5 * 1.15);
-  textStyle(NORMAL);
-  text("layers", x + w / 2, y - 4);
-
   textAlign(LEFT, BASELINE);
+  textStyle(NORMAL);
 }
 
 function drawWeekNavButton(x, y, label) {
@@ -2807,7 +2808,7 @@ function drawWeeklyDayDetail() {
   const day = week[selectedWeeklyDayIndex] || week[0];
 
   const x = 54;
-  const y = 600;
+  const y = 640;
   const w = width - 108;
 
   const selectedPresent = weeklySelectedFactors.filter(key => day.layers[key]);
