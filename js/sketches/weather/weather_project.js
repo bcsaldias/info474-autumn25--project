@@ -12,12 +12,20 @@ let selectedWeeklyDayIndex = 0;
 let selectedContextDayIndex = -1;
 
 const VIZ_HEIGHTS = {
-  1: 860,
-  2: 980,
-  3: 760,
-  4: 820,
-  5: 790
+  0: 720,
+  1: 740,
+  2: 760,
+  3: 740,
+  4: 760,
+  5: 740,
+  6: 720
 };
+
+const FIXED_HEADER_HEIGHT = 40;
+
+function getAvailableVizHeight() {
+  return Math.max(620, window.innerHeight - FIXED_HEADER_HEIGHT - 24);
+}
 
 let selectedWeekStart = 0;
 let selectedDayGlobalIndex = 0;
@@ -155,7 +163,7 @@ function draw() {
 
 function windowResized() {
   const visContainer = document.getElementById("vis");
-  const canvasW = Math.max(720, visContainer.clientWidth);
+  const canvasW = Math.max(720, visContainer ? visContainer.clientWidth : 720);
 
   currentCanvasHeight = getTargetCanvasHeight();
 
@@ -186,7 +194,10 @@ function mousePressed() {
 -------------------------- */
 
 function getTargetCanvasHeight() {
-  return VIZ_HEIGHTS[activeSection] || 760;
+  const designedHeight = VIZ_HEIGHTS[activeSection] || 740;
+  const availableHeight = getAvailableVizHeight();
+
+  return Math.min(designedHeight, availableHeight);
 }
 
 function updateVisContainerHeight() {
@@ -194,6 +205,7 @@ function updateVisContainerHeight() {
 
   if (visContainer) {
     visContainer.style.minHeight = `${currentCanvasHeight}px`;
+    visContainer.style.height = `${currentCanvasHeight}px`;
   }
 }
 
@@ -202,7 +214,7 @@ function resizeCanvasForActiveSection() {
   const visContainer = document.getElementById("vis");
   const targetWidth = Math.max(720, visContainer ? visContainer.clientWidth : width);
 
-  if (currentCanvasHeight !== targetHeight || width !== targetWidth) {
+  if (Math.abs(currentCanvasHeight - targetHeight) > 2 || Math.abs(width - targetWidth) > 2) {
     currentCanvasHeight = targetHeight;
     resizeCanvas(targetWidth, currentCanvasHeight);
     updateVisContainerHeight();
@@ -1916,7 +1928,7 @@ function drawMonthlyComparisonPanel() {
 
 function drawMonthButtons() {
   const startX = 54;
-  const y = 118;
+  const y = 92;
   const h = 32;
   const gap = 6;
 
@@ -1960,7 +1972,7 @@ function drawMonthButtons() {
 
 function handleMonthSelection() {
   const startX = 54;
-  const y = 118;
+  const y = 92;
   const h = 32;
   const gap = 6;
 
@@ -1982,7 +1994,7 @@ function drawMonthlyFlaggedDaysProfile() {
   const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
 
   const chartX = 54;
-  const chartY = 175;
+  const chartY = 140;
   const chartW = width - 108;
   const chartH = 350;
 
@@ -2106,7 +2118,7 @@ function drawMonthlyAverageSummary() {
   const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
 
   const x = 54;
-  const y = 545;
+  const y = 500;
   const w = width - 108;
 
   drawSectionDivider(x, x + w, y);
@@ -2169,7 +2181,7 @@ function drawMonthlySelectedInsight() {
 
   const info = FACTORS[highestKey];
   const x = 54;
-  const y = 655;
+  const y = 600;
   const w = width - 108;
 
   drawInlineInsight(
@@ -2341,7 +2353,7 @@ function getCurrentWeekDays() {
 
 function drawWeeklyFactorControls() {
   const x = 54;
-  const y = 100;
+  const y = 72;
   const w = width - 108;
 
   fill("#2f276f");
@@ -2409,7 +2421,7 @@ function handleWeeklyLensInteraction() {
 
 function handleWeeklyFactorToggle() {
   const x = 54;
-  const y = 100;
+  const y = 72;
   const w = width - 108;
   const keys = ["rain", "cloud", "daylight", "solar", "wind", "temp"];
 
@@ -2443,7 +2455,7 @@ function handleWeeklyFactorToggle() {
 }
 
 function handleWeekNavigation() {
-  const y = 225;
+  const y = 172;
   const leftX = 54;
   const rightX = width - 134;
   const buttonW = 80;
@@ -2478,7 +2490,7 @@ function handleWeeklyDaySelection() {
   if (!week.length) return;
 
   const chartX = 76;
-  const chartY = 350;
+  const chartY = 300;
   const chartW = width - 152;
   const chartH = 220;
 
@@ -2506,7 +2518,7 @@ function drawWeeklyTimeline() {
   const week = getCurrentWeekDays();
   if (!week.length) return;
 
-  const navY = 225;
+  const navY = 172;
 
   drawWeekNavButton(54, navY, "← Prev");
   drawWeekNavButton(width - 134, navY, "Next →");
@@ -2529,7 +2541,7 @@ function drawWeeklyTimeline() {
   textAlign(LEFT, BASELINE);
 
   const chartX = 76;
-  const chartY = 350;   // moved lower
+  const chartY = 300;   // moved lower
   const chartW = width - 152;
   const chartH = 220;
 
@@ -2808,7 +2820,7 @@ function drawWeeklyDayDetail() {
   const day = week[selectedWeeklyDayIndex] || week[0];
 
   const x = 54;
-  const y = 640;
+  const y = 600;
   const w = width - 108;
 
   const selectedPresent = weeklySelectedFactors.filter(key => day.layers[key]);

@@ -152,9 +152,10 @@ main {
 
 #vis {
   position: sticky;
-  top: 82px;
+  top: 40px;
   width: 100%;
-  min-height: 760px;
+  min-height: calc(100vh - 40px);
+  height: calc(100vh - 40px);
   overflow: visible;
   display: flex;
   align-items: flex-start;
