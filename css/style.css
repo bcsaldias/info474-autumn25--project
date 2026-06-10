@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  padding-top: 40px;
+  padding-top: 62px;
   background: #fbf9f6;
   color: #222;
   font-family: Arial, Helvetica, sans-serif;
@@ -11,39 +11,63 @@ main {
   background: #fbf9f6;
 }
 
+/* Fixed top header */
+
 #site-header {
   width: 100%;
-  padding: 6px 32px;
-  background: #1f1f1f;
-  color: #f7f2ea;
+  height: 45px;
+  padding: 0 24px;
+  background: #fbf9f6;
+  color: #111;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 9999;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
 
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 24px;
 }
 
+.header-left {
+  display: flex;
+  align-items: baseline;
+  gap: 30px;
+  min-width: 0;
+}
+
 #site-title {
-  font-size: 21px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   margin: 0;
-  letter-spacing: 0.2px;
+  color: #111;
+  letter-spacing: -0.02em;
   white-space: nowrap;
 }
 
 #site-subtitle {
-  font-size: 12.5px;
+  font-size: 18px;
+  font-weight: 500;
   margin: 0;
-  color: #d6d0c7;
+  color: #8c8c8c;
   line-height: 1.25;
   max-width: none;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+#header-status {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 16px;
+  color: #aaa;
+  white-space: nowrap;
+}
+
+/* Intro */
 
 #intro {
   max-width: 980px;
@@ -83,6 +107,14 @@ main {
   font-weight: 450;
 }
 
+.article-meta {
+  margin: -6px 0 22px 0;
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
 .tag-row {
   display: flex;
   flex-wrap: wrap;
@@ -120,7 +152,7 @@ main {
 
 #vis {
   position: sticky;
-  top: 28px;
+  top: 82px;
   width: 100%;
   min-height: 760px;
   overflow: visible;
@@ -148,6 +180,7 @@ canvas {
   font-size: 18px;
   color: #222;
   max-width: 520px;
+  cursor: default;
 }
 
 .step .title {
@@ -156,6 +189,7 @@ canvas {
   margin-bottom: 18px;
   color: #111;
   line-height: 1.25;
+  cursor: default;
 }
 
 .step p {
@@ -179,206 +213,7 @@ canvas {
   text-underline-offset: 3px;
 }
 
-#closing {
-  max-width: 880px;
-  margin: 20px auto 90px auto;
-  padding: 0 28px;
-}
-
-#closing h2 {
-  font-size: 32px;
-  font-weight: 800;
-  margin-bottom: 16px;
-}
-
-#closing p {
-  font-size: 18px;
-  line-height: 1.65;
-  color: #444;
-}
-
- 
-@media (max-width: 1050px) {
-  #graphic {
-    display: block;
-    padding: 0 24px 90px 24px;
-  }
-
-  #sections {
-    width: 100%;
-    max-width: none;
-  }
-
-  #vis {
-    position: relative;
-    top: 0;
-    width: 100%;
-    min-height: 700px;
-    margin-bottom: 40px;
-  }
-
-  .step {
-    margin-bottom: 44px;
-    padding-right: 0;
-  }
-
-  #intro h1 {
-    font-size: 34px;
-  }
-}
-
-/* Interaction language
-   - Clickable elements are drawn in p5 with hover + hand cursor.
-   - Article notes and static data panels stay visually quiet and never use hover styling.
-*/
-#vis canvas {
-  user-select: none;
-}
-
-.step {
-  cursor: default;
-}
-
-.step .title {
-  cursor: default;
-}
-
-#closing,
-#intro {
-  cursor: default;
-}
-.author-info {
-  margin-top: 54px;
-  padding-top: 34px;
-  border-top: 1px solid #d8d0c8;
-}
-
-.author-info h3 {
-  margin: 0 0 22px 0;
-  color: #111;
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.author-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 34px;
-}
-
-.author-card {
-  padding-left: 18px;
-  border-left: 4px solid #4d3f8f;
-}
-
-.author-card h4 {
-  margin: 0 0 10px 0;
-  color: #2f276f;
-  font-size: 19px;
-  font-weight: 800;
-}
-
-.author-card p {
-  margin: 0;
-  color: #444;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-@media (max-width: 760px) {
-  .author-grid {
-    grid-template-columns: 1fr;
-    gap: 26px;
-  }
-}
-
-.article-meta {
-  margin: -6px 0 22px 0;
-  color: #6b7280;
-  font-size: 14px;
-  font-weight: 650;
-  letter-spacing: 0.01em;
-}
-
-.closing-eyebrow {
-  margin-bottom: 8px;
-}
-
-.closing-notes {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 34px;
-  margin-top: 44px;
-  padding-top: 32px;
-  border-top: 1px solid #d8d0c8;
-}
-
-.closing-note {
-  padding-left: 18px;
-  border-left: 4px solid #4d3f8f;
-}
-
-.closing-note h3 {
-  margin: 0 0 10px 0;
-  color: #2f276f;
-  font-size: 19px;
-  font-weight: 800;
-}
-
-.closing-note p {
-  margin: 0;
-  color: #444;
-  font-size: 16px;
-  line-height: 1.62;
-}
-
-.author-info {
-  margin-top: 54px;
-  padding-top: 34px;
-  border-top: 1px solid #d8d0c8;
-}
-
-.author-info h3 {
-  margin: 0 0 24px 0;
-  color: #111;
-  font-size: 24px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-}
-
-.author-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 34px;
-}
-
-.author-card {
-  padding-left: 18px;
-  border-left: 4px solid #4d3f8f;
-}
-
-.author-card h4 {
-  margin: 0 0 10px 0;
-  color: #2f276f;
-  font-size: 19px;
-  font-weight: 800;
-}
-
-.author-card p {
-  margin: 0;
-  color: #444;
-  font-size: 16px;
-  line-height: 1.6;
-}
-
-@media (max-width: 760px) {
-  .closing-notes,
-  .author-grid {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-}
+/* Reading notes */
 
 .reading-note {
   margin-top: 26px;
@@ -407,6 +242,8 @@ canvas {
   color: #6b7280;
   font-size: 14px;
 }
+
+/* Intro callouts */
 
 .article-callout {
   margin: 28px 0;
@@ -452,6 +289,83 @@ canvas {
 .article-callout.muted p {
   color: #6b7280;
 }
+
+/* Intro pills */
+
+.intro-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.intro-pills span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 13px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #e2dcd3;
+  color: #444;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+/* Closing */
+
+#closing {
+  max-width: 880px;
+  margin: 20px auto 90px auto;
+  padding: 0 28px;
+  cursor: default;
+}
+
+#closing h2 {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+#closing p {
+  font-size: 18px;
+  line-height: 1.65;
+  color: #444;
+}
+
+.closing-eyebrow {
+  margin-bottom: 8px;
+}
+
+.closing-notes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+  margin-top: 44px;
+  padding-top: 32px;
+  border-top: 1px solid #d8d0c8;
+}
+
+.closing-note {
+  padding-left: 18px;
+  border-left: 4px solid #4d3f8f;
+}
+
+.closing-note h3 {
+  margin: 0 0 10px 0;
+  color: #2f276f;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.closing-note p {
+  margin: 0;
+  color: #444;
+  font-size: 16px;
+  line-height: 1.62;
+}
+
+/* Threshold section */
 
 .threshold-info {
   margin-top: 54px;
@@ -501,12 +415,48 @@ canvas {
   line-height: 1.55;
 }
 
-@media (max-width: 760px) {
-  .threshold-grid {
-    grid-template-columns: 1fr;
-    gap: 24px;
-  }
+/* Author section */
+
+.author-info {
+  margin-top: 54px;
+  padding-top: 34px;
+  border-top: 1px solid #d8d0c8;
 }
+
+.author-info h3 {
+  margin: 0 0 24px 0;
+  color: #111;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.author-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+}
+
+.author-card {
+  padding-left: 18px;
+  border-left: 4px solid #4d3f8f;
+}
+
+.author-card h4 {
+  margin: 0 0 10px 0;
+  color: #2f276f;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.author-card p {
+  margin: 0;
+  color: #444;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Footer */
 
 #article-footer {
   margin: 20px auto 0 auto;
@@ -543,6 +493,100 @@ canvas {
   color: #2f276f;
 }
 
+/* Interaction language
+   - Clickable elements are drawn in p5 with hover + hand cursor.
+   - Article notes and static data panels stay visually quiet and never use hover styling.
+*/
+
+#vis canvas {
+  user-select: none;
+}
+
+#intro {
+  cursor: default;
+}
+
 html {
   scroll-behavior: smooth;
+}
+
+/* Responsive */
+
+@media (max-width: 1050px) {
+  body {
+    padding-top: 58px;
+  }
+
+  #site-header {
+    height: 58px;
+    padding: 0 18px;
+  }
+
+  .header-left {
+    gap: 18px;
+  }
+
+  #site-title {
+    font-size: 20px;
+  }
+
+  #site-subtitle {
+    font-size: 14px;
+  }
+
+  #header-status {
+    display: none;
+  }
+
+  #graphic {
+    display: block;
+    padding: 0 24px 90px 24px;
+  }
+
+  #sections {
+    width: 100%;
+    max-width: none;
+  }
+
+  #vis {
+    position: relative;
+    top: 0;
+    width: 100%;
+    min-height: 700px;
+    margin-bottom: 40px;
+  }
+
+  .step {
+    margin-bottom: 44px;
+    padding-right: 0;
+  }
+
+  #intro h1 {
+    font-size: 34px;
+  }
+}
+
+@media (max-width: 760px) {
+  #site-header {
+    justify-content: flex-start;
+  }
+
+  .header-left {
+    display: block;
+  }
+
+  #site-title {
+    font-size: 18px;
+  }
+
+  #site-subtitle {
+    display: none;
+  }
+
+  .closing-notes,
+  .author-grid,
+  .threshold-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
 }
