@@ -16,13 +16,18 @@ function startP5() {
             h = Math.round(w * (520 / 600));
         } else {
             margin = { top: 0, left: 80, bottom: 4, right: 10 };
-            var isFullViz = !!(document.querySelector('#graphic.layout-full-viz'));
-            var rawW = isFullViz
-                ? Math.round(window.innerWidth) - 40
-                : Math.round(window.innerWidth * 0.70) - 60;
-            var availW = rawW - margin.left - margin.right;
-            var wFromHeight = Math.round((window.innerHeight - 120) * (600 / 520)) - margin.left - margin.right;
-            w = Math.min(availW, wFromHeight);
+            // Read the actual #vis element dimensions so the canvas always fits,
+            // regardless of which layout (normal / full-viz / full-text) is active.
+            var visEl = document.getElementById('vis');
+            var cw = (visEl && visEl.clientWidth > 0)
+                ? visEl.clientWidth
+                : (Math.round(window.innerWidth * 0.70) - 60);
+            var ch = (visEl && visEl.clientHeight > 0)
+                ? visEl.clientHeight
+                : (window.innerHeight - 68);
+            var maxFromW = cw - margin.left - margin.right;
+            var maxFromH = Math.round((ch - margin.bottom - 16) * (600 / 520));
+            w = Math.max(1, Math.min(maxFromW, maxFromH));
             h = Math.round(w * (520 / 600));
         }
         return { width: w, height: h, margin: margin };
@@ -45,6 +50,13 @@ function startP5() {
         // create the p5 instance bound to this manager
         var self = this;
         var sketch = function (p) {
+            p.preload = function () {
+                // Call preload for the current renderer if it exists
+                if (localRenderer && localRenderer.preload) {
+                    localRenderer.preload(p);
+                }
+            };
+
             p.setup = function () {
                 var parent = document.getElementById('vis');
                 parent.innerHTML = '';
@@ -66,7 +78,7 @@ function startP5() {
             };
 
             p.draw = function () {
-                p.background(255);
+                p.background(0);
                 self.draw(p);
 
                 // scroll in/out transition using progress
@@ -90,11 +102,16 @@ function startP5() {
                 p.canvas.style.transform = 'translateY(' + tx.toFixed(2) + 'px)';
                 p.canvas.style.opacity = op.toFixed(3);
 
-                // mirror transition on the active text step
+                // mirror transition on the active text step (skip full-text sections — no viz to sync with)
                 var activeStep = document.querySelector('.step[data-active-index="' + (self.state.activeIndex || 0) + '"]');
                 if (activeStep) {
-                    activeStep.style.transform = 'translateY(' + tx.toFixed(2) + 'px)';
-                    activeStep.style.opacity = op.toFixed(3);
+                    if (activeStep.dataset.layout === 'full-text') {
+                        activeStep.style.transform = '';
+                        activeStep.style.opacity = '';
+                    } else {
+                        activeStep.style.transform = 'translateY(' + tx.toFixed(2) + 'px)';
+                        activeStep.style.opacity = op.toFixed(3);
+                    }
                 }
 
                 var dbg = document.getElementById('debug-state');

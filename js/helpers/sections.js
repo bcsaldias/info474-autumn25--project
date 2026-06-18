@@ -93,8 +93,14 @@
 
                     sc.on('active', function (index) {
                         // highlight steps (light coupling — just visual text opacity)
+                        // full-text sections manage their own visibility; skip them
+                        console.log('active index:', index, 'mapped:', mappedIndex, 'layout:', sc.steps[index] && sc.steps[index].dataset.layout);
                         document.querySelectorAll('.step').forEach(function (el, i) {
-                            el.style.opacity = (i === index) ? '1' : '0.1';
+                            if (el.dataset.layout === 'full-text') {
+                                el.style.opacity = (i === index) ? '1' : '0';
+                            } else {
+                                el.style.opacity = (i === index) ? '1' : '0';
+                            }
                         });
 
                         // apply layout class from data-layout attribute
@@ -109,6 +115,16 @@
                                     window.__sketchAPI.p5.windowResized();
                                 }
                             });
+                        }
+
+                        var vis = document.querySelector(cfg.visSelector);
+                        if (vis) {
+                            var activeLayout = sc.steps[index] && sc.steps[index].dataset && sc.steps[index].dataset.layout;
+                            if (activeLayout === 'full-text') {
+                                vis.style.visibility = 'hidden';
+                            } else {
+                                vis.style.visibility = 'visible';
+                            }
                         }
 
                         // Determine if the active step defines a custom active-index
@@ -133,6 +149,7 @@
                     sc.on('progress', function (index, progress) {
                         // Map index to any per-section activeIndex so the sketch receives
                         // a consistent activeIndex value during progress updates.
+                        console.log('progress index:', index, 'progress:', progress);
                         var mappedIndex = index;
                         try {
                             var stepEl = (sc.steps && sc.steps[index]) ? sc.steps[index] : document.querySelectorAll(cfg.stepSelector)[index];

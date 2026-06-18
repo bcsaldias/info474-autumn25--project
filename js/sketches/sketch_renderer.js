@@ -4,6 +4,26 @@
 (function () {
     window.Renderer = {
 
+        preload: function (p) {
+            // Preload all visualizations that need data loading
+            if (window.VizLineChart && window.VizLineChart.preload) {
+                window.VizLineChart.preload(p);
+            }
+            if (window.VizHousing && window.VizHousing.preload) {
+                window.VizHousing.preload(p);
+            }
+            if (window.VizPayIndex && window.VizPayIndex.preload) {
+                window.VizPayIndex.preload(p);
+            }
+            if (window.VizRentCap && window.VizRentCap.preload) {
+                window.VizRentCap.preload(p);
+            }
+
+            if (window.VizCategories && window.VizCategories.preload) {
+                window.VizCategories.preload(p);
+            }
+        },
+
         setData: function (manager) {
             var self = this;
 
@@ -20,23 +40,50 @@
 
         draw: function (p, manager, ai, progress) {
 
-            if (ai === 0 || ai === 1) {
-                window.VizTitle.draw(p, manager, ai, progress);
+            if (ai == 0 || ai == 6 || ai === 9 || ai === 10) return;
+
+            if (ai === 1) {
+                window.VizLineChart.draw(p, manager, ai, progress);
+                return;
+            } else {
+                if (window.VizLineChart &&
+                    window.VizLineChart.resetAnimation) {
+                    window.VizLineChart.resetAnimation();
+                }
+            }
+
+            if (ai == 2) {
+                window.VizCategories.draw(p, manager, ai, progress);
                 return;
             }
 
-            if (ai === 6  || ai === 9) {
+            if (ai === 6) {
                 window.VizProgressColor.draw(p, manager, ai, progress);
                 return;
             }
 
-            if ((ai >= 4 && ai < 6)) {
-                window.VizScatter.draw(p, manager, ai, progress);
+            if (ai === 4) {
+                window.VizHousing.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai === 5) {
+                window.VizPayIndex.draw(p, manager, ai, progress);
                 return;
             }
 
             if (ai === 7) {
-                window.VizBar.draw(p, manager, ai, progress);
+                window.VizRentCap.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai === 8) {
+                window.VizTimeline.draw(p, manager, ai, progress);
+                return;
+            }
+
+            if (ai === 3) {
+                window.GroceryBasket.draw(p, manager, ai, progress);
                 return;
             }
         }

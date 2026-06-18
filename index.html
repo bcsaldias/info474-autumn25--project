@@ -4,85 +4,210 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>IMT 561 Data Visualization: Design and Development</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
 </head>
 
 <body>
   <header id="site-header">
-    <span id="site-title">Your Project Title</span>
+    <span id="site-title">Is Washington State Still Affordable?</span>
     <span id="site-course">IMT 561 Data Visualization: Design and Development</span>
     <span id="debug-state"></span>
   </header>
   <div class="container">
     <div id='graphic'>
       <div id='sections'>
-        <section class="step" data-active-index="0">
-          <div class="title">IMT 561 Final Project</div>
-          Here is a template to work on your final project.<br /><br />
-          Your mission is to create an <b>interactive article using P5.js</b>.
+        <section class="step hero-section" data-active-index="0" data-layout="full-text">
+          <div class="hero-eyebrow">Washington State &nbsp;·&nbsp; 2026</div>
+          <div class="hero-title">
+            <span class="hero-title-main">Is Washington State</span>
+            <span class="hero-title-accent">Still Affordable?</span>
+          </div>
+          <p class="hero-body">
+            If you've been grocery shopping lately, you may have noticed your cart feels a little
+            lighter for the same $20. If you're renting, you know the feeling of opening a lease
+            renewal and holding your breath. If you're working full-time and still watching your
+            savings thin out, you're not imagining it, and you're not alone.
+          </p>
+          <p class="hero-body">
+            Over the past two decades, the cost of living in Washington State has climbed faster
+            than most paychecks can follow. Housing, food, gas, and healthcare have all risen, and
+            while wages have grown, they haven't kept up.
+          </p>
+          <p class="hero-body">
+            This piece follows that story through the numbers: what has gotten more expensive, who
+            is feeling it most, and what Washington has begun to do about it.
+          </p>
+          <p class="hero-note">
+            <b style="color: #F4A261;">For best experience, please view this article in a full browser window.</b>
+          </p>
+          <p class="hero-note">
+            <b>Data note:</b> CPI data is from the U.S. Bureau of Labor Statistics for the
+            Seattle-Tacoma-Bellevue metro area. It measures price changes relative to each region's own base period.
+            Data is bimonthly and not seasonally adjusted.
+          </p>
         </section>
         <section class="step" data-active-index="1">
-          <div class="title">Sections</div>
-          Note that each section in index.html corresponds to a section in the
-          scrolling article. You can add or remove sections as needed.
+          <div class="title">Inflation Trend</div>
+          <p class="hero-body">
+          Prices in Washington State have risen dramatically since 2000. After a relatively
+          steady increase through the 2000s and 2010s, inflation
+          <b style="color: #F4A261;">surged following the COVID-19 pandemic</b>.
+          Supply chain disruptions, increased consumer demand, and federal stimulus contributed
+          to the sharp rise in prices between 2021 and 2023.
+
+          Although Seattle is already one of the most expensive metro areas in the country, its overall inflation
+          trend closely followed the national average. In Seattle, the cost of the same basket of
+          goods is now <b style="color: #F4A261;">more than double</b> what it was in 2000.
+          </p> 
+          <p class="hero-note">
+            <b>Data note:</b> Cumulative CPI Change is rebased to 2000. For example, 29% on June 2009, means that prices
+            in June 2009 were 29% higher than in June 2000. Inflation rate of 4.2% in the same month, means that prices
+            increased by 4.2% compared to the previous year (June 2008).
+          </p>
+
+
         </section>
         <section class="step" data-active-index="2">
-          <div class="title">No visualization</div>
-          You don't need to have a visualization for every section. Some sections may simply be text.
+          <div class="title">Not All Prices Rise Equally</div>
+          <p class="hero-body">
+            While the overall Consumer Price Index shows the broad trend, the
+            categories people rely on every day tell a more uneven story.
+            <br>
+            <br>
+            Since 2000, <b style="color: #F4A261;">housing</b> costs in Seattle have risen steadily, climbing far faster than most other categories.
+            <b style="color: #F4A261;">Medical care</b> has also increased consistently over time, continuing upward regardless of recessions or short
+            term economic swings. The most noticeable increase is <b style="color: #F4A261;">gas</b>, with a cumulative CPI of
+            <b style="color: #F4A261;">315.7%</b> in August 2023. These are expenses households cannot easily cut back on. Rent must still be paid, and
+            healthcare remains necessary even when budgets tighten. <b style="color: #2DA3EE;">Apparel</b> stands in sharp contrast. Prices have remained relatively flat for much of the past 25 years, and at times even declined.
+            Altogether, these trends show that inflation does not affect all goods and services equally. The largest
+            increases have occurred in essentials like housing, healthcare, and gas, categories that make up
+            a significant share of spending for low and moderate income households.
+          </p>
         </section>
         <section class="step" data-active-index="3">
-          <div class="title">Narrative</div>
-          These sections will tell a story. You can use them to explain the visualization, provide context,
-          or share insights.
+          <div class="title">How the $20 Grocery Cart Changed from 2006 to 2026</div>
+          <p>
+            A <b style="color: #F4A261;">$20 grocery budget</b> goes much less far today than it did in 2006. This visualization tracks how rising food
+            prices in Washington State changed a typical grocery basket over two decades. While staples like bread,
+            milk, and eggs remain, more expensive items such as <b style="color: #F4A261;">beef and fresh produce</b> gradually disappear. The
+            shrinking basket shows how inflation affects <b style="color: #F4A261;">food choices, nutrition and everyday quality of life</b>.
+          </p>
+
         </section>
         <section class="step" data-active-index="4">
-          <div class="title">Be creative</div>
-          Surprise your readers with interesting interactions, animations, or data visualizations.
+          <div class="title">Rent Cost Burden</div>
+          <p>
+            In Washington State, more renters are spending <b style="color: #F4A261;">over half of their income on rent</b>.
+            From 2010 to 2022, the number of severely cost-burdened renter households rose
+            from about <b style="color: #2DA3EE;">430,000</b> to more than <b style="color: #F4A261;">520,000</b>.
+          </p>
+
+          <p>
+            But the pressure is not shared equally. Renters earning less than
+            <b style="color: #F4A261;">80% of HAMFI</b> make up the vast majority of affected households
+            every year, usually around <b style="color: #F4A261;">85% to 90%</b> of the total.
+            Middle- and higher-income renters appear in the data, but their shares remain much smaller.
+          </p>
+
+          <p>
+            Washington’s rent crisis is growing, but it is still
+            <b style="color: #F4A261;">hitting low-income renters the hardest</b>. The data points to an urgent need for deeply affordable housing and
+            stronger support for lower-income households.
+          </p>
         </section>
         <section class="step" data-active-index="5">
-          <div class="title">Same visualization multiple sections</div>
-          Some visualizations may be relevant to multiple sections. You can reuse the same visualization
-          across different sections to reinforce key points. Or build on the previous visualization to just add on.
+          <div class="title"> Growth vs. Inflation</div>
+          <p>
+            Washington State’s economy has become significantly more productive over the past 25 years, but worker pay
+            has not kept pace. Using 1999 as a baseline, this visualization compares growth in productivity, real wages,
+            and consumer prices. By 2025, productivity had increased by
+            <b style="color: #2DA3EE;">more than 50%</b>, while real pay rose by only about
+            <b style="color: #F4A261;">30%</b>. Meanwhile, prices climbed
+            <b style="color: #F4A261;">nearly 90%</b>, driven by inflation in recent years. The widening gap highlights
+            a growing challenge for workers: even as the economy produces more, rising living costs continue to outpace
+            wage growth.
+          </p>
         </section>
-        <div id="extra-space">
-        </div>
-        <section class="step" data-active-index="6">
-          <div class="title">Examples</div>
-          There is two examples in this code. One is a grid of circles that changes color
-          based on the section index. The other is a scatter plot and bar chart that
-          shows random data points. You can modify or replace these examples with your own visualizations.
-          Make sure you read both source files to understand how they work.
+        <section class="step" data-active-index="6" data-layout="full-text">
+          <div class="title-6">When housing and basic expenses rise faster than paychecks, states respond in two
+            directions:
+            reduce what households pay, or increase what households keep.</div>
+
         </section>
         <section class="step" data-active-index="7">
-          <div class="title">Best of Luck in the Project!</div>
-          You are now ready to start building your interactive article. Good luck!
+          <div class="title">Reduce What Households Pay: Washington Rent Growth Slows as New Cap Takes Effect</div>
+          <p>
+            Average rents in Washington State have continued to climb, surpassing
+            <b style="color: #F4A261;">$2,000 per month</b> by 2025. However,
+            rent growth has <b style="color: #2DA3EE;">slowed sharply</b> from the double-digit increases seen during the pandemic housing boom. This
+            visualization compares rising rent levels with annual growth rates and the new statewide rent cap
+            established under <b style="color: #2DA3EE;">HB 1217</b>. As the policy takes effect in 2025, it marks a new effort to limit future rent
+            increases and improve housing affordability for renters.
+          </p>
         </section>
-        <section class="step" data-active-index="8" data-layout="full-text">
-          <div class="title">Full-text section</div>
-          Add <code>data-layout="full-text"</code> to a section to hide the visualization and
+        <section class="step" data-active-index="8">
+          <div class="title">Increase What Households Keep: Working Families Tax Credit</div>
+          <!-- Add <code>data-layout="full-text"</code> to a section to hide the visualization and
           give the text the full width of the screen. Use this for introductions, transitions,
           or any moment where the data should step aside and the writing takes center stage.<br /><br />
           This is a good place for a pull quote, a key finding stated plainly, or a paragraph
-          that needs room to breathe without competing with a chart.
+          that needs room to breathe without competing with a chart. -->
+          Washington State created the <b style="color: #2DA3EE;">Working Families Tax Credit (WFTC)</b> in 2008 to help offset the tax burden on
+          low-income workers. Modeled after the federal Earned Income Tax Credit, the program was designed to return
+          some sales tax revenue to low- and moderate-income households. Because Washington does not have a state income
+          tax, <b style="color: #F4A261;">lower-income residents often pay a larger share of their income through sales taxes</b>.
+          Although the law passed in 2008, the program went <b style="color: #F4A261;">unfunded for more than a decade</b>. During that time,
+          Washington experienced the 2008 financial crisis, rising housing costs, and increasing living expenses. In
+          2021, as inflation and living costs surged following the COVID-19 pandemic, the legislature finally funded the
+          credit. The first payments were distributed in <b style="color: #2DA3EE;">2023</b>. Today, the program is managed by the Washington State
+          Department of Revenue and aims to support the financial stability of low- and moderate-income residents across
+          the state.
+          <p class="hero-note">Learn More: <a href="https://wcaap.org/washingtons-working-families-tax-credit/" target="_blank">https://wcaap.org/washingtons-working-families-tax-credit/</a></p>
+
         </section>
-        <section class="step" data-active-index="9" data-layout="full-viz">
-          <div class="title">Full-visualization section</div>
-          Add <code>data-layout="full-viz"</code> to a section to expand the visualization
-          to the full screen width. The text column disappears and the sketch fills the space.
-          Use this for a dramatic reveal, a dense chart that needs every pixel, or a
-          cinematic moment in your story.
+        <section class="step" data-active-index="9" data-layout="full-text">
+          <div class="title">Is Washington Still Affordable?</div>
+          <p class="hero-body">
+            For many residents, the answer is no, not the way it used to be.
+          </p>
+          <p class="hero-body">
+            Prices have more than doubled since 2000. Rent now averages over $2,000 a month
+            statewide, and nearly one in four renter households spends more than half their income
+            on housing. Wages have grown, but not fast enough to keep pace.
+          </p>
+          <p class="hero-body">
+            Washington has taken steps to respond. A new rent cap limits annual increases, and the
+            Working Families Tax Credit puts money back into the hands of lower-income households.
+            Both are meaningful. Neither is enough on its own.
+          </p>
+          <p class="hero-body">
+            Affordability is shaped by policy choices made each legislative session in Olympia.
+            For Washington residents, those choices are worth watching.
+          </p>
+          <p class="hero-note">
+            <b>Take action:</b> Washington residents who qualify for the Working Families Tax Credit
+            can apply through the
+            <a href="https://dor.wa.gov/taxes-rates/tax-incentives/working-families-tax-credit" target="_blank">Washington State Department of Revenue</a>.
+            Many eligible households have not yet applied.
+          </p>
         </section>
         <section class="step author-section" data-active-index="10" data-layout="full-text">
           <div class="title">About the Authors</div>
           <div class="authors">
             <div class="author">
-              <div class="author-name">Author One</div>
-              <div class="author-bio">Brief bio or affiliation. Describe your background, research interests, or role in this project.</div>
+              <div class="author-name">Sunghee Park</div>
+              <div class="author-bio">I am a senior in Informatics Program at the University of Washington focusing on Data Science.</div>
             </div>
             <div class="author">
-              <div class="author-name">Author Two</div>
-              <div class="author-bio">Brief bio or affiliation. Describe your background, research interests, or role in this project.</div>
+              <div class="author-name">Christie Dong</div>
+              <div class="author-bio">I am a master's student in Information Management at the University of Washington,
+                focusing on data analytics and human-centered AI.
+
+                This quarter I want to improve my skills in interactive visualization and storytelling with data.</div>
             </div>
           </div>
         </section>
@@ -113,11 +238,17 @@
 
   <!-- sketches (renderers): UPDATE HERE FOR PROJECT -->
   <script src="js/sketches/viz/viz_title.js"></script>
+  <script src="js/sketches/viz/viz_linechart.js"></script>
+  <script src="js/sketches/viz/viz_timeline.js"></script>
   <script src="js/sketches/viz/viz_progress_color.js"></script>
+  <script src="js/sketches/viz/viz_housing.js"></script>
+  <script src="js/sketches/viz/viz_pay_index.js"></script>
+  <script src="js/sketches/viz/viz_rent_cap.js"></script>
   <script src="js/sketches/viz/viz_scatter.js"></script>
   <script src="js/sketches/viz/viz_bar.js"></script>
+  <script src="js/sketches/viz/grocery_basket.js"></script>
   <script src="js/sketches/sketch_renderer.js"></script>
-
+  <script src="js/sketches/viz/viz_categories.js"></script>
 
 </body>
 
